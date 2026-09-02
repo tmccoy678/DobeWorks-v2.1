@@ -15,6 +15,7 @@ Preliminary clearance research is retained only as future reference. It does not
 - [Context map](CONTEXT-MAP.md)
 - [Project language](CONTEXT.md)
 - [Operational System](contexts/operational-system/README.md)
+- [DobeWorks Engineering Assurance Standard v1.0](docs/standards/deas/v1/standard.md)
 - [Decision records](docs/adr/)
 - [Future-public-use preliminary clearance research](docs/research/preliminary-clearance-2026-08-31.md)
 - [Private Source manifest](references/source-manifest.md)

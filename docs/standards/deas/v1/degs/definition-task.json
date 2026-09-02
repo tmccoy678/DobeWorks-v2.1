@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "task_id": "DEGS-T1-DW-ENGINEERING-ASSURANCE-V1-DEFINE-20260902",
+  "task_author": "Codex in Taylor AI Workbench",
+  "title": "Define DobeWorks Engineering Assurance Standard v1.0",
+  "objective": "Define and validate DEAS v1.0 after preserving the exact Phase 1 and Phase 2 Generation 1 commits, prove Generation 1 fails the new semantic checks, define but do not execute Generation 2, and stop before remediation or merge.",
+  "stakeholders": ["Taylor"],
+  "scope": {
+    "description": "The exact 14-path C3 definition surface on deas/v1-phase2-generation-2, following the frozen C1 and C2 commits.",
+    "read_only": false
+  },
+  "non_goals": [
+    "Execute or create the Generation 2 correction",
+    "Merge or change main",
+    "Adopt DEAS outside the DobeWorks repository",
+    "Begin Phase 3, assign a Role Disposition, qualify, or release",
+    "Access or change devices, storage, credentials, permissions, private sources, repository settings, collaborators, or unrelated files",
+    "Amend, rebase, reset, force-push, delete, or rewrite history"
+  ],
+  "authority_lane": "TAYLOR_AI_WORKBENCH",
+  "risk_tier": "TIER_1",
+  "requirements": [
+    "Define Core, Strict, and Exploratory profiles and Python, Document, Evidence, Validator, AI-Assisted, and Git overlays.",
+    "Define and enforce DEAS-PRE-001 through DEAS-PRE-010.",
+    "Provide static, semantic, validation, negative-test, exception, identity, rollback, and Git-first controls.",
+    "Require Generation 1 to fail exactly six frozen semantic findings.",
+    "Require Generation 2 conformance PASS to combine the exact manifest and Phase 2 public result with independent task, report, preservation, Role Disposition, DEGS, and DEAS checks.",
+    "Bound public text inputs and subprocess waits and outputs, reject unexpected diagnostics, parse structured results completely, and test timeout, exhaustion, and diagnostic paths.",
+    "Define the exact no-exception Generation 2 transformation without executing it.",
+    "Preserve the separate merge, release, Phase 3, Role Disposition, and cross-workspace authority boundaries."
+  ],
+  "acceptance_criteria": [
+    "The public DEAS validator CLI tests pass.",
+    "Definition validation passes with three profiles, six overlays, ten invariants, matching Generation 1 findings, and a verified artifact manifest.",
+    "Direct Generation 1 conformance exits 1 with exactly the frozen six findings.",
+    "The task JSON validates and DEGS evaluates PASS.",
+    "Syntax, Strict function-size, JSON, links, diff, hash, and secret checks pass.",
+    "The C3 commit changes exactly 14 paths and the private draft PR remains unmerged.",
+    "No Generation 2 artifact or excluded action occurs."
+  ],
+  "assumptions": [
+    "C1 is 56a54533bf88118c121d8e9ea4770a66ce9d2376.",
+    "C2 and the immutable Generation 1 baseline are f45ae80c64a0aa8c723a5a58b4fbc7073682d349.",
+    "The exact 28 predecessor bytes remain represented by manifest 9ed515ac90cc100bae3d3a3baa674d6c2a200f5e18b3da4d7b4daaf979ac8d77."
+  ],
+  "invariants": [
+    "DEGS-SEC-003",
+    "DEGS-SEC-002",
+    "DEGS-AI-004",
+    "DEGS-DATA-001",
+    "DEGS-RISK-003",
+    "DEGS-CFG-001",
+    "DEGS-SEC-004",
+    "DEGS-SEC-005",
+    "DEGS-SEC-006",
+    "DEGS-AI-003",
+    "DEGS-AI-002",
+    "DEGS-AI-006",
+    "DEGS-OPS-002",
+    "DEGS-OPS-004",
+    "DEGS-DATA-002",
+    "DEGS-DATA-003",
+    "DEGS-RISK-006",
+    "DEGS-OPS-001",
+    "DEGS-CFG-002",
+    "DEGS-CFG-003",
+    "DEGS-REQ-001"
+  ],
+  "baseline": {
+    "status": "VERIFIED",
+    "evidence_path": "../validation/validation-report.md"
+  },
+  "alternatives": [
+    "Use the C-specific Power of Ten rules literally",
+    "Rely on review without preventive invariants",
+    "Correct Generation 1 in place",
+    "Adopt the standard across workspaces before establishing one committed baseline"
+  ],
+  "selected_design": "A prospective profile-and-overlay standard with deterministic public-seam validation, immutable generations, explicit human-controlled exceptions, and Git-first evidence.",
+  "affected_files": [
+    "AGENTS.md",
+    "README.md",
+    "docs/adr/0014-adopt-deas-v1.md",
+    "docs/standards/deas/v1/standard.md",
+    "docs/standards/deas/v1/source-register.md",
+    "docs/standards/deas/v1/enforcement-matrix.md",
+    "docs/standards/deas/v1/phase2-generation-2-plan.md",
+    "docs/standards/deas/v1/validation/validate_deas.py",
+    "docs/standards/deas/v1/validation/test_validate_deas.py",
+    "docs/standards/deas/v1/validation/generation-1-expected-findings.json",
+    "docs/standards/deas/v1/validation/validation-report.md",
+    "docs/standards/deas/v1/degs/definition-task.json",
+    "docs/standards/deas/v1/handoff.md",
+    "docs/standards/deas/v1/deas-v1-sha256.txt"
+  ],
+  "backup": {
+    "required": true,
+    "status": "VERIFIED",
+    "evidence_path": "../validation/validation-report.md"
+  },
+  "rollback": {
+    "required": true,
+    "status": "VERIFIED",
+    "procedure": "Preserve the exact branch, commits, remote, manifest, task evidence, and owned lock on failure. Do not amend, reset, rebase, force-push, delete, merge, or automatically roll back.",
+    "evidence_path": "../handoff.md"
+  },
+  "risk_analysis": {
+    "status": "NOT_REQUIRED",
+    "summary": "Tier 1 reversible private-repository documentation and validator work bounded by exact paths, frozen predecessors, deterministic checks, an early remote branch, and a draft pull request."
+  },
+  "tests": {
+    "static": [
+      {"status": "PASS", "evidence_path": "../validation/validation-report.md"}
+    ],
+    "positive": [
+      {"status": "PASS", "evidence_path": "../validation/validation-report.md"}
+    ],
+    "negative": [
+      {"status": "PASS", "evidence_path": "../validation/generation-1-expected-findings.json"}
+    ],
+    "security": [
+      {"status": "PASS", "evidence_path": "../validation/validation-report.md"}
+    ],
+    "failure_path": [
+      {"status": "PASS", "evidence_path": "../validation/validation-report.md"}
+    ],
+    "integration": [
+      {"status": "PASS", "evidence_path": "../validation/validation-report.md"}
+    ],
+    "end_to_end": []
+  },
+  "verification": {"status": "PASS", "evidence_path": "../validation/validation-report.md"},
+  "validation": {"status": "PASS", "evidence_path": "../validation/validation-report.md"},
+  "independent_review": {
+    "required": true,
+    "status": "PASS",
+    "kind": "REVIEW",
+    "reviewer": "Beauvoir and Boyle",
+    "reviewer_role": "INDEPENDENT_STANDARDS_AND_SPEC_REVIEW",
+    "open_issues_status": "NONE",
+    "retest_status": "PASS",
+    "evidence_path": "../validation/validation-report.md"
+  },
+  "human_approval": {
+    "required": true,
+    "status": "APPROVED",
+    "approver": "Taylor",
+    "approver_role": "HUMAN",
+    "approval_mode": "OUT_OF_BAND",
+    "evidence_path": "../source-register.md"
+  },
+  "recovery_validation": {"required": false, "status": "NOT_REQUIRED"},
+  "target_identity": "C2 f45ae80c64a0aa8c723a5a58b4fbc7073682d349 plus the exact C3 paths and deas-v1-sha256.txt.",
+  "blast_radius": "Exactly 14 C3 paths on one private task branch and draft pull request; no main, merge, release, device, storage, credential, or cross-workspace change.",
+  "stop_conditions": [
+    "A predecessor, branch, path, byte, manifest, private-remote, task-lock, or writer check changes unexpectedly.",
+    "Any required check fails and cannot be corrected within the exact C3 authority, outside the expected Generation 1 nonconformance.",
+    "Any exception, unsupported fact, path expansion, authentication interaction, non-fast-forward push, or review finding requiring scope expansion becomes necessary.",
+    "Any Generation 2 mutation, merge, root adoption, Phase 3, release, Role Disposition, device, storage, credential, permission, physical, destructive, security-setting, collaborator, or unrelated action would occur."
+  ],
+  "post_action_validation": {"status": "PENDING", "evidence_path": "../validation/validation-report.md"},
+  "dry_run": {
+    "applicable": true,
+    "performed": true,
+    "status": "PASS",
+    "evidence_path": "../validation/validation-report.md"
+  },
+  "telemetry": {"status": "PASS", "evidence_path": "../validation/validation-report.md"},
+  "documentation": {"status": "PASS", "evidence_path": "../standard.md"},
+  "handoff": {"status": "PASS", "evidence_path": "../handoff.md"},
+  "secret_handling": {"exposure_possible": false, "controlled": true},
+  "warnings": [],
+  "unresolved_items": [],
+  "status": "READY_FOR_EXECUTION"
+}

@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "generation": 1,
+  "baseline": {
+    "commit": "f45ae80c64a0aa8c723a5a58b4fbc7073682d349",
+    "manifest_sha256": "9ed515ac90cc100bae3d3a3baa674d6c2a200f5e18b3da4d7b4daaf979ac8d77",
+    "artifacts": {
+      "AGENTS.md": "4f4d3a92a946dc4a82af61d137d6a69313394a6f7c2a5751e94a994420449d68",
+      "CONTEXT-MAP.md": "c5dcc4d379711ae7bad09312ab3df2e76efcc906bf9c4f72f541c0ba463c4a48",
+      "README.md": "f6c17d60c243ba4470f217da7265efcca994a4b15a3a10afcde29b03066d1a1e",
+      "contexts/operational-system/CONTEXT.md": "a829da81c9e8721615dae9299c08ff1336e327ee926938be3f7151ebcfec1f14",
+      "contexts/operational-system/README.md": "9d8e514f0e560413529074b424129ffd53229a5f2e9809562dad0d8cc4de976e",
+      "contexts/operational-system/docs/program/v1/decisions.md": "21cd53b6f0c4fc8a1da7f08266553047dac4e801ecfe72b6e49842b5e7104fe2",
+      "contexts/operational-system/docs/program/v1/evidence-and-audit-plan.md": "531e5e1c60e032d27740962050b76dd285417993884ae7c4079efc8e4c90d537",
+      "contexts/operational-system/docs/program/v1/fault-test-matrix.md": "f6e025c572bac2ad7ac4b22ba481f14aa6372b63f3a8fa67ae5cff39a7d59e89",
+      "contexts/operational-system/docs/program/v1/phase-2-entry-criteria.md": "1f4799ce6bcb7940b4bdb04efb361c89a4894d8407c58f3060bae1033c4e0ef5",
+      "contexts/operational-system/docs/program/v1/program-definition.md": "1bfefa024ae18c4d06a15422b67b3012bc8474c68ad8a232f945d519bb4d57d9",
+      "contexts/operational-system/docs/program/v1/provenance.md": "8b1f07ba812c511488db1ac5e7d8a9fb560b94cc855eb8d8ff7f9cbbbd461abd",
+      "contexts/operational-system/docs/program/v1/qualification/phase-2/degs/phase2-task.json": "6377c8a5f3d057e74b931f871d5f4e5434c1d2762a7e878f09e616939824e97b",
+      "contexts/operational-system/docs/program/v1/qualification/phase-2/discrepancies-and-unknowns.md": "f218d8b2441fee8b47f212ebeaf3a66cdc840e2dc055d58724dfe20bd88071fb",
+      "contexts/operational-system/docs/program/v1/qualification/phase-2/evidence-sha256.txt": "3901bb1d87659585092037d86d7f5291bd84091739f797dd56f51a4766476e80",
+      "contexts/operational-system/docs/program/v1/qualification/phase-2/evidence/command-log.md": "affe2c741e04b776c4f57e226ee352689bcd57426fdbdfd29c9425f55bfa8324",
+      "contexts/operational-system/docs/program/v1/qualification/phase-2/evidence/current-mac-baseline.md": "9478faa83b6367d8737325fb1136c2d9c90eabf42d64c52a715c0a533ca87eca",
+      "contexts/operational-system/docs/program/v1/qualification/phase-2/evidence/observer-surface.md": "9b772d85cf7b0124cfd7a6fd931e0b882866a52475d10c52fc652a348a8b0cdc",
+      "contexts/operational-system/docs/program/v1/qualification/phase-2/evidence/seagate-device-volume.md": "0be85cc8856ea610cad9239b8d163be0b4049e768bb170f852eb7b7909b76514",
+      "contexts/operational-system/docs/program/v1/qualification/phase-2/evidence/worker-candidate.md": "92b246de1e5e8c5c7b1ecd2fc4f88290ea77265ae89c9d4dde0c7e09503b79ac",
+      "contexts/operational-system/docs/program/v1/qualification/phase-2/handoff.md": "a7bd6a84094199ef46cab5dd3c1de852083f7619376973b02a254db0da8c5778",
+      "contexts/operational-system/docs/program/v1/qualification/phase-2/qualification-plan.md": "be393580f9db8b900fcbcca5a10585ae442a56f5c3bcdfdda968e4ac36fa9021",
+      "contexts/operational-system/docs/program/v1/qualification/phase-2/source-register.md": "ea6e7f3734bd12410a5c7e15abe8067561030fff4e12c3c3f924be66e3f90ee8",
+      "contexts/operational-system/docs/program/v1/qualification/phase-2/validation/validate_phase2.py": "e9d4ea4a3c527d26828fef3111c88d29571376c8283c993ad67c202c5b0419da",
+      "contexts/operational-system/docs/program/v1/qualification/phase-2/validation/validation-report.md": "d53354301c4718bc55e85c692cbffb30f8c576a4103e09f6c3ac7b08cf90cbb7",
+      "contexts/operational-system/docs/program/v1/requirements.md": "addb4d5c564866ad7115fa40b6e36189e3cb54397224d6c805a11fc431b168c0",
+      "contexts/operational-system/docs/program/v1/traceability-matrix.md": "ff3aa1f9f7046c69f8304e376be99a7c0511d685de66465eb6a4a1203f2aa771",
+      "docs/adr/0013-distinct-operational-system-context.md": "25e5bb641a1793244058daf34713e0f1e982efb66bcc09ac885fb0e506387960",
+      "docs/agents/domain.md": "9389b10d5d5177266c900e041284059f20b49ee61037183a4a45a9d73c2ee30d"
+    }
+  },
+  "expected_decision": "FAIL",
+  "findings": [
+    {
+      "message": "Completed Phase 2 evidence is still represented as planned or reserved.",
+      "path": "contexts/operational-system/docs/program/v1/traceability-matrix.md",
+      "rule_id": "DEAS-TRACE-001"
+    },
+    {
+      "message": "Phase 2 entry prerequisites remain unchecked although evidence collection is complete.",
+      "path": "contexts/operational-system/docs/program/v1/phase-2-entry-criteria.md",
+      "rule_id": "DEAS-PHASE-001"
+    },
+    {
+      "message": "Consequential evidence record omits one or more required contract fields.",
+      "path": "contexts/operational-system/docs/program/v1/qualification/phase-2/evidence/current-mac-baseline.md",
+      "rule_id": "DEAS-EVIDENCE-001"
+    },
+    {
+      "message": "Consequential evidence record omits one or more required contract fields.",
+      "path": "contexts/operational-system/docs/program/v1/qualification/phase-2/evidence/seagate-device-volume.md",
+      "rule_id": "DEAS-EVIDENCE-001"
+    },
+    {
+      "message": "Consequential evidence record omits one or more required contract fields.",
+      "path": "contexts/operational-system/docs/program/v1/qualification/phase-2/evidence/observer-surface.md",
+      "rule_id": "DEAS-EVIDENCE-001"
+    },
+    {
+      "message": "Consequential evidence record omits one or more required contract fields.",
+      "path": "contexts/operational-system/docs/program/v1/qualification/phase-2/evidence/worker-candidate.md",
+      "rule_id": "DEAS-EVIDENCE-001"
+    }
+  ]
+}
