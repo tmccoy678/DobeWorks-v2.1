@@ -12,4 +12,4 @@ The project uses the default five-role triage vocabulary. See `docs/agents/triag
 
 ### Domain docs
 
-The project uses a single-context domain layout with `CONTEXT.md` at the repository root and architectural decisions under `docs/adr/`. See `docs/agents/domain.md`.
+The project uses the multi-context layout in `CONTEXT-MAP.md`. The root `CONTEXT.md` owns the DobeWorks name, private scope, identity, and provenance; `contexts/operational-system/CONTEXT.md` owns Operational System language. Cross-context decisions live under `docs/adr/`, and future context-specific decisions live with their context. See `docs/agents/domain.md`.
