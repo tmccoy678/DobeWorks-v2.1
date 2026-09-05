@@ -22,6 +22,10 @@ GIT_TIMEOUT_SECONDS = 2
 PHASE2_TIMEOUT_SECONDS = 2
 DEGS_TIMEOUT_SECONDS = 5
 GENERATION_2_TASK_ID = "DEGS-T1-DW-HWSW-P2-GENERATION-2-20260902"
+DEFINITION_CORRECTION_TASK_ID = (
+    "DEGS-T1-DW-ENGINEERING-ASSURANCE-V1-CORRECT-20260905"
+)
+EXTERNAL_GATES = ("G7", "G8", "G9")
 VALIDATOR_REPOSITORY_ROOT = Path(__file__).resolve().parents[5]
 TRACE_PATH = "contexts/operational-system/docs/program/v1/traceability-matrix.md"
 ENTRY_PATH = "contexts/operational-system/docs/program/v1/phase-2-entry-criteria.md"
@@ -42,6 +46,11 @@ EVIDENCE_PATHS = (
 PHASE2_VALIDATOR_PATH = (
     "contexts/operational-system/docs/program/v1/qualification/phase-2/"
     "validation/validate_phase2.py"
+)
+DEAS_VALIDATOR_PATH = "docs/standards/deas/v1/validation/validate_deas.py"
+ENGINEERING_GATE_RELATIVE = "governance/bin/engineering-gate.py"
+ENGINEERING_GATE_SHA256 = (
+    "44c33ba743851d7befe11ebf93f2f4d9021b126f951a4587562adfca21f65c1e"
 )
 GENERATION_2_TASK_PATH = (
     "contexts/operational-system/docs/program/v1/qualification/phase-2/"
@@ -101,6 +110,20 @@ DEFINITION_ARTIFACTS = (
     "docs/standards/deas/v1/validation/validate_deas.py",
     "docs/standards/deas/v1/validation/validation-report.md",
 )
+DEFINITION_CORRECTION_PATHS = frozenset(
+    {
+        "docs/standards/deas/v1/degs/definition-task.json",
+        "docs/standards/deas/v1/deas-v1-sha256.txt",
+        "docs/standards/deas/v1/enforcement-matrix.md",
+        "docs/standards/deas/v1/handoff.md",
+        "docs/standards/deas/v1/phase2-generation-2-plan.md",
+        "docs/standards/deas/v1/source-register.md",
+        "docs/standards/deas/v1/standard.md",
+        "docs/standards/deas/v1/validation/test_validate_deas.py",
+        "docs/standards/deas/v1/validation/validate_deas.py",
+        "docs/standards/deas/v1/validation/validation-report.md",
+    }
+)
 PROFILE_MARKERS = ("### Core", "### Strict", "### Exploratory")
 OVERLAY_MARKERS = (
     "### Python overlay",
@@ -119,12 +142,34 @@ DISCREPANCY_REFERENCES = re.compile(
 
 
 class ValidationError(Exception):
-    """A deterministic input or repository-boundary failure."""
+    """A deterministic input, execution, or repository-boundary failure."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        path: str = DEAS_VALIDATOR_PATH,
+        rule_id: str = "DEAS-PRE-007",
+    ) -> None:
+        super().__init__(message)
+        self.path = path
+        self.rule_id = rule_id
+
+
+class DeasArgumentParser(argparse.ArgumentParser):
+    """Convert parser failures into the validator's structured error seam."""
+
+    def error(self, message: str) -> None:
+        raise ValidationError(
+            f"invalid arguments: {message}",
+            path="command-line",
+            rule_id="DEAS-PRE-007",
+        )
 
 
 def read_bounded_bytes(path: Path, label: str) -> bytes:
-    if not path.is_file():
-        raise ValidationError(f"missing required file: {label}")
+    if path.is_symlink() or not path.is_file():
+        raise ValidationError(f"missing or non-regular required file: {label}")
     if path.stat().st_size > MAX_TEXT_BYTES:
         raise ValidationError(f"input exceeds {MAX_TEXT_BYTES} bytes: {label}")
     return path.read_bytes()
@@ -532,14 +577,14 @@ def verify_generation_2_task(repository_root: Path) -> None:
         raise ValidationError("Generation 2 task is incomplete or inconsistent")
     required = (
         task.get("task_id") == GENERATION_2_TASK_ID,
-        task.get("status") == "COMPLETE",
+        task.get("status") == "READY_FOR_EXECUTION",
         task.get("risk_tier") == "TIER_1",
         task.get("authority_lane") == "TAYLOR_AI_WORKBENCH",
         task.get("unresolved_items") == [],
         record_has_status(task.get("validation"), "PASS"),
-        record_has_status(task.get("post_action_validation"), "PASS"),
+        record_has_status(task.get("post_action_validation"), "PENDING"),
         record_has_status(task.get("handoff"), "PASS"),
-        record_has_status(task.get("independent_review"), "PASS"),
+        record_has_status(task.get("independent_review"), "PENDING"),
     )
     if not all(required):
         raise ValidationError("Generation 2 task is incomplete or inconsistent")
@@ -556,7 +601,7 @@ def verify_generation_2_report(
     discrepancies = evidence_field_values(report, "**Discrepancy references:**")
     if not (
         evidence_contract_complete(report, labels)
-        and status == ["PASS"]
+        and status == ["PACKAGE_PASS_READY_FOR_GIT_DELIVERY"]
         and len(identities) == 1
         and str(GENERATION_2_MANIFEST_PATH) in identities[0]
         and GENERATION_2_TASK_ID in report
@@ -609,10 +654,23 @@ def verify_original_observations(repository_root: Path) -> None:
             raise ValidationError(f"Generation 2 Role Disposition differs: {relative}")
 
 
-def find_engineering_gate() -> Path:
-    for root in (VALIDATOR_REPOSITORY_ROOT, *VALIDATOR_REPOSITORY_ROOT.parents):
-        candidate = root / "governance/bin/engineering-gate.py"
+def verify_engineering_gate_identity(gate: Path) -> None:
+    digest = hashlib.sha256(
+        read_bounded_bytes(gate, ENGINEERING_GATE_RELATIVE)
+    ).hexdigest()
+    if digest != ENGINEERING_GATE_SHA256:
+        raise ValidationError(
+            "canonical DEGS gate identity differs",
+            path=ENGINEERING_GATE_RELATIVE,
+            rule_id="DEAS-PRE-003",
+        )
+
+
+def find_engineering_gate(repository_root: Path) -> Path:
+    for root in (repository_root, *repository_root.parents):
+        candidate = root / ENGINEERING_GATE_RELATIVE
         if candidate.is_file():
+            verify_engineering_gate_identity(candidate)
             return candidate
     raise ValidationError("Generation 2 DEGS gate is unavailable")
 
@@ -658,7 +716,7 @@ def verify_degs_pass_output(
 
 
 def verify_generation_2_degs(repository_root: Path) -> None:
-    gate = find_engineering_gate()
+    gate = find_engineering_gate(repository_root)
     task_path = (repository_root / GENERATION_2_TASK_PATH).resolve()
     for action in ("validate", "evaluate"):
         result = run_bounded_subprocess(
@@ -668,6 +726,7 @@ def verify_generation_2_degs(repository_root: Path) -> None:
             DEGS_TIMEOUT_SECONDS,
         )
         verify_degs_pass_output(result, action)
+        verify_engineering_gate_identity(gate)
 
 
 def generation_1_findings_from_commit(
@@ -698,10 +757,16 @@ def verify_definition_package_lifecycle(
     repository_root: Path,
     task: object,
 ) -> str:
-    if not isinstance(task, dict) or task.get("status") != "READY_FOR_EXECUTION":
+    if not (
+        isinstance(task, dict)
+        and task.get("task_id") == DEFINITION_CORRECTION_TASK_ID
+        and task.get("status") == "READY_FOR_EXECUTION"
+    ):
         raise ValidationError("definition package is not READY_FOR_EXECUTION")
     if not record_has_status(task.get("post_action_validation"), "PENDING"):
         raise ValidationError("definition Git delivery is not PENDING")
+    if not record_has_status(task.get("independent_review"), "PENDING"):
+        raise ValidationError("definition independent review is not PENDING")
     report = read_repository_text(
         repository_root,
         str(DEAS_ROOT / "validation/validation-report.md"),
@@ -739,23 +804,25 @@ def validate_definition_content(repository_root: Path) -> dict[str, object]:
     task = load_json(repository_root, str(DEAS_ROOT / "degs/definition-task.json"))
     report = verify_definition_package_lifecycle(repository_root, task)
     affected_files = task.get("affected_files")
-    expected_affected = set(DEFINITION_ARTIFACTS) | {str(MANIFEST_PATH)}
+    expected_affected = DEFINITION_CORRECTION_PATHS
     if (
         not isinstance(affected_files, list)
-        or len(affected_files) != 14
+        or len(affected_files) != len(expected_affected)
         or set(affected_files) != expected_affected
     ):
         raise ValidationError("definition task affected-file count differs")
     if not evidence_contract_complete(report, load_evidence_contract_labels()):
         raise ValidationError("validation report evidence contract is incomplete")
-    if "- Result: PASS" not in report.splitlines():
-        raise ValidationError("validation report is not PASS")
+    if "- Result: PACKAGE_PASS" not in report.splitlines():
+        raise ValidationError("validation report is not package PASS")
     verify_markdown_links(repository_root)
     verify_strict_python_functions(repository_root)
     verify_artifact_manifest(repository_root)
     return {
         "artifact_manifest_verified": True,
         "decision": "PASS",
+        "decision_scope": "PACKAGE",
+        "external_gates_pending": list(EXTERNAL_GATES),
         "generation_1_decision": "FAIL",
         "generation_1_findings_match": findings_match,
         "overlay_count": len(OVERLAY_MARKERS),
@@ -826,7 +893,11 @@ def generation_findings(repository_root: Path) -> list[dict[str, str]]:
 def run_conformance(arguments: argparse.Namespace) -> int:
     repository_root = arguments.repository_root.resolve()
     if not repository_root.is_dir():
-        raise ValidationError("repository root is not a directory")
+        raise ValidationError(
+            "repository root is not a directory",
+            path=".",
+            rule_id="DEAS-PRE-006",
+        )
     identity_verified = False
     if arguments.generation == 1:
         if arguments.identity_manifest or arguments.identity_manifest_sha256:
@@ -861,10 +932,14 @@ def run_conformance(arguments: argparse.Namespace) -> int:
         "schema_version": 1,
     }
     payload.update(compound_result)
+    if arguments.generation == 2 and not findings:
+        payload["decision_scope"] = "PACKAGE"
+        payload["external_gates_pending"] = list(EXTERNAL_GATES)
     if arguments.json:
         print(json.dumps(payload, indent=2, sort_keys=True))
     else:
-        print(f"DEAS_GENERATION_{arguments.generation}_CONFORMANCE: {payload['decision']}")
+        label = "PACKAGE_VALIDATION" if arguments.generation == 2 else "CONFORMANCE"
+        print(f"DEAS_GENERATION_{arguments.generation}_{label}: {payload['decision']}")
         for item in findings:
             print(f"- {item['rule_id']} {item['path']}: {item['message']}")
     return 1 if findings else 0
@@ -873,7 +948,11 @@ def run_conformance(arguments: argparse.Namespace) -> int:
 def run_definition(arguments: argparse.Namespace) -> int:
     repository_root = arguments.repository_root.resolve()
     if not repository_root.is_dir():
-        raise ValidationError("repository root is not a directory")
+        raise ValidationError(
+            "repository root is not a directory",
+            path=".",
+            rule_id="DEAS-PRE-006",
+        )
     payload = validate_definition_content(repository_root)
     if arguments.json:
         print(json.dumps(payload, indent=2, sort_keys=True))
@@ -890,7 +969,11 @@ def run_definition(arguments: argparse.Namespace) -> int:
 def run_evidence_record(arguments: argparse.Namespace) -> int:
     repository_root = arguments.repository_root.resolve()
     if not repository_root.is_dir():
-        raise ValidationError("repository root is not a directory")
+        raise ValidationError(
+            "repository root is not a directory",
+            path=".",
+            rule_id="DEAS-PRE-006",
+        )
     relative = str(arguments.record)
     record = read_repository_text(repository_root, relative)
     is_complete = evidence_contract_complete(
@@ -918,7 +1001,7 @@ def run_evidence_record(arguments: argparse.Namespace) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = DeasArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     conformance = commands.add_parser("conformance")
     conformance.add_argument("--generation", type=int, choices=(1, 2), required=True)
@@ -939,12 +1022,33 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def error_payload(error: ValidationError) -> dict[str, object]:
+    return {
+        "decision": "ERROR",
+        "finding_count": 1,
+        "findings": [
+            {
+                "message": str(error),
+                "path": error.path,
+                "rule_id": error.rule_id,
+            }
+        ],
+        "schema_version": 1,
+    }
+
+
 def main() -> int:
+    raw_arguments = sys.argv[1:]
+    json_requested = "--json" in raw_arguments
     try:
-        arguments = build_parser().parse_args()
+        arguments = build_parser().parse_args(raw_arguments)
         return arguments.handler(arguments)
-    except (OSError, UnicodeError, ValidationError) as error:
-        print(f"DEAS_VALIDATION_ERROR: {error}", file=sys.stderr)
+    except (OSError, UnicodeError, ValidationError) as caught:
+        error = caught if isinstance(caught, ValidationError) else ValidationError(str(caught))
+        if json_requested:
+            print(json.dumps(error_payload(error), indent=2, sort_keys=True))
+        else:
+            print(f"DEAS_VALIDATION_ERROR: {error}", file=sys.stderr)
         return 2
 
 

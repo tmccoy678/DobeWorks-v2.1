@@ -1,22 +1,64 @@
-# DEAS v1.0 Handoff
+# DEAS v1.0 Definition-Correction Handoff
 
-- Task: DEGS-T1-DW-ENGINEERING-ASSURANCE-V1-DEFINE-20260902
+- Task: DEGS-T1-DW-ENGINEERING-ASSURANCE-V1-CORRECT-20260905
 - State: READY_FOR_GIT_DELIVERY
-- Candidate baseline: the exact staged C3 candidate with intended parent f45ae80c64a0aa8c723a5a58b4fbc7073682d349 and artifacts bound by deas-v1-sha256.txt
+- Decision scope: PACKAGE
+- External gates pending in this package: G7, G8, G9
+- Candidate baseline: C3 `47b32aeeb107584291f69ba90b11706c7cf3eae0` plus exactly the 10 correction paths bound by `deas-v1-sha256.txt`
 - Branch: deas/v1-phase2-generation-2
 - Draft pull request: 1
 - Phase 2 Generation 1: EXPECTED_NONCONFORMING
-- Phase 2 Generation 2: DEFINED_NOT_AUTHORIZED
+- Phase 2 Generation 2: AUTHORIZED_SUSPENDED_UNTIL_CORRECTION_DELIVERY
 - Merge: NOT_AUTHORIZED
 
-## What the candidate establishes
+## What the correction establishes
 
-DEAS v1.0 defines three profiles, six context overlays, ten preventive invariants, static and semantic enforcement, ten validation gates, negative regression behavior, explicit exception control, Git-first phase controls, and exact generation-correction rules.
+The standard, enforcement matrix, C4 plan, definition task, evidence record,
+and public DEAS validator now use one lifecycle:
 
-C1 and C2 preserve the original Phase 1 and Generation 1 bytes in separate commits. The DEAS CLI reports the six frozen Generation 1 findings with exit 1. Definition validation passes only because both independent review axes closed with zero blockers, those findings match the expected JSON, every final C3 artifact hash verifies, and all public CLI cases pass.
+- immutable task state remains `READY_FOR_EXECUTION`;
+- immutable handoff state remains `READY_FOR_GIT_DELIVERY`;
+- embedded independent-review and post-action-validation states remain
+  `PENDING`;
+- deterministic validator PASS is explicitly scoped to `PACKAGE` and names
+  G7/G8/G9 as pending; and
+- external control-plane evidence binds review, acceptance, commit, pushed ref,
+  and draft-PR identities without rewriting reviewed bytes.
 
-## Next authority boundary
+The public suite has 28 passing cases, including three independent lifecycle
+mutations, unfrozen-DEGS-gate rejection, and structured argument/runtime error
+paths. The exact canonical engineering-gate digest is verified before and after
+each Generation 2 DEGS execution. The
+definition validator preserves three profiles, six overlays, ten preventive
+invariants, the exact six-finding Generation 1 regression, and the sorted
+13-artifact definition manifest. The package validation report records the
+exact commands, exits, hashes, warnings, and safe stop.
 
-The remaining authorized C3 delivery is committing and pushing this exact package, maintaining draft pull request 1, verifying the resulting Git/GitHub identities, and closing the overall task in external control-plane evidence. This immutable package remains `READY_FOR_GIT_DELIVERY`; it does not predict or record delivery completion. After the safe stop, the next possible action is a separately authorized C4 using phase2-generation-2-plan.md. C4 is not implicit, and this handoff cannot authorize Generation 2 candidate creation, remediation, merge, Phase 3, Role Disposition, qualification, release, exception, root adoption, device/storage work, credential/permission work, physical action, destructive action, or unrelated work.
+## External review and delivery
 
-Before any continuation, verify the exact commit, artifact manifest, private remote branch, draft PR, current context, lock state, relevant writers, and Taylor's new authority. Generation 1 must remain reproducibly nonconforming and Generation 2 must be the first conforming case.
+Canonical bytes do not claim their independent review or Git delivery already
+passed. The external review index at workspace-relative
+`.scratch/dobeworks-deas-v1-definition-correction/review/final-review-index.md`
+must bind the exact manifest-file SHA-256 and both no-blocker review decisions
+before commit. After the authorized non-force commit and push, external
+delivery evidence must verify local HEAD, remote branch head, draft PR 1 head,
+unchanged `main`, and unmerged state before G7 closes.
+
+## C4 resumption boundary
+
+Taylor separately authorized the exact C4 work unit and explicitly authorized
+its resumption after this correction is refrozen and delivered. Resume C4 only
+after the correction commit and remote identity agree. Rebind C4 to that
+correction predecessor, preserve its 15-path allowlist and pre-correction patch
+identity, apply the corrected package lifecycle, rerun all required checks, and
+obtain fresh external Standards and Spec reviews before its own delivery.
+
+This handoff does not authorize merge, main mutation, release, Phase 3, Role
+Disposition, qualification, exception, root adoption, device/storage work,
+credential/permission work, physical action, destructive action, repository
+settings, collaborators, or unrelated work. Stop on drift, extra paths,
+manifest disagreement, review blocker, authentication interaction,
+non-fast-forward push, or any need for wider authority. Preserve C3, the
+verified complete-history bundle, the exact pre-correction C4 patch, the
+candidate, and review evidence; do not amend, reset, rebase, force-push,
+delete, or merge automatically.

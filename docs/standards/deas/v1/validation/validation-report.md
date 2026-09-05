@@ -1,134 +1,123 @@
-# DEAS v1.0 Validation Report
+# DEAS v1.0 Definition-Correction Validation Report
 
-- Result: PASS
-- Task: DEGS-T1-DW-ENGINEERING-ASSURANCE-V1-DEFINE-20260902
+- Result: PACKAGE_PASS
+- Decision scope: PACKAGE
+- External gates pending in the immutable package: G7, G8, G9
+- Task: DEGS-T1-DW-ENGINEERING-ASSURANCE-V1-CORRECT-20260905
 - Profile: Strict
 - Overlays: Python, Document, Evidence, Validator, AI-Assisted, Git
-- Predecessor: f45ae80c64a0aa8c723a5a58b4fbc7073682d349
+- Predecessor: C3 `47b32aeeb107584291f69ba90b11706c7cf3eae0`
 
 ## Evidence-record contract
 
-- **Evidence ID:** `EV-DEAS-V1-C3-VALIDATION`
-- **Requirement/fault IDs:** `DEAS-PRE-002`, `DEAS-PRE-003`, `DEAS-PRE-004`, `DEAS-PRE-005`, `DEAS-PRE-007`, `DEAS-PRE-010`, `DEAS-TRACE-001`, `DEAS-PHASE-001`, and `DEAS-EVIDENCE-001`
-- **Claim under test:** The exact C3 definition candidate satisfies its authorized definition-and-validation scope while preserving C1, C2, and the non-authorized C4 boundary.
-- **Acceptance method:** Public command-line behavior tests, static and semantic checks, exact hash verification, DEGS evaluation, secret scan, and independent Standards and Spec review.
-- **Exact source/configuration/role/device-safe identity/environment/target:** Private DobeWorks branch `deas/v1-phase2-generation-2`, C2 predecessor `f45ae80c64a0aa8c723a5a58b4fbc7073682d349`, exact 14-path C3 candidate, no device target.
-- **Procedure or command identity:** The literal commands in Exact validation commands below, run from the repository root and bound to the candidate artifact manifest.
+- **Evidence ID:** `EV-DEAS-V1-DEFINITION-CORRECTION-PACKAGE`
+- **Requirement/fault IDs:** `DEAS-PRE-001` through `DEAS-PRE-010`, `DEAS-TRACE-001`, `DEAS-PHASE-001`, `DEAS-EVIDENCE-001`, `DEAS-DC-001`, `DEAS-DC-REV1-001` through `DEAS-DC-REV1-003`
+- **Claim under test:** The exact 10-path definition-correction candidate reconciles the DEAS standard, C4 plan, enforcement matrix, and C3 validator without changing, staging, or accepting the separate C4 layer.
+- **Acceptance method:** Public command-line tests, definition and historical conformance validation, DEGS schema and Tier 1 evaluation, static and semantic inspection, exact manifests, diff and link checks, secret scan, then external two-axis review.
+- **Exact source/configuration/role/device-safe identity/environment/target:** Private DobeWorks branch `deas/v1-phase2-generation-2`; fixed C3 predecessor `47b32aeeb107584291f69ba90b11706c7cf3eae0`; exactly the 10 correction paths in `definition-task.json`; no device target.
+- **Procedure or command identity:** The literal commands in Exact validation commands below, run from the DobeWorks repository root against the exact manifest-bound candidate.
 - **Start time:** NOT RECORDED
-- **End time:** 2026-09-02T23:01:00Z
-- **Clock-quality basis:** UTC from the execution host at the sixth-review correction boundary; exact-byte replay follows this self-recording step.
-- **Expected result:** All definition-package gates pass while Git delivery remains pending; Generation 1 exits 1 with exactly six findings; no Generation 2 candidate or excluded action occurs.
-- **Actual result:** All 24 public CLI cases pass at the package boundary; the preserved Generation 1 snapshot exits 1 with exactly six ordered findings; both fifth-review axes report zero blockers; the sixth lifecycle-only finding is corrected; and the manifest, schema, link, diff, and secret gates pass before the C3 commit.
+- **End time:** NOT RECORDED
+- **Clock-quality basis:** No execution timestamps are used as acceptance evidence; exact byte identities and command exits are the freshness basis.
+- **Expected result:** The correction receives package-scoped PASS with G7/G8/G9 explicitly pending; Generation 1 remains an exact six-finding FAIL; embedded task completion, review PASS, and post-action PASS are rejected.
+- **Actual result:** All 28 DEAS public CLI cases pass, including three independent lifecycle mutations, frozen-DEGS-gate rejection, and structured argument/runtime errors; definition validation emits package-scoped PASS with G7/G8/G9 pending; Generation 1 exits 1 with the exact six frozen findings; schema, DEGS, manifest, links, Strict function size, diff, and secret gates pass. Final independent review and Git delivery remain external and pending in these immutable bytes.
 - **Status:** PACKAGE_PASS_READY_FOR_GIT_DELIVERY
-- **Discrepancy references:** `DEAS-C3-REV1-001` through `DEAS-C3-REV1-005`, `DEAS-C3-REV2-001` through `DEAS-C3-REV2-006`, `DEAS-C3-REV3-001` through `DEAS-C3-REV3-003`, `DEAS-C3-REV4-001` through `DEAS-C3-REV4-003`, and `DEAS-C3-REV6-001`; every listed discrepancy is RESOLVED.
-- **Artifact paths:** `docs/standards/deas/v1/validation/validation-report.md`, `docs/standards/deas/v1/validation/generation-1-expected-findings.json`, and `docs/standards/deas/v1/deas-v1-sha256.txt`
-- **Cryptographic identities:** C2 is `f45ae80c64a0aa8c723a5a58b4fbc7073682d349`; candidate artifact hashes are in `deas-v1-sha256.txt`; C3 commit, pushed-ref, and manifest-file identities are PENDING external Git/PR delivery evidence.
-- **Evidence owner:** Codex under Taylor's exact C1-through-C3 authorization
+- **Discrepancy references:** `DEAS-DC-001`, `DEAS-DC-REV1-001`, `DEAS-DC-REV1-002`, `DEAS-DC-REV1-003`
+- **Artifact paths:** `docs/standards/deas/v1/validation/validation-report.md`, `docs/standards/deas/v1/validation/test_validate_deas.py`, `docs/standards/deas/v1/validation/validate_deas.py`, and `docs/standards/deas/v1/deas-v1-sha256.txt`
+- **Cryptographic identities:** C3 is `47b32aeeb107584291f69ba90b11706c7cf3eae0`; the predecessor manifest-file SHA-256 is `97e3e2689dd7fc3a7ecdd835b6370253574b9975160693cd0d577be74fc9d3c8`; canonical `governance/bin/engineering-gate.py` SHA-256 is `44c33ba743851d7befe11ebf93f2f4d9021b126f951a4587562adfca21f65c1e`; corrected artifact hashes are in `deas-v1-sha256.txt`; its own SHA-256 is recorded externally after freeze.
+- **Evidence owner:** Codex under Taylor's exact definition-correction authorization
 - **Human/physical action owner:** Taylor for human approval; physical action is NOT AUTHORIZED
 - **Confidentiality classification:** PRIVATE PERSONAL USE - NOT FOR PUBLIC RELEASE
-- **Recoverability classification:** Recoverable from the verified Git bundle, exact 28-path snapshot, branch, and staged candidate.
-- **Limitations:** The candidate is not yet committed or pushed; delivery completion and its Git/PR identities remain external, and no Generation 2 conformance result exists.
-- **Unsupported inferences:** This record does not authorize or prove Generation 2 remediation, merge, release, Phase 3, Role Disposition, device action, or cross-workspace adoption.
-- **Current freshness:** Current only for the exact staged C3 bytes verified by `deas-v1-sha256.txt` on 2026-09-02; any byte change invalidates this package result.
-- **Supersession:** NONE; this is an uncommitted package-validation record, not overall delivery completion.
+- **Recoverability classification:** Recoverable from C3, complete-history bundle SHA-256 `33c967482d4de7783a0c595bffc768e69f871fc395d3f060bcd60058d4c15d68`, and pre-correction C4 patch SHA-256 `c4a5d5c52553a823966d259a78394c4b5c3cd736bc37c06cb98c4cbc5edad3ba`.
+- **Limitations:** This is deterministic package evidence, not overall conformance; it does not embed or predict independent-review decisions, a commit identity, pushed-ref identity, pull-request verification, or post-action completion.
+- **Unsupported inferences:** This record does not authorize or prove merge, main mutation, release, Phase 3, Role Disposition, qualification, exception, root adoption, device/storage work, credential/permission work, physical action, destructive action, or unrelated work.
+- **Current freshness:** Current only for the exact correction bytes verified by `deas-v1-sha256.txt`; any candidate-byte or manifest change invalidates this package result and requires complete replay.
+- **Supersession:** Supersedes the active C3 definition package only for the corrected lifecycle contract; C3 remains the immutable Git predecessor and historical record.
 
-## Test-driven sequence
+## Reconciled lifecycle
 
-- Red 1: the first public-seam test failed because validate_deas.py did not exist.
-- Green 1: conformance inspection derived the exact six Generation 1 findings.
-- Red 2: the definition test failed because the definition command did not exist.
-- Red 2 continued: after the command existed, it failed closed while this report and the artifact manifest were incomplete.
-- Red 3: the Generation 2 conformance test exposed that an arbitrary manifest did not bind the exact correction path set.
-- Green 3: Generation 2 now requires the exact other 14 C4 paths plus the separately supplied manifest SHA-256.
-- Red 4: the validation report failed its own canonical evidence-record contract.
-- Green 4: the report now carries all 23 exact, nonblank contract fields and is checked through the public CLI.
-- Red 5: a semantically clean Generation 2 fixture passed with an inert Phase 2 validator.
-- Green 5: Generation 2 now requires the exact Phase 2 CLI compound result and independent task, report, historical-observation, Role Disposition, DEGS, and DEAS-definition checks.
-- Red 6: Git output was rejected only after an oversized buffer had already been captured, and a stalled Git read was not terminated within the intended bound.
-- Green 6: subprocess streams are consumed concurrently with a combined four-MiB cap, and stalled Git or Phase 2 process groups are killed at two seconds.
-- Red 7: a structurally complete Generation 2 report with vague procedure and discrepancy values reached later preservation checks instead of failing at the report boundary.
-- Green 7: the report gate now requires both literal commands and a single `NONE` or exact `P2-G2-DISC-NNN` discrepancy value; independent command and discrepancy negatives pass.
-- Red 8: successful Git and Phase 2 subprocesses could emit ignored standard-error diagnostics.
-- Green 8: successful subprocesses must be silent, DEGS results use closed-schema JSON rather than a text prefix, and public CLI diagnostic negatives pass.
-- Red 9: the definition package claimed task completion before its commit, push, and pull-request delivery evidence existed.
-- Green 9: package validation now requires task state `READY_FOR_EXECUTION`, handoff state `READY_FOR_GIT_DELIVERY`, and pending post-action delivery validation; overall completion is external.
+The frozen C3 validator required the Generation 2 task, embedded independent
+review, and embedded post-action validation to claim completion before review,
+commit, push, or pull-request verification could exist. That contradicted the
+accepted standard's immutable-candidate rule.
 
-## Review findings and corrections
+The correction keeps task state `READY_FOR_EXECUTION`, handoff state
+`READY_FOR_GIT_DELIVERY`, and embedded review and post-action states `PENDING`.
+Package validators emit `decision: PASS`, `decision_scope: PACKAGE`, and
+`external_gates_pending: [G7, G8, G9]`. External control-plane records bind the
+frozen manifest, review decisions, authorized acceptance, and Git delivery
+identities without rewriting reviewed bytes.
 
-The first independent Standards and Spec review found five blocking gaps: Generation 1 identity was only a label; the evidence contract was incomplete and duplicated; Strict function-size enforcement omitted the future Phase 2 validator; completion was claimed before review; and failure-path claims lacked direct tests. The resulting corrections bound all 28 Generation 1 artifacts, derived the 23-field nonblank evidence contract from one canonical table, required the exact Generation 2 identity set, applied Strict sizing to the Phase 2 validator, recorded review as pending, and exercised tampered, absent, incomplete, malformed, and out-of-root inputs.
+## Test-driven lifecycle correction
 
-The second review confirmed those original gaps were resolved and found six remaining blockers: the Generation 2 manifest filename was not fixed; collection-state parsing could skip checks; this report lacked the evidence contract; one test imported validator internals; subprocess and public-input bounds were absent; and pending task metadata still claimed completed checks. The resulting corrections required the exact manifest path, failed closed on collection state, validated this report through the public CLI, used only CLI calls in tests, bounded subprocess waits and text inputs, required future Phase 2 public-seam failure cases, and recorded unfinished checks as PENDING.
-
-The third review reported zero Spec blockers and three Standards blockers: an overbroad Generation 2 PASS, semantically vague report fields, and post-capture rather than preventive Git-output bounds without a CLI timeout test. The candidate now requires compound Phase 2 proof independently corroborated by DEAS, records exact commands and stable discrepancy IDs, bounds subprocess streams during execution, and tests timeout and exhaustion paths through the CLI.
-
-The fourth review reported zero Spec blockers and three Standards blockers: Generation 2 report semantics did not yet enforce the literal commands or stable discrepancy grammar; Git fixture reads were duplicated and buffered without a preflight bound; and successful subprocess diagnostics were ignored while DEGS output was accepted by prefix. The candidate now checks exact command and discrepancy evidence, preflights immutable Git blob sizes and streams fixture bytes through one helper, rejects unexpected diagnostics, parses the exact DEGS JSON shape, and tests the public Git and Phase 2 diagnostic paths.
-
-The fifth review reported zero actionable blockers on both the Spec and Standards axes and zero baseline-smell findings. It confirmed the exact 14-path C3 scope, all 28 frozen Generation 1 identities and six ordered negative findings, the plan-only C4 boundary, exact report semantics, bounded streaming subprocess controls, diagnostic rejection, closed-schema DEGS parsing, public failure-path coverage, Strict function sizing, and truthful lifecycle state. All earlier discrepancies are resolved.
-
-The sixth lifecycle-only review reported one shared Spec and Standards blocker: the package predicted its own commit and push by marking the overall task complete. The correction separates package-validation PASS from Git delivery completion, requires explicit pre-delivery states in the immutable package, and reserves overall completion for external evidence created only after commit, push, and draft-PR verification.
-
-## Review discrepancy register
-
-| ID | Finding | Candidate disposition |
-|---|---|---|
-| `DEAS-C3-REV1-001` | Generation 1 identity was only a label | RESOLVED |
-| `DEAS-C3-REV1-002` | Evidence contract was incomplete and duplicated | RESOLVED |
-| `DEAS-C3-REV1-003` | Strict sizing omitted the future Phase 2 validator | RESOLVED |
-| `DEAS-C3-REV1-004` | Completion was claimed before review | RESOLVED |
-| `DEAS-C3-REV1-005` | Failure-path claims lacked direct tests | RESOLVED |
-| `DEAS-C3-REV2-001` | Generation 2 manifest path was not exact | RESOLVED |
-| `DEAS-C3-REV2-002` | Collection-state parsing could skip semantic checks | RESOLVED |
-| `DEAS-C3-REV2-003` | This report omitted its evidence contract | RESOLVED |
-| `DEAS-C3-REV2-004` | A test bypassed the public CLI | RESOLVED |
-| `DEAS-C3-REV2-005` | Subprocess and public-input bounds were absent | RESOLVED |
-| `DEAS-C3-REV2-006` | Pending metadata claimed completed checks | RESOLVED |
-| `DEAS-C3-REV3-001` | Generation 2 could receive an overbroad PASS | RESOLVED |
-| `DEAS-C3-REV3-002` | Report procedure and discrepancy values were semantically vague | RESOLVED |
-| `DEAS-C3-REV3-003` | Git output was bounded only after capture and timeout was untested | RESOLVED |
-| `DEAS-C3-REV4-001` | Report command and discrepancy semantics were not exact | RESOLVED |
-| `DEAS-C3-REV4-002` | Git fixture reads were duplicated and lacked a preventive blob-size check | RESOLVED |
-| `DEAS-C3-REV4-003` | Successful diagnostics were ignored and DEGS output used prefix matching | RESOLVED |
-| `DEAS-C3-REV6-001` | Overall C3 delivery was closed before its commit, push, and PR evidence existed | RESOLVED |
+- Red: two public Generation 2 cases failed against the frozen C3 validator for
+  the intended inverse behavior: a truthful package-ready task was rejected,
+  while embedded `COMPLETE`/review-PASS/post-action-PASS advanced to a later
+  check.
+- Green: the same two cases pass after the validator requires
+  `READY_FOR_EXECUTION`, embedded review `PENDING`, embedded post-action
+  `PENDING`, and report status `PACKAGE_PASS_READY_FOR_GIT_DELIVERY`.
+- Review-red: the first exact-identity review found the combined lifecycle
+  mutation could not independently prove all three rejections, the DEGS gate
+  lacked a frozen executable identity, and JSON error paths were plaintext.
+- Review-green: three isolated lifecycle mutations now fail independently; the
+  exact engineering-gate SHA-256 is verified before and after use; and argument
+  plus runtime failures emit one structured error object with stable rule ID
+  and path while standard error remains empty.
+- Scope result: C4 bytes remained outside the correction index, and the
+  pre-correction C4 patch retained SHA-256
+  `c4a5d5c52553a823966d259a78394c4b5c3cd736bc37c06cb98c4cbc5edad3ba`.
 
 ## Exact validation commands
 
 Run from the DobeWorks repository root:
 
 ```sh
-DEAS_GENERATION_1_ROOT=../../.scratch/dobeworks-deas-v1-definition/backup/working-tree-28
 python3 -B docs/standards/deas/v1/validation/test_validate_deas.py -v
 python3 -B docs/standards/deas/v1/validation/validate_deas.py definition --json --repository-root .
+DEAS_GENERATION_1_ROOT=../../.scratch/dobeworks-deas-v1-generation-2/backup/generation-1
 python3 -B docs/standards/deas/v1/validation/validate_deas.py conformance --generation 1 --json --repository-root "$DEAS_GENERATION_1_ROOT"
-python3 ../../governance/bin/engineering-gate.py validate docs/standards/deas/v1/degs/definition-task.json
-python3 ../../governance/bin/engineering-gate.py evaluate docs/standards/deas/v1/degs/definition-task.json
+python3 ../../governance/bin/engineering-gate.py validate docs/standards/deas/v1/degs/definition-task.json --json
+python3 ../../governance/bin/engineering-gate.py evaluate docs/standards/deas/v1/degs/definition-task.json --json
+shasum -a 256 ../../governance/bin/engineering-gate.py
 shasum -a 256 -c docs/standards/deas/v1/deas-v1-sha256.txt
 git diff --cached --check
 gitleaks git --staged --redact --no-banner --timeout 30 .
 ```
 
-## Completed package and pre-delivery checks
+## Deterministic package results
 
-- Python syntax: PASS
-- Strict 60-logical-line function limit: PASS
-- Markdown links: PASS
-- Expected-findings JSON: PASS
-- Generation 1 direct conformance: expected FAIL, exit 1, six exact ordered findings
-- Public CLI cases: 24 PASS
-- Git and Phase 2 subprocess timeout/exhaustion/diagnostic cases: PASS
-- Generation 2 compound negative cases: PASS without retaining a candidate
-- Validation-report evidence-record CLI: PASS
-- Definition task JSON schema and DEGS Tier 1 final evaluation: PASS
-- Artifact manifest and exact 14-path staged surface: PASS
-- Fifth independent Standards and Spec review: PASS with zero blockers
-- Staged secret scan: PASS
-- Git diff whitespace check: PASS
-- Generation 2 candidate creation: NONE
+| Check | Required exit | Observed exit | Result |
+|---|---:|---:|---|
+| 28 public CLI cases | 0 | 0 | PASS |
+| Definition package validation | 0 | 0 | PASS with `PACKAGE` scope and G7/G8/G9 pending |
+| Generation 1 regression | 1 | 1 | Expected FAIL with six exact findings |
+| DEGS schema validation | 0 | 0 | PASS |
+| DEGS Tier 1 evaluation | 0 | 0 | PASS |
+| DEGS gate identity | 0 | 0 | PASS; `44c33ba743851d7befe11ebf93f2f4d9021b126f951a4587562adfca21f65c1e` |
+| 13-artifact manifest verification | 0 | 0 | PASS |
+| Staged diff hygiene | 0 | 0 | PASS |
+| Staged secret scan | 0 | 0 | PASS; no warning |
 
-## Post-package delivery boundary
+Strict function-size and Markdown-link checks run inside definition validation.
+No unexplained warning remains. The package stop state is
+`READY_FOR_GIT_DELIVERY`; external review must pass before the authorized
+non-force commit/push delivery, and any byte change requires refreeze and
+review replay.
 
-- Commit exactly the verified 14-path C3 package with subject `docs: define DobeWorks Engineering Assurance Standard v1.0`.
-- Push only `deas/v1-phase2-generation-2` and maintain pull request 1 as draft.
-- Record the resulting commit, manifest-file hash, remote branch, and draft-PR identities in external task evidence.
-- Stop before Generation 2 remediation, merge, or any excluded action.
+## Discrepancy register
 
-The final two-axis post-commit review and GitHub identity check are maintained as task evidence outside this immutable C3 package.
+| ID | Finding | Disposition |
+|---|---|---|
+| `DEAS-DC-001` | Standard required immutable package readiness while the C4 plan and C3 validator required embedded completion and review PASS | RESOLVED by one package lifecycle, explicit package decision scope, negative public test, and external G7/G8/G9 records |
+| `DEAS-DC-REV1-001` | One combined mutation did not independently prove task, review, and post-action rejection | RESOLVED by three isolated public mutations |
+| `DEAS-DC-REV1-002` | DEGS gate execution was not bound to exact bytes | RESOLVED by the recorded digest, pre/post-use verification, and tampered-gate rejection |
+| `DEAS-DC-REV1-003` | JSON-mode argument and runtime errors were plaintext | RESOLVED by closed-schema error output and public argument/runtime tests |
+
+## External acceptance boundary
+
+The independent Standards and Spec reports, their exact hashes, the corrected
+manifest-file hash, and later Git/PR delivery identities live under
+`.scratch/dobeworks-deas-v1-definition-correction/`. They may close G8, G7, and
+G9 for this authorized checkpoint without changing this package. They do not
+authorize merge or any excluded action.

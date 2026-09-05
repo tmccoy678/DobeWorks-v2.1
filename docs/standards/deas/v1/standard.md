@@ -22,7 +22,10 @@ The words SHALL, SHALL NOT, SHOULD, SHOULD NOT, and MAY are normative. A work it
 
 **Generation** is an immutable artifact set with one exact identity. A correction creates a later generation and never silently rewrites the reviewed predecessor.
 
-**Conformance** is the deterministic result that all selected profile and overlay requirements pass for one exact generation.
+**Conformance** is the overall result that all selected profile, overlay, and
+applicable gate requirements pass for one exact generation. **Package
+validation** is the deterministic pre-delivery result for the immutable bytes;
+it is an input to conformance and cannot itself satisfy external gates.
 
 **Exception** is a temporary, human-approved deviation from one named DEAS rule. An exception cannot authorize a task or weaken an external security, privacy, release, credential, physical, or destructive boundary.
 
@@ -203,6 +206,15 @@ Failure at any gate stops later mutation. A known negative regression may satisf
 
 Package validation and delivery completion are distinct when the commit, pushed ref, or pull request is itself an acceptance input. An immutable candidate may record package-validation PASS only while its task remains `READY_FOR_EXECUTION` and its handoff remains `READY_FOR_GIT_DELIVERY`; that state does not satisfy G7 or complete the overall delivery task. After the commit, push, and pull-request state exist and are verified, a control-plane record external to the immutable package SHALL bind those identities and may close the overall task. A canonical package SHALL NOT predict its own commit, pushed ref, or completed delivery.
 
+The immutable pre-delivery package SHALL keep embedded independent-review and
+post-action-validation states `PENDING`. Independent reviewers SHALL bind their
+decision to the frozen package identity in an external control-plane record;
+their decision SHALL NOT require rewriting the bytes they reviewed. A package
+validator MAY report deterministic package PASS only with an explicit
+`PACKAGE` decision scope and the unsatisfied external gates named. It SHALL NOT
+represent that result as overall conformance, G7, G8, G9, embedded task
+completion, or embedded review PASS.
+
 ## Exceptions
 
 Exception records live at docs/standards/deas/exceptions/DEAS-EXC-YYYYMMDD-NNN.json. Each record SHALL contain:
@@ -235,4 +247,14 @@ Phase 2 Generation 1 is the first DEAS negative regression case. It fails the se
 
 ## Conformance decision
 
-PASS requires all applicable profile, overlay, gate, identity, and exception controls to pass on one exact generation. A nested validator's PASS assertion is not sufficient by itself: compound conformance SHALL independently corroborate consequential task, report, identity, preservation, authority, and validator results. FAIL means inspected artifacts violate a rule. BLOCKED means a required input, authority, tool, identity, or decision is unavailable. ERROR means validation could not complete deterministically. No result carries merge, release, phase, credential, physical, destructive, or residual-risk authority.
+Overall conformance PASS requires all applicable profile, overlay, gate,
+identity, and exception controls to pass on one exact generation. A package
+validator SHALL emit `decision_scope: PACKAGE` and
+`external_gates_pending: [G7, G8, G9]` when those gates are deliberately closed
+by external control-plane records. A nested validator's PASS assertion is not
+sufficient by itself: compound package validation SHALL independently
+corroborate consequential task, report, identity, preservation, authority, and
+validator results. FAIL means inspected artifacts violate a rule. BLOCKED means
+a required input, authority, tool, identity, or decision is unavailable. ERROR
+means validation could not complete deterministically. No result carries merge,
+release, phase, credential, physical, destructive, or residual-risk authority.

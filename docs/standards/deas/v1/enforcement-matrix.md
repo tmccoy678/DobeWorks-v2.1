@@ -62,11 +62,12 @@ The expected Generation 1 decision is FAIL with six ordered findings. validation
 | Exact identity | require the canonical generation-2-sha256.txt path, its externally supplied SHA-256, and exactly the other 14 C4 paths | sorted manifest, external digest, and zero hash mismatch |
 | Semantic correction | inspect collection state, traceability, entry history, and all four evidence contracts | zero `DEAS-TRACE-001`, `DEAS-PHASE-001`, and `DEAS-EVIDENCE-001` findings |
 | Phase 2 validator | execute the exact public CLI and require silent standard error plus its exact schema-v2 compound JSON | bounded exit 0, empty diagnostics, and exact result object |
-| Task and report | inspect the exact task ID and canonical evidence-record fields; independently run DEGS validation and evaluation with closed-schema JSON parsing | COMPLETE/PASS task states, report status PASS, literal commands, stable discrepancy IDs, and two silent exact DEGS PASS results |
+| Task and report | inspect the exact task ID and canonical evidence-record fields; verify the frozen engineering-gate digest before and after independently running DEGS validation and evaluation with closed-schema JSON parsing | task `READY_FOR_EXECUTION`; validation PASS; embedded review and post-action validation PENDING; report `PACKAGE_PASS_READY_FOR_GIT_DELIVERY`; literal commands; stable discrepancy IDs; exact gate SHA-256; and two silent exact DEGS PASS results |
 | Historical preservation | compare all four C2 records with their successors as ordered byte-identical line subsequences | all original lines present unchanged and in order |
 | Role boundary | parse every Role Disposition field in the four records | exactly one `not assigned` value per record |
-| DEAS baseline | re-run definition validation against the committed C3 identity and historical C2 findings | definition PASS and exact six-finding Generation 1 regression |
-| Resource bounds | stream stdout and stderr concurrently, cap combined output at four MiB, kill stalled process groups, and reject unexpected diagnostics | Git and Phase 2 timeout, exhaustion, and diagnostic tests pass |
+| DEAS baseline | re-run definition validation against the active correction manifest and historical C3/C2 predecessors | definition result has `PACKAGE` scope, names G7/G8/G9 pending, and preserves the exact six-finding Generation 1 regression |
+| Resource bounds | stream stdout and stderr concurrently, cap combined output at four MiB, kill stalled process groups, reject unexpected diagnostics, and keep argument parsing inside the structured failure seam | Git and Phase 2 timeout, exhaustion, diagnostic, invalid-argument, and runtime-error tests pass with stable rule IDs and paths |
+| External review and delivery | bind Standards and Spec decisions, commit, pushed ref, draft-PR head, unchanged base, and unmerged state outside the immutable package | exact package-manifest digest; both review axes PASS; non-force Git identities agree; external records close G7/G8/G9 without rewriting package bytes |
 
 ## Exception enforcement
 

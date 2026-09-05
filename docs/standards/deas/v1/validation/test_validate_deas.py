@@ -58,6 +58,35 @@ class DeasValidatorCliTests(unittest.TestCase):
             env=environment,
         )
 
+    def assert_validation_error(
+        self,
+        result: subprocess.CompletedProcess[str],
+        marker: str,
+        *,
+        path: str | None = None,
+        rule_id: str | None = None,
+    ) -> None:
+        self.assertEqual(2, result.returncode)
+        self.assertEqual("", result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertEqual(
+            {"decision", "finding_count", "findings", "schema_version"},
+            set(payload),
+        )
+        self.assertEqual("ERROR", payload["decision"])
+        self.assertEqual(1, payload["finding_count"])
+        self.assertEqual(1, payload["schema_version"])
+        self.assertEqual(1, len(payload["findings"]))
+        finding = payload["findings"][0]
+        self.assertEqual({"message", "path", "rule_id"}, set(finding))
+        self.assertRegex(finding["rule_id"], r"^DEAS-[A-Z]+-\d{3}$")
+        self.assertTrue(finding["path"])
+        self.assertIn(marker, finding["message"])
+        if path is not None:
+            self.assertEqual(path, finding["path"])
+        if rule_id is not None:
+            self.assertEqual(rule_id, finding["rule_id"])
+
     def materialize_git_blob(
         self,
         commit: str,
@@ -224,7 +253,7 @@ class DeasValidatorCliTests(unittest.TestCase):
         (destination / validator_path).write_text(script, encoding="utf-8")
         return self.write_generation_2_manifest(destination)
 
-    def write_superficially_complete_generation_2_task(self, destination: Path) -> str:
+    def write_package_ready_generation_2_task(self, destination: Path) -> str:
         task_path = next(
             path
             for path in self.generation_2_paths()
@@ -233,10 +262,10 @@ class DeasValidatorCliTests(unittest.TestCase):
         task = {
             "authority_lane": "TAYLOR_AI_WORKBENCH",
             "handoff": {"status": "PASS"},
-            "independent_review": {"status": "PASS"},
-            "post_action_validation": {"status": "PASS"},
+            "independent_review": {"status": "PENDING"},
+            "post_action_validation": {"status": "PENDING"},
             "risk_tier": "TIER_1",
-            "status": "COMPLETE",
+            "status": "READY_FOR_EXECUTION",
             "task_id": "DEGS-T1-DW-HWSW-P2-GENERATION-2-20260902",
             "unresolved_items": [],
             "validation": {"status": "PASS"},
@@ -262,7 +291,7 @@ class DeasValidatorCliTests(unittest.TestCase):
         )
         values = {
             "**Requirement/fault IDs:**": "DEGS-T1-DW-HWSW-P2-GENERATION-2-20260902",
-            "**Status:**": "PASS",
+            "**Status:**": "PACKAGE_PASS_READY_FOR_GIT_DELIVERY",
             "**Cryptographic identities:**": str(GENERATION_2_MANIFEST),
             "**Procedure or command identity:**": procedure,
             "**Discrepancy references:**": discrepancies,
@@ -299,9 +328,15 @@ class DeasValidatorCliTests(unittest.TestCase):
         for relative in evidence_paths:
             target = destination / relative
             self.materialize_git_blob(commit, relative, target)
-            separator = b"" if target.read_bytes().endswith(b"\n") else b"\n"
+            original = target.read_bytes()
+            separator = b"" if original.endswith(b"\n") else b"\n"
+            role = (
+                b""
+                if b"- **Role Disposition:**" in original
+                else b"- **Role Disposition:** not assigned\n"
+            )
             with target.open("ab") as output:
-                output.write(separator + contract + b"\n")
+                output.write(separator + contract + b"\n" + role)
         return self.write_generation_2_manifest(destination)
 
     def test_generation_1_fails_with_exact_semantic_findings(self) -> None:
@@ -381,19 +416,43 @@ class DeasValidatorCliTests(unittest.TestCase):
                 repository_root=source_root,
             )
 
-        self.assertEqual(2, result.returncode)
-        self.assertIn(
+        self.assert_validation_error(
+            result,
             f"Generation 1 identity mismatch: {relative}",
-            result.stderr,
         )
 
     def test_generation_2_requires_an_exact_identity_manifest(self) -> None:
         result = self.run_cli("conformance", "--generation", "2", "--json")
 
-        self.assertEqual(2, result.returncode)
-        self.assertIn(
+        self.assert_validation_error(
+            result,
             "Generation 2 requires an identity manifest and its SHA-256",
-            result.stderr,
+        )
+
+    def test_json_argument_failure_is_machine_readable(self) -> None:
+        result = self.run_cli("conformance", "--generation", "3", "--json")
+
+        self.assert_validation_error(
+            result,
+            "invalid arguments",
+            path="command-line",
+            rule_id="DEAS-PRE-007",
+        )
+
+    def test_json_runtime_failure_is_machine_readable(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            missing_root = Path(directory) / "missing"
+            result = self.run_cli(
+                "definition",
+                "--json",
+                repository_root=missing_root,
+            )
+
+        self.assert_validation_error(
+            result,
+            "repository root is not a directory",
+            path=".",
+            rule_id="DEAS-PRE-006",
         )
 
     def test_generation_2_rejects_an_incomplete_identity_manifest(self) -> None:
@@ -421,10 +480,9 @@ class DeasValidatorCliTests(unittest.TestCase):
                 repository_root=source_root,
             )
 
-        self.assertEqual(2, result.returncode)
-        self.assertIn(
+        self.assert_validation_error(
+            result,
             "Generation 2 identity manifest path set differs",
-            result.stderr,
         )
 
     def test_generation_2_rejects_a_malformed_identity_manifest(self) -> None:
@@ -446,8 +504,7 @@ class DeasValidatorCliTests(unittest.TestCase):
                 repository_root=source_root,
             )
 
-        self.assertEqual(2, result.returncode)
-        self.assertIn("invalid identity manifest line", result.stderr)
+        self.assert_validation_error(result, "invalid identity manifest line")
 
     def test_generation_2_rejects_an_out_of_root_identity_manifest(self) -> None:
         with tempfile.TemporaryDirectory() as repository_directory:
@@ -468,8 +525,7 @@ class DeasValidatorCliTests(unittest.TestCase):
                     repository_root=source_root,
                 )
 
-        self.assertEqual(2, result.returncode)
-        self.assertIn("identity manifest escapes repository root", result.stderr)
+        self.assert_validation_error(result, "identity manifest escapes repository root")
 
     def test_generation_2_requires_the_exact_manifest_path(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -490,8 +546,7 @@ class DeasValidatorCliTests(unittest.TestCase):
                 repository_root=source_root,
             )
 
-        self.assertEqual(2, result.returncode)
-        self.assertIn("Generation 2 identity manifest path differs", result.stderr)
+        self.assert_validation_error(result, "Generation 2 identity manifest path differs")
 
     def test_generation_2_rejects_missing_collection_state(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -509,8 +564,10 @@ class DeasValidatorCliTests(unittest.TestCase):
                 repository_root=source_root,
             )
 
-        self.assertEqual(2, result.returncode)
-        self.assertIn("evidence collection state is missing or duplicated", result.stderr)
+        self.assert_validation_error(
+            result,
+            "evidence collection state is missing or duplicated",
+        )
 
     def test_generation_2_rejects_an_inert_phase2_validator(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -528,8 +585,7 @@ class DeasValidatorCliTests(unittest.TestCase):
                 repository_root=source_root,
             )
 
-        self.assertEqual(2, result.returncode)
-        self.assertIn("Phase 2 validator result is not valid JSON", result.stderr)
+        self.assert_validation_error(result, "Phase 2 validator result is not valid JSON")
 
     def test_generation_2_terminates_a_stalled_phase2_validator(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -557,8 +613,7 @@ class DeasValidatorCliTests(unittest.TestCase):
                 repository_root=source_root,
             )
 
-        self.assertEqual(2, result.returncode)
-        self.assertIn("Phase 2 validator read timed out", result.stderr)
+        self.assert_validation_error(result, "Phase 2 validator read timed out")
 
     def test_generation_2_rejects_phase2_validator_diagnostics(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -580,8 +635,7 @@ class DeasValidatorCliTests(unittest.TestCase):
                 repository_root=source_root,
             )
 
-        self.assertEqual(2, result.returncode)
-        self.assertIn("Phase 2 validator emitted diagnostics", result.stderr)
+        self.assert_validation_error(result, "Phase 2 validator emitted diagnostics")
 
     def test_generation_2_independently_rejects_an_incomplete_task(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -600,15 +654,17 @@ class DeasValidatorCliTests(unittest.TestCase):
                 repository_root=source_root,
             )
 
-        self.assertEqual(2, result.returncode)
-        self.assertIn("Generation 2 task is incomplete or inconsistent", result.stderr)
+        self.assert_validation_error(
+            result,
+            "Generation 2 task is incomplete or inconsistent",
+        )
 
     def test_generation_2_independently_rejects_an_incomplete_report(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             source_root = Path(directory)
             self.materialize_semantic_pass_generation_2(source_root)
             self.write_passing_phase2_stub(source_root)
-            manifest_hash = self.write_superficially_complete_generation_2_task(
+            manifest_hash = self.write_package_ready_generation_2_task(
                 source_root
             )
             result = self.run_cli(
@@ -623,15 +679,91 @@ class DeasValidatorCliTests(unittest.TestCase):
                 repository_root=source_root,
             )
 
-        self.assertEqual(2, result.returncode)
-        self.assertIn("Generation 2 validation report is incomplete", result.stderr)
+        self.assert_validation_error(result, "Generation 2 validation report is incomplete")
+
+    def test_generation_2_rejects_each_embedded_completion_claim(self) -> None:
+        mutations = (
+            ("task completion", "status", "COMPLETE"),
+            ("post-action PASS", "post_action_validation", {"status": "PASS"}),
+            ("review PASS", "independent_review", {"status": "PASS"}),
+        )
+        for label, field, value in mutations:
+            with self.subTest(label=label), tempfile.TemporaryDirectory() as directory:
+                source_root = Path(directory)
+                self.materialize_semantic_pass_generation_2(source_root)
+                self.write_passing_phase2_stub(source_root)
+                self.write_package_ready_generation_2_task(source_root)
+                task_path = next(
+                    path
+                    for path in self.generation_2_paths()
+                    if path.endswith("degs/phase2-generation-2-task.json")
+                )
+                task_file = source_root / task_path
+                task = json.loads(task_file.read_text(encoding="utf-8"))
+                task[field] = value
+                task_file.write_text(
+                    json.dumps(task, indent=2, sort_keys=True) + "\n",
+                    encoding="utf-8",
+                )
+                manifest_hash = self.write_generation_2_manifest(source_root)
+                result = self.run_cli(
+                    "conformance",
+                    "--generation",
+                    "2",
+                    "--identity-manifest",
+                    str(GENERATION_2_MANIFEST),
+                    "--identity-manifest-sha256",
+                    manifest_hash,
+                    "--json",
+                    repository_root=source_root,
+                )
+
+            self.assert_validation_error(
+                result,
+                "Generation 2 task is incomplete or inconsistent",
+            )
+
+    def test_generation_2_rejects_an_unfrozen_engineering_gate(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source_root = Path(directory)
+            self.materialize_semantic_pass_generation_2(source_root)
+            self.preserve_generation_1_evidence(source_root)
+            self.write_passing_phase2_stub(source_root)
+            self.write_package_ready_generation_2_task(source_root)
+            manifest_hash = self.write_superficially_complete_generation_2_report(
+                source_root,
+                procedure="See Exact validation commands below.",
+                discrepancies="NONE",
+                include_commands=True,
+            )
+            gate = source_root / "governance/bin/engineering-gate.py"
+            gate.parent.mkdir(parents=True)
+            gate.write_text("#!/usr/bin/env python3\n", encoding="utf-8")
+            result = self.run_cli(
+                "conformance",
+                "--generation",
+                "2",
+                "--identity-manifest",
+                str(GENERATION_2_MANIFEST),
+                "--identity-manifest-sha256",
+                manifest_hash,
+                "--json",
+                repository_root=source_root,
+            )
+
+        self.assert_validation_error(
+            result,
+            "canonical DEGS gate identity differs",
+            path="governance/bin/engineering-gate.py",
+            rule_id="DEAS-PRE-003",
+        )
 
     def test_generation_2_rejects_report_without_literal_commands(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             source_root = Path(directory)
             self.materialize_semantic_pass_generation_2(source_root)
             self.write_passing_phase2_stub(source_root)
-            self.write_superficially_complete_generation_2_task(source_root)
+            self.write_package_ready_generation_2_task(source_root)
             manifest_hash = self.write_superficially_complete_generation_2_report(
                 source_root
             )
@@ -647,15 +779,14 @@ class DeasValidatorCliTests(unittest.TestCase):
                 repository_root=source_root,
             )
 
-        self.assertEqual(2, result.returncode)
-        self.assertIn("Generation 2 report command evidence differs", result.stderr)
+        self.assert_validation_error(result, "Generation 2 report command evidence differs")
 
     def test_generation_2_rejects_unstable_discrepancy_references(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             source_root = Path(directory)
             self.materialize_semantic_pass_generation_2(source_root)
             self.write_passing_phase2_stub(source_root)
-            self.write_superficially_complete_generation_2_task(source_root)
+            self.write_package_ready_generation_2_task(source_root)
             manifest_hash = self.write_superficially_complete_generation_2_report(
                 source_root,
                 procedure="See Exact validation commands below.",
@@ -673,10 +804,9 @@ class DeasValidatorCliTests(unittest.TestCase):
                 repository_root=source_root,
             )
 
-        self.assertEqual(2, result.returncode)
-        self.assertIn(
+        self.assert_validation_error(
+            result,
             "Generation 2 report discrepancy evidence differs",
-            result.stderr,
         )
 
     def test_generation_2_rejects_changed_original_observations(self) -> None:
@@ -684,7 +814,7 @@ class DeasValidatorCliTests(unittest.TestCase):
             source_root = Path(directory)
             self.materialize_semantic_pass_generation_2(source_root)
             self.write_passing_phase2_stub(source_root)
-            self.write_superficially_complete_generation_2_task(source_root)
+            self.write_package_ready_generation_2_task(source_root)
             manifest_hash = self.write_superficially_complete_generation_2_report(
                 source_root,
                 procedure="See Exact validation commands below.",
@@ -703,8 +833,7 @@ class DeasValidatorCliTests(unittest.TestCase):
                 repository_root=source_root,
             )
 
-        self.assertEqual(2, result.returncode)
-        self.assertIn("Generation 2 original observations differ", result.stderr)
+        self.assert_validation_error(result, "Generation 2 original observations differ")
 
     def test_generation_2_rejects_a_role_disposition_addition(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -712,7 +841,7 @@ class DeasValidatorCliTests(unittest.TestCase):
             self.materialize_semantic_pass_generation_2(source_root)
             self.preserve_generation_1_evidence(source_root)
             self.write_passing_phase2_stub(source_root)
-            self.write_superficially_complete_generation_2_task(source_root)
+            self.write_package_ready_generation_2_task(source_root)
             self.write_superficially_complete_generation_2_report(
                 source_root,
                 procedure="See Exact validation commands below.",
@@ -739,8 +868,7 @@ class DeasValidatorCliTests(unittest.TestCase):
                 repository_root=source_root,
             )
 
-        self.assertEqual(2, result.returncode)
-        self.assertIn("Generation 2 Role Disposition differs", result.stderr)
+        self.assert_validation_error(result, "Generation 2 Role Disposition differs")
 
     def test_evidence_record_cli_rejects_empty_and_duplicate_values(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -795,8 +923,7 @@ class DeasValidatorCliTests(unittest.TestCase):
                 repository_root=source_root,
             )
 
-        self.assertEqual(2, result.returncode)
-        self.assertIn("input exceeds 4194304 bytes", result.stderr)
+        self.assert_validation_error(result, "input exceeds 4194304 bytes")
 
     def test_definition_cli_terminates_a_stalled_git_read(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -810,8 +937,7 @@ class DeasValidatorCliTests(unittest.TestCase):
                 environment=environment,
             )
 
-        self.assertEqual(2, result.returncode)
-        self.assertIn("Generation 1 Git read timed out", result.stderr)
+        self.assert_validation_error(result, "Generation 1 Git read timed out")
 
     def test_definition_cli_prevents_oversize_git_output(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -825,8 +951,7 @@ class DeasValidatorCliTests(unittest.TestCase):
                 environment=environment,
             )
 
-        self.assertEqual(2, result.returncode)
-        self.assertIn("Generation 1 Git output limit exceeded", result.stderr)
+        self.assert_validation_error(result, "Generation 1 Git output limit exceeded")
 
     def test_definition_cli_rejects_successful_git_diagnostics(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -841,8 +966,7 @@ class DeasValidatorCliTests(unittest.TestCase):
                 environment=environment,
             )
 
-        self.assertEqual(2, result.returncode)
-        self.assertIn("Generation 1 Git emitted diagnostics", result.stderr)
+        self.assert_validation_error(result, "Generation 1 Git emitted diagnostics")
 
     def test_definition_passes_with_frozen_generation_1_regression(self) -> None:
         task = json.loads(DEFINITION_TASK.read_text(encoding="utf-8"))
@@ -854,6 +978,8 @@ class DeasValidatorCliTests(unittest.TestCase):
             {
                 "artifact_manifest_verified": True,
                 "decision": "PASS",
+                "decision_scope": "PACKAGE",
+                "external_gates_pending": ["G7", "G8", "G9"],
                 "generation_1_decision": "FAIL",
                 "generation_1_findings_match": True,
                 "overlay_count": 6,
