@@ -68,3 +68,29 @@ The `0`-byte sanitizer result conflicts with the nonzero POSIX available-block r
 | Gatekeeper assessments | enabled | `P2-CP-013` |
 
 These observations establish status only. No recovery, configuration, or key material was accessed.
+
+## DEAS evidence-record contract
+
+- **Evidence ID:** EV-P2-CP-BASELINE
+- **Requirement/fault IDs:** `REQ-PGM-005`, `REQ-CP-001`, `DEAS-EVIDENCE-001`
+- **Claim under test:** The authorized Phase 2 observation recorded the listed privacy-safe current-Mac fields and preserved the unresolved free-space discrepancy; it did not establish Control Plane qualification.
+- **Acceptance method:** Inspection of the frozen sanitized outputs and canonical record without evidence recollection.
+- **Exact source/configuration/role/device-safe identity/environment/target:** `CP-CANDIDATE-01` in the 2026-09-02 supervised qualification environment; exact configuration identities are in `../source-register.md`.
+- **Procedure or command identity:** `P2-CP-001` through `P2-CP-013` as frozen in the method catalog; no command was rerun for Generation 2.
+- **Start time:** 2026-09-02T01:49:15Z
+- **End time:** 2026-09-02T01:57:21Z
+- **Clock-quality basis:** UTC execution-host timestamps recorded by the historical command log; per-command subsecond precision is NOT RECORDED.
+- **Expected result:** Privacy-safe allowed fields, explicit UNKNOWN values for unavailable or conflicting facts, and no mutation or Role Disposition.
+- **Actual result:** Allowed fields were recorded; root free-space methods disagreed; read-only flags and any fitness conclusion remain UNKNOWN; no mutation occurred.
+- **Status:** OBSERVED_WITH_UNRESOLVED_DISCREPANCY
+- **Discrepancy references:** [Root free-space disagreement and unavailable flags](../discrepancies-and-unknowns.md#current-observations)
+- **Artifact paths:** `evidence/current-mac-baseline.md`, `evidence/command-log.md`, and `discrepancies-and-unknowns.md`
+- **Cryptographic identities:** Generation 1 file SHA-256 `9478faa83b6367d8737325fb1136c2d9c90eabf42d64c52a715c0a533ca87eca`; the successor is bound by `../generation-2-sha256.txt`.
+- **Evidence owner:** UNKNOWN; contemporaneous evidence does not name the owner accountable for record integrity.
+- **Human/physical action owner:** Taylor for authorization; physical action NOT APPLICABLE.
+- **Confidentiality classification:** PRIVATE PERSONAL USE - NOT FOR PUBLIC RELEASE
+- **Recoverability classification:** Recoverable from Generation 1 commit `f45ae80c64a0aa8c723a5a58b4fbc7073682d349` and the frozen manifests; observations were not recollected.
+- **Limitations:** The methods were privacy-filtered point observations; they do not reconcile free space, expose read-only flags, test recovery, or establish current fitness.
+- **Unsupported inferences:** Current capacity, health, recoverability, Control Plane suitability, Role Disposition, qualification, release, and any post-observation state.
+- **Current freshness:** Historical observation window ending 2026-09-02T01:57:21Z; no Generation 2 remeasurement occurred, so present operational values are UNKNOWN.
+- **Supersession:** Generation 2 supersedes only the evidence-contract omission in the Generation 1 record; every original observation line remains preserved in order.

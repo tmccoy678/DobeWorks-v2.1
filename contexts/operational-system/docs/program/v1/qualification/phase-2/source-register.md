@@ -28,3 +28,25 @@ The exact command text is bound by the frozen method-catalog identity above. Exe
 ## Evidence handling
 
 Only role IDs `CP-CANDIDATE-01`, `SR-CANDIDATE-01`, `WK-CANDIDATE-01`, and `OBS-SURFACE-01` identify observed targets. Raw outputs have zero intended retention. Command-output hashes establish execution traceability without persisting prohibited fields.
+
+## Generation 2 correction sources
+
+Generation 2 is a documentation correction, not evidence recollection.
+
+| Source | Identity | Use |
+|---|---|---|
+| Immutable Generation 1 | commit `f45ae80c64a0aa8c723a5a58b4fbc7073682d349`; 28-path manifest `9ed515ac90cc100bae3d3a3baa674d6c2a200f5e18b3da4d7b4daaf979ac8d77` | Historical negative regression and original observations |
+| Corrected DEAS v1.0 definition | commit `ca8efcefe6568a7a64b5b6d930031dff0131efec`; tree `e785cafa49bdfcc3ec5e660d3a87c943047d9ef5`; manifest-file SHA-256 `3f40080f3cd725db8906385abb6f7db79fadef5a231cf6bc9206b2fa43863c88` | Reconciled package lifecycle, public validator seam, C4 rules, and correction boundary |
+| Exact C4 plan | `docs/standards/deas/v1/phase2-generation-2-plan.md` at commit `ca8efcefe6568a7a64b5b6d930031dff0131efec` | Exact paths, transformations, proof sequence, and exclusions |
+| Generation 2 task | `degs/phase2-generation-2-task.json`; task `DEGS-T1-DW-HWSW-P2-GENERATION-2-20260902` | Taylor authority, scope, tests, stops, and acceptance |
+| Canonical DEGS engineering gate | workspace `governance/bin/engineering-gate.py`; SHA-256 `44c33ba743851d7befe11ebf93f2f4d9021b126f951a4587562adfca21f65c1e` | Frozen executable input for Generation 2 DEGS validate and evaluate |
+| Resumed-C4 backup | workspace `.scratch/dobeworks-deas-v1-generation-2/backup/dobeworks-pre-c4-resumed.bundle`; SHA-256 `8a01883b463ae85fddeebf0b78cc0e601903a1350567c761a5d1241ee3065200` | Complete-history recovery source rooted at the correction predecessor |
+| Active package manifest | `evidence-sha256.txt` | Active canonical package identities, excluding itself and the non-circular Generation 2 manifest |
+| Generation 2 identity manifest | `generation-2-sha256.txt` | Exact other 14 C4 artifacts; its SHA-256 is supplied externally after freezing |
+| Generation 2 validation | `validation/validation-report.md` | Compound public-seam result and limitations |
+| Independent review | workspace `.scratch/dobeworks-deas-v1-generation-2/review/final-review-index.md` | External Standards and Spec decisions bound after package freeze; canonical state remains `PENDING` |
+
+The predecessor `evidence-sha256.txt` has SHA-256
+`3901bb1d87659585092037d86d7f5291bd84091739f797dd56f51a4766476e80`.
+Taylor's exact C4 instruction is preserved in `qualification-plan.md`. No
+session, window, or model identity is used as authority evidence.
