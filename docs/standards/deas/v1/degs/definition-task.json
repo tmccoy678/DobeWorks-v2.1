@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "task_id": "DEGS-T1-DW-ENGINEERING-ASSURANCE-V1-CORRECT-20260905",
+  "task_author": "Codex in Taylor AI Workbench",
+  "title": "Correct the DEAS v1.0 Generation 2 lifecycle contract",
+  "objective": "Reconcile the accepted DEAS lifecycle rule, C4 plan, enforcement matrix, and C3 validator so immutable packages remain READY_FOR_EXECUTION with embedded review and Git post-action states PENDING while external records bind review and delivery.",
+  "stakeholders": ["Taylor"],
+  "scope": {
+    "description": "Exactly 10 DEAS definition-correction paths on deas/v1-phase2-generation-2, with C3 as the immutable predecessor and C4 retained as a separate unstaged layer.",
+    "read_only": false
+  },
+  "non_goals": [
+    "Change or stage a C4 path in the definition-correction commit",
+    "Weaken or waive a DEAS gate or create an exception",
+    "Merge or change main",
+    "Adopt DEAS outside the DobeWorks repository",
+    "Begin Phase 3, assign a Role Disposition, qualify, or release",
+    "Access or change devices, storage, credentials, permissions, private sources, repository settings, collaborators, or unrelated files",
+    "Amend, rebase, reset, force-push, delete, or rewrite history"
+  ],
+  "authority_lane": "TAYLOR_AI_WORKBENCH",
+  "risk_tier": "TIER_1",
+  "requirements": [
+    "Preserve C3 commit 47b32aeeb107584291f69ba90b11706c7cf3eae0 and its accepted 13-artifact definition identity.",
+    "Keep immutable package tasks READY_FOR_EXECUTION and embedded independent-review and post-action-validation states PENDING.",
+    "Bind G7 delivery, G8 review, and G9 acceptance in external control-plane evidence without rewriting reviewed package bytes.",
+    "Update the C4 plan, enforcement matrix, and DEAS validator to one lifecycle contract without exception.",
+    "Reject a Generation 2 task that embeds COMPLETE, review PASS, or post-action PASS before external delivery.",
+    "Verify canonical DEGS engineering-gate SHA-256 44c33ba743851d7befe11ebf93f2f4d9021b126f951a4587562adfca21f65c1e before and after use.",
+    "Emit closed-schema machine-readable JSON with a stable rule ID and path for argument and runtime validation errors.",
+    "Preserve the exact Generation 1 six-finding negative regression and all existing DEAS profiles, overlays, invariants, resource bounds, and authority exclusions.",
+    "Refreeze all 13 active DEAS definition artifacts in the sorted non-self manifest."
+  ],
+  "acceptance_criteria": [
+    "The definition-correction diff contains exactly the 10 authorized paths and no C4 path is staged with it.",
+    "The public DEAS validator tests pass, including independent rejection of embedded Generation 2 task completion, review PASS, and post-action PASS claims.",
+    "The validator rejects an unfrozen engineering gate and emits structured JSON for argument and runtime errors.",
+    "Definition validation passes with three profiles, six overlays, ten invariants, matching Generation 1 findings, and a verified artifact manifest.",
+    "Direct Generation 1 conformance exits 1 with exactly the frozen six findings.",
+    "This task JSON validates and its Tier 1 DEGS evaluation passes while independent review and Git post-action validation remain PENDING.",
+    "Syntax, Strict function-size, JSON, links, diff, hash, secret, positive, negative, timeout, exhaustion, and diagnostic checks pass.",
+    "External Standards and Spec reviews bind the exact frozen manifest and report no blocker without changing canonical package bytes.",
+    "One coherent correction commit is pushed non-force to the existing private branch and draft PR; main remains unchanged and no merge occurs."
+  ],
+  "assumptions": [
+    "C3 is 47b32aeeb107584291f69ba90b11706c7cf3eae0 and is the local and remote task-branch head before this correction.",
+    "C2 and the immutable Generation 1 baseline remain f45ae80c64a0aa8c723a5a58b4fbc7073682d349.",
+    "The exact Generation 1 28-path manifest remains 9ed515ac90cc100bae3d3a3baa674d6c2a200f5e18b3da4d7b4daaf979ac8d77.",
+    "The separately frozen 15-path C4 working layer remains byte-identical until this correction is delivered."
+  ],
+  "invariants": [
+    "DEGS-SEC-003",
+    "DEGS-SEC-002",
+    "DEGS-AI-004",
+    "DEGS-DATA-001",
+    "DEGS-RISK-003",
+    "DEGS-CFG-001",
+    "DEGS-SEC-004",
+    "DEGS-SEC-005",
+    "DEGS-SEC-006",
+    "DEGS-AI-003",
+    "DEGS-AI-002",
+    "DEGS-AI-006",
+    "DEGS-OPS-002",
+    "DEGS-OPS-004",
+    "DEGS-DATA-002",
+    "DEGS-DATA-003",
+    "DEGS-RISK-006",
+    "DEGS-OPS-001",
+    "DEGS-CFG-002",
+    "DEGS-CFG-003",
+    "DEGS-REQ-001"
+  ],
+  "baseline": {
+    "status": "VERIFIED",
+    "evidence_path": "../source-register.md"
+  },
+  "alternatives": [
+    "Change the standard to permit embedded COMPLETE before Git delivery",
+    "Use duplicate or ambiguous JSON status values to satisfy conflicting checks",
+    "Create an exception for the first conforming Generation 2 correction",
+    "Commit C4 together with the definition correction"
+  ],
+  "selected_design": "Preserve the stronger accepted lifecycle rule, make package PASS explicitly pre-review and pre-delivery, keep embedded review and post-action states PENDING, freeze external executable inputs, emit structured failures, and bind later G7, G8, and G9 evidence externally.",
+  "affected_files": [
+    "docs/standards/deas/v1/standard.md",
+    "docs/standards/deas/v1/enforcement-matrix.md",
+    "docs/standards/deas/v1/phase2-generation-2-plan.md",
+    "docs/standards/deas/v1/degs/definition-task.json",
+    "docs/standards/deas/v1/source-register.md",
+    "docs/standards/deas/v1/handoff.md",
+    "docs/standards/deas/v1/validation/validate_deas.py",
+    "docs/standards/deas/v1/validation/test_validate_deas.py",
+    "docs/standards/deas/v1/validation/validation-report.md",
+    "docs/standards/deas/v1/deas-v1-sha256.txt"
+  ],
+  "backup": {
+    "required": true,
+    "status": "VERIFIED",
+    "evidence_path": "../validation/validation-report.md"
+  },
+  "rollback": {
+    "required": true,
+    "status": "VERIFIED",
+    "procedure": "Preserve C3, the verified complete-history bundle, the exact pre-correction C4 patch, the correction candidate, review evidence, and owned lock. Do not amend, reset, rebase, force-push, delete, merge, or automatically roll back.",
+    "evidence_path": "../handoff.md"
+  },
+  "risk_analysis": {
+    "status": "NOT_REQUIRED",
+    "summary": "Tier 1 reversible private-repository policy, validator, test, task, evidence, and manifest correction bounded by exact paths, frozen predecessors, deterministic tests, independent review, and non-force Git delivery."
+  },
+  "tests": {
+    "static": [{"status": "PASS", "evidence_path": "../validation/validation-report.md"}],
+    "positive": [{"status": "PASS", "evidence_path": "../validation/validation-report.md"}],
+    "negative": [{"status": "PASS", "evidence_path": "../validation/validation-report.md"}],
+    "security": [{"status": "PASS", "evidence_path": "../validation/validation-report.md"}],
+    "failure_path": [{"status": "PASS", "evidence_path": "../validation/validation-report.md"}],
+    "integration": [{"status": "PASS", "evidence_path": "../validation/validation-report.md"}],
+    "end_to_end": []
+  },
+  "verification": {"status": "PASS", "evidence_path": "../validation/validation-report.md"},
+  "validation": {"status": "PASS", "evidence_path": "../validation/validation-report.md"},
+  "independent_review": {
+    "required": true,
+    "status": "PENDING",
+    "kind": "REVIEW",
+    "open_issues_status": "UNKNOWN",
+    "retest_status": "PENDING",
+    "evidence_path": ".scratch/dobeworks-deas-v1-definition-correction/review/final-review-index.md"
+  },
+  "human_approval": {
+    "required": true,
+    "status": "APPROVED",
+    "approver": "Taylor",
+    "approver_role": "HUMAN",
+    "approval_mode": "OUT_OF_BAND",
+    "evidence_path": "../source-register.md"
+  },
+  "recovery_validation": {"required": false, "status": "NOT_REQUIRED"},
+  "target_identity": "C3 47b32aeeb107584291f69ba90b11706c7cf3eae0 plus exactly the 10 definition-correction paths and the externally bound deas-v1-sha256.txt.",
+  "blast_radius": "Exactly 10 definition-correction paths on one private task branch and draft pull request; no C4 staging in this commit and no main, merge, release, device, storage, credential, or cross-workspace change.",
+  "stop_conditions": [
+    "A predecessor, branch, path, C4 byte, manifest, private-remote, task-lock, or writer check changes unexpectedly.",
+    "Any required check fails and cannot be corrected within the exact 10-path authority, outside the expected Generation 1 nonconformance.",
+    "Any exception, unsupported fact, path expansion, authentication interaction, non-fast-forward push, or review finding requiring wider scope becomes necessary.",
+    "Any merge, main mutation, root adoption, Phase 3, release, Role Disposition, device, storage, credential, permission, physical, destructive, security-setting, collaborator, or unrelated action would occur."
+  ],
+  "post_action_validation": {"status": "PENDING", "evidence_path": "../validation/validation-report.md"},
+  "dry_run": {
+    "applicable": true,
+    "performed": true,
+    "status": "PASS",
+    "evidence_path": "../validation/validation-report.md"
+  },
+  "telemetry": {"status": "PASS", "evidence_path": "../validation/validation-report.md"},
+  "documentation": {"status": "PASS", "evidence_path": "../standard.md"},
+  "handoff": {"status": "PASS", "evidence_path": "../handoff.md"},
+  "secret_handling": {
+    "exposure_possible": false,
+    "controlled": true,
+    "status": "PASS",
+    "evidence_path": "../validation/validation-report.md"
+  },
+  "warnings": [],
+  "unresolved_items": [],
+  "status": "READY_FOR_EXECUTION"
+}

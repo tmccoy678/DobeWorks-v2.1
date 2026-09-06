@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "task_id": "DEGS-T1-DW-HWSW-P2-GENERATION-2-20260902",
+  "task_author": "Codex in Taylor AI Workbench",
+  "title": "Create the conforming Phase 2 Generation 2 documentation correction",
+  "objective": "Correct the exact Phase 2 documentation and validator defects identified by DEAS while preserving immutable Generation 1 observations, uncertainties, privacy boundaries, and the absence of a Role Disposition.",
+  "stakeholders": ["Taylor"],
+  "scope": {
+    "description": "The exact 15-path C4 package correction; Git delivery is external.",
+    "read_only": false
+  },
+  "non_goals": [
+    "Recollect, reinterpret, normalize, or replace any original observation",
+    "Resolve an UNKNOWN or BLOCKED_PENDING_EVIDENCE value",
+    "Assign a Role Disposition, qualify or release the system, or begin Phase 3",
+    "Merge or change main",
+    "Adopt DEAS outside the DobeWorks repository",
+    "Complete, predict, or attest the commit, pushed ref, pull-request head, or other Git delivery identity inside this immutable package",
+    "Access or change devices, storage, credentials, permissions, private sources, repository settings, collaborators, or unrelated files",
+    "Amend, rebase, reset, force-push, delete, or rewrite history"
+  ],
+  "authority_lane": "TAYLOR_AI_WORKBENCH",
+  "risk_tier": "TIER_1",
+  "requirements": [
+    "Preserve Generation 1 at commit f45ae80c64a0aa8c723a5a58b4fbc7073682d349 and reproduce its exact six DEAS findings.",
+    "Change exactly the 15 C4 paths frozen by the accepted DEAS plan.",
+    "Replace stale Phase 2 reservations and unchecked historical entry items only where exact evidence supplies a truthful disposition.",
+    "Implement all 23 canonical evidence-record fields for the four consequential records without moving or changing an original line.",
+    "Keep each Python function within 60 logical code lines and fail closed on missing, malformed, oversize, out-of-root, manifest-mismatched, changed-original, timeout, execution-error, or noisy subprocess input.",
+    "Require exact package and Generation 2 manifests, silent structured Phase 2 and DEGS results, and independent DEAS corroboration.",
+    "Require the corrected DEAS definition at commit ca8efcefe6568a7a64b5b6d930031dff0131efec with manifest-file SHA-256 3f40080f3cd725db8906385abb6f7db79fadef5a231cf6bc9206b2fa43863c88.",
+    "Keep JSON-mode argument and runtime failures inside one closed-schema public error seam with stable rule IDs and paths.",
+    "Keep Role Disposition at not assigned and preserve every unknown, blocked state, privacy boundary, and excluded action."
+  ],
+  "acceptance_criteria": [
+    "The public Phase 2 CLI returns the exact schema-v2 PASS object with empty standard error.",
+    "The public DEAS Generation 2 CLI returns package-scoped PASS with zero semantic findings, independent compound corroboration, and G7/G8/G9 explicitly pending.",
+    "Generation 1 still exits 1 with exactly the frozen six ordered findings.",
+    "The canonical DEGS validate and evaluate commands return exact silent PASS JSON.",
+    "Syntax, function size, JSON, links, manifests, diff, secret, positive, negative, timeout, execution-error, and original-line preservation checks pass.",
+    "Standards and Spec review have no blocking finding.",
+    "The immutable package remains READY_FOR_EXECUTION, changes exactly the 15 C4 paths, and hands off in READY_FOR_GIT_DELIVERY state; review, commit, push, pull-request, unchanged-main, unmerged, and exact-result acceptance identities remain external evidence."
+  ],
+  "assumptions": [
+    "The delivered definition-correction predecessor is ca8efcefe6568a7a64b5b6d930031dff0131efec and remains the branch and draft pull-request head before resumed C4.",
+    "C2 and immutable Generation 1 are f45ae80c64a0aa8c723a5a58b4fbc7073682d349.",
+    "The exact Generation 1 manifest remains 9ed515ac90cc100bae3d3a3baa674d6c2a200f5e18b3da4d7b4daaf979ac8d77.",
+    "The corrected DEAS v1.0 definition has tree e785cafa49bdfcc3ec5e660d3a87c943047d9ef5 and manifest-file SHA-256 3f40080f3cd725db8906385abb6f7db79fadef5a231cf6bc9206b2fa43863c88."
+  ],
+  "invariants": [
+    "DEGS-SEC-003",
+    "DEGS-SEC-002",
+    "DEGS-AI-004",
+    "DEGS-DATA-001",
+    "DEGS-RISK-003",
+    "DEGS-CFG-001",
+    "DEGS-SEC-004",
+    "DEGS-SEC-005",
+    "DEGS-SEC-006",
+    "DEGS-AI-003",
+    "DEGS-AI-002",
+    "DEGS-AI-006",
+    "DEGS-OPS-002",
+    "DEGS-OPS-004",
+    "DEGS-DATA-002",
+    "DEGS-DATA-003",
+    "DEGS-RISK-006",
+    "DEGS-OPS-001",
+    "DEGS-CFG-002",
+    "DEGS-CFG-003",
+    "DEGS-REQ-001"
+  ],
+  "baseline": {
+    "status": "VERIFIED",
+    "evidence_path": "../generation-history.md"
+  },
+  "alternatives": [
+    "Rewrite Generation 1 in place",
+    "Treat the three semantic finding families as waived",
+    "Recollect evidence to fill gaps",
+    "Rely on a nested Phase 2 PASS assertion without independent DEAS corroboration"
+  ],
+  "selected_design": "Create one immutable successor generation with additive evidence-contract metadata, exact historical dispositions, public-seam fail-closed validation, non-circular manifests, and no change to original observations or authority.",
+  "affected_files": [
+    "contexts/operational-system/docs/program/v1/traceability-matrix.md",
+    "contexts/operational-system/docs/program/v1/phase-2-entry-criteria.md",
+    "contexts/operational-system/docs/program/v1/qualification/phase-2/qualification-plan.md",
+    "contexts/operational-system/docs/program/v1/qualification/phase-2/source-register.md",
+    "contexts/operational-system/docs/program/v1/qualification/phase-2/evidence/current-mac-baseline.md",
+    "contexts/operational-system/docs/program/v1/qualification/phase-2/evidence/seagate-device-volume.md",
+    "contexts/operational-system/docs/program/v1/qualification/phase-2/evidence/worker-candidate.md",
+    "contexts/operational-system/docs/program/v1/qualification/phase-2/evidence/observer-surface.md",
+    "contexts/operational-system/docs/program/v1/qualification/phase-2/validation/validate_phase2.py",
+    "contexts/operational-system/docs/program/v1/qualification/phase-2/validation/validation-report.md",
+    "contexts/operational-system/docs/program/v1/qualification/phase-2/handoff.md",
+    "contexts/operational-system/docs/program/v1/qualification/phase-2/evidence-sha256.txt",
+    "contexts/operational-system/docs/program/v1/qualification/phase-2/generation-history.md",
+    "contexts/operational-system/docs/program/v1/qualification/phase-2/generation-2-sha256.txt",
+    "contexts/operational-system/docs/program/v1/qualification/phase-2/degs/phase2-generation-2-task.json"
+  ],
+  "backup": {
+    "required": true,
+    "status": "VERIFIED",
+    "evidence_path": "../validation/validation-report.md"
+  },
+  "rollback": {
+    "required": true,
+    "status": "VERIFIED",
+    "procedure": "Preserve the exact definition-correction predecessor, verified resumed-C4 Git bundle, Generation 1 snapshot, C4 candidate, manifests, validation evidence, and owned lock on failure. Do not amend, reset, rebase, force-push, delete, merge, or automatically roll back.",
+    "evidence_path": "../handoff.md"
+  },
+  "risk_analysis": {
+    "status": "NOT_REQUIRED",
+    "summary": "Tier 1 reversible private-repository documentation and validator work, bounded by exact paths, immutable predecessors, deterministic tests, a verified backup, an existing private branch, and a draft pull request."
+  },
+  "tests": {
+    "static": [{"status": "PASS", "evidence_path": "../validation/validation-report.md"}],
+    "positive": [{"status": "PASS", "evidence_path": "../validation/validation-report.md"}],
+    "negative": [{"status": "PASS", "evidence_path": "../validation/validation-report.md"}],
+    "security": [{"status": "PASS", "evidence_path": "../validation/validation-report.md"}],
+    "failure_path": [{"status": "PASS", "evidence_path": "../validation/validation-report.md"}],
+    "integration": [{"status": "PASS", "evidence_path": "../validation/validation-report.md"}],
+    "end_to_end": []
+  },
+  "verification": {"status": "PASS", "evidence_path": "../validation/validation-report.md"},
+  "validation": {"status": "PASS", "evidence_path": "../validation/validation-report.md"},
+  "independent_review": {
+    "required": true,
+    "status": "PENDING",
+    "kind": "REVIEW",
+    "open_issues_status": "UNKNOWN",
+    "retest_status": "PENDING",
+    "evidence_path": ".scratch/dobeworks-deas-v1-generation-2/review/final-review-index.md"
+  },
+  "human_approval": {
+    "required": true,
+    "status": "APPROVED",
+    "approver": "Taylor",
+    "approver_role": "HUMAN",
+    "approval_mode": "OUT_OF_BAND",
+    "evidence_path": "../qualification-plan.md"
+  },
+  "recovery_validation": {"required": false, "status": "NOT_REQUIRED"},
+  "target_identity": "Definition-correction commit ca8efcefe6568a7a64b5b6d930031dff0131efec plus exactly the 15 C4 paths and the externally bound generation-2-sha256.txt.",
+  "blast_radius": "Exactly 15 C4 package paths; no Git delivery identity, main, merge, release, device, storage, credential, or cross-workspace change is completed by this package task.",
+  "stop_conditions": [
+    "A predecessor, branch, path, original line, manifest, private-remote, task-lock, or writer check changes unexpectedly.",
+    "Any required check fails and cannot be corrected within the exact C4 authority.",
+    "Any exception, unsupported fact, path expansion, authentication interaction, non-fast-forward push, or review finding requiring scope expansion becomes necessary.",
+    "Any merge, root adoption, Phase 3, qualification, release, Role Disposition, evidence recollection, device, storage, credential, permission, physical, destructive, security-setting, collaborator, or unrelated action would occur."
+  ],
+  "post_action_validation": {"status": "PENDING", "evidence_path": "../validation/validation-report.md"},
+  "dry_run": {
+    "applicable": true,
+    "performed": true,
+    "status": "PASS",
+    "evidence_path": "../validation/validation-report.md"
+  },
+  "telemetry": {"status": "PASS", "evidence_path": "../validation/validation-report.md"},
+  "documentation": {"status": "PASS", "evidence_path": "../qualification-plan.md"},
+  "handoff": {"status": "PASS", "evidence_path": "../handoff.md"},
+  "secret_handling": {
+    "exposure_possible": false,
+    "controlled": true,
+    "status": "PASS",
+    "evidence_path": "../validation/validation-report.md"
+  },
+  "warnings": [],
+  "unresolved_items": [],
+  "status": "READY_FOR_EXECUTION"
+}

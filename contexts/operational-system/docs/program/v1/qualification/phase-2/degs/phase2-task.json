@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "task_id": "DEGS-T1-DW-HWSW-P2-QUAL-20260901",
+  "task_author": "Codex in Taylor AI Workbench",
+  "title": "DobeWorks hardware/software v1 Phase 2 Read-Only Qualification",
+  "objective": "Collect a privacy-safe, read-only staged qualification Evidence Set for the current Mac, accessible Seagate metadata, the blocked 2015 MacBook candidate, and Observer feasibility without changing any device, permission, configuration, canonical project path, or protected data surface.",
+  "stakeholders": ["Taylor"],
+  "scope": {
+    "description": "Run only the exact commands in the reviewed method catalog and create exactly 13 evidence files beneath .scratch/dobeworks-hardware-software-v1-phase2-evidence/ for the reserved canonical destination.",
+    "read_only": false
+  },
+  "non_goals": [
+    "Inspect Seagate or Time Machine contents or request Full Disk Access",
+    "Operate, connect to, power on, or inspect the 2015 MacBook",
+    "Assign a final Role Disposition or begin Phase 3",
+    "Install or configure telemetry, services, software, startup items, or alerts",
+    "Mount, unmount, repair, benchmark, write, update, delete, reorganize, repartition, erase, sanitize, or wipe",
+    "Access PRIVATE VAULT, credentials, recovery keys, full serials, private identifiers, filenames, or user content",
+    "Create the reserved canonical destination, stage, commit, push, or modify governance"
+  ],
+  "authority_lane": "TAYLOR_AI_WORKBENCH",
+  "risk_tier": "TIER_1",
+  "requirements": [
+    "Bind execution to the exact final Phase 1 canonical and promotion evidence identities.",
+    "Use one exact staged Evidence Set and one reserved canonical destination.",
+    "Run only reviewed read-only commands and persist only allowlisted sanitized fields.",
+    "Refresh current-Mac evidence and treat historical values as planning context only.",
+    "Collect only accessible Seagate device/volume metadata and leave inaccessible facts UNKNOWN.",
+    "Record the 2015 MacBook as BLOCKED_PENDING_EVIDENCE absent a separate physical authorization.",
+    "Inventory Observer command feasibility without implementation or deployment.",
+    "Stop without Role Disposition, Phase 3, canonical promotion, commit, push, or authority expansion."
+  ],
+  "acceptance_criteria": [
+    "A refreshed canonical context and fresh manual context opening show no unresolved drift before execution.",
+    "Taylor separately authorizes execution of this exact task and route.",
+    "Exactly the 13 staged evidence paths are created and no canonical DobeWorks path changes.",
+    "Every command ID, target, exit, sanitizer result, and evidence identity is recorded without raw prohibited data.",
+    "Historical measurements are never represented as current evidence.",
+    "Missing, denied, ambiguous, or inaccessible evidence remains UNKNOWN or BLOCKED_PENDING_EVIDENCE.",
+    "The Phase 2 evidence validator and DEGS completion evaluation pass before evidence freezing.",
+    "Phase 2 stops without beginning Phase 3 or making a qualification/release claim."
+  ],
+  "assumptions": [
+    "The final Phase 1 canonical target and promotion evidence manifests remain unchanged.",
+    "The current Mac is the supervised execution host; any Seagate absence or ambiguity is a valid UNKNOWN result.",
+    "No 2015 MacBook evidence is available without a separate Taylor-performed physical step."
+  ],
+  "invariants": [
+    "DEGS-SEC-003", "DEGS-SEC-002", "DEGS-AI-004", "DEGS-DATA-001", "DEGS-RISK-003",
+    "DEGS-CFG-001", "DEGS-SEC-004", "DEGS-SEC-005", "DEGS-AI-003", "DEGS-AI-002",
+    "DEGS-OPS-002", "DEGS-OPS-004", "DEGS-DATA-002", "DEGS-OPS-001", "DEGS-CFG-002",
+    "DEGS-CFG-003", "DEGS-REQ-001", "DEGS-SEC-006", "DEGS-DATA-003", "DEGS-AI-006", "DEGS-RISK-006"
+  ],
+  "baseline": {"status": "VERIFIED", "evidence_path": "../source-register.md"},
+  "alternatives": [
+    "Write qualification evidence directly into the canonical repository",
+    "Reuse August 30 measurements as current evidence",
+    "Request Full Disk Access to enumerate Seagate backup contents",
+    "Operate the 2015 MacBook during the same task",
+    "Implement telemetry while qualifying its surface"
+  ],
+  "selected_design": "Use exact privacy-filtered one-shot commands to build one staged Evidence Set, reserve one canonical destination, record inaccessible facts as UNKNOWN, and require a later exact canonical promotion.",
+  "affected_files": [
+    ".scratch/dobeworks-hardware-software-v1-phase2-evidence/qualification-plan.md",
+    ".scratch/dobeworks-hardware-software-v1-phase2-evidence/source-register.md",
+    ".scratch/dobeworks-hardware-software-v1-phase2-evidence/evidence/current-mac-baseline.md",
+    ".scratch/dobeworks-hardware-software-v1-phase2-evidence/evidence/seagate-device-volume.md",
+    ".scratch/dobeworks-hardware-software-v1-phase2-evidence/evidence/worker-candidate.md",
+    ".scratch/dobeworks-hardware-software-v1-phase2-evidence/evidence/observer-surface.md",
+    ".scratch/dobeworks-hardware-software-v1-phase2-evidence/discrepancies-and-unknowns.md",
+    ".scratch/dobeworks-hardware-software-v1-phase2-evidence/evidence/command-log.md",
+    ".scratch/dobeworks-hardware-software-v1-phase2-evidence/validation/validate_phase2.py",
+    ".scratch/dobeworks-hardware-software-v1-phase2-evidence/validation/validation-report.md",
+    ".scratch/dobeworks-hardware-software-v1-phase2-evidence/degs/phase2-task.json",
+    ".scratch/dobeworks-hardware-software-v1-phase2-evidence/handoff.md",
+    ".scratch/dobeworks-hardware-software-v1-phase2-evidence/evidence-sha256.txt"
+  ],
+  "backup": {
+    "required": false,
+    "status": "NOT_REQUIRED",
+    "reason": "Execution created only a new bounded scratch Evidence Set and did not replace canonical or device data."
+  },
+  "rollback": {
+    "required": false,
+    "status": "NOT_REQUIRED",
+    "procedure": "Preserve the frozen sanitized evidence. Do not automatically delete, reset, or overwrite it; any later removal requires exact-scope review and Taylor direction.",
+    "reason": "The result is new reversible scratch documentation produced from read-only observations."
+  },
+  "risk_analysis": {
+    "status": "NOT_REQUIRED",
+    "summary": "Tier 1 reversible evidence documentation. Exact methods, privacy allowlists, hard stops, output hashing, deterministic validation, and UNKNOWN semantics controlled privacy leakage, access widening, stale context, and unsupported inference."
+  },
+  "tests": {
+    "static": [{"status": "PASS", "evidence_path": "../validation/validation-report.md"}],
+    "positive": [{"status": "PASS", "evidence_path": "../validation/validation-report.md"}],
+    "negative": [],
+    "security": [],
+    "failure_path": [],
+    "integration": [],
+    "end_to_end": []
+  },
+  "verification": {"status": "PASS", "evidence_path": "../validation/validation-report.md"},
+  "validation": {"status": "PASS", "evidence_path": "../validation/validation-report.md"},
+  "independent_review": {"required": false, "status": "NOT_REQUIRED"},
+  "human_approval": {"required": false, "status": "NOT_REQUIRED"},
+  "recovery_validation": {"required": false, "status": "NOT_REQUIRED"},
+  "target_identity": "Current Mac=CP-CANDIDATE-01; Seagate volume=SR-CANDIDATE-01; 2015 MacBook=WK-CANDIDATE-01; Observer surface=OBS-SURFACE-01; Phase 1 canonical manifest SHA-256 385b5f08b4248f115e6f04932400c864f6c1bf5135662e2fc4bb0c7e938b82cc; staged and canonical roots as recorded in the frozen route.",
+  "blast_radius": "Read-only observation of explicitly listed current-Mac and Seagate metadata plus exactly 13 new staged Markdown, JSON, Python, and hash artifacts; no canonical, device, permission, or configuration write.",
+  "stop_conditions": [
+    "Canonical context, Phase 1 identity, DEGS policy, target, method, or evidence-route drift.",
+    "The governance lock or a conflicting writer is present.",
+    "Any exact command is unavailable, returns unexpected sensitive fields, or requires a broader substitute.",
+    "Any Full Disk Access, authentication, credential, administrator, recovery-key, PRIVATE VAULT, content, or private-identifier access is requested.",
+    "Any Seagate/Time Machine traversal or any mount, unmount, repair, write, install, update, configuration, delete, partition, erase, sanitize, wipe, or other mutation would occur.",
+    "Any physical or remote 2015 MacBook action would occur without a separately authorized human step.",
+    "Any fact would need to be inferred, any Role Disposition issued, or Phase 3/canonical promotion begun."
+  ],
+  "post_action_validation": {"status": "PASS", "evidence_path": "../validation/validation-report.md"},
+  "dry_run": {"applicable": false, "performed": false, "status": "NOT_REQUIRED", "reason": "The task used only one-shot read-only observations and new controlled scratch artifacts."},
+  "telemetry": {"status": "PASS", "evidence_path": "../evidence/command-log.md"},
+  "documentation": {"status": "PASS", "evidence_path": "../qualification-plan.md"},
+  "handoff": {"status": "PASS", "evidence_path": "../handoff.md"},
+  "secret_handling": {"exposure_possible": true, "controlled": true, "status": "PASS", "evidence_path": "../validation/validation-report.md"},
+  "warnings": [
+    {
+      "severity": "CRITICAL",
+      "message": "Resolved: the canonical context was refreshed and the explicitly invoked fresh-context receipt reported READY with drift NONE.",
+      "resolved": true
+    },
+    {
+      "severity": "CRITICAL",
+      "message": "Resolved: Taylor explicitly authorized this exact task, frozen package identity, methods, 13-path route, privacy boundary, and hard stops.",
+      "resolved": true
+    }
+  ],
+  "unresolved_items": [],
+  "status": "COMPLETE"
+}
