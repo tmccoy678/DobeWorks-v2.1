@@ -13,17 +13,18 @@ and rollback are frozen in the external Phase 4 specification identified in
 [source-register.md](source-register.md). This package remains
 `NOT_YET_QUALIFIED` and `NOT_YET_RELEASED`.
 
-Generations 1 through 4 at commits
+Generations 1 through 5 at commits
 `c365171e3ae7aff184d5e2ade5ec470365765009`,
 `a9f11d8d92d3b3ae1b04d80e3ef9de31233f4c4c`,
 `6a989b8807c376e45b6345da54d6603d495ad3cd`, and
-`4cb086fbc1f22fe4b8c2a920f20af5ad0c3b4a9b` are preserved, independently
-rejected predecessors. Generation 5 retains the same interfaces and 25-path
-boundary while closing every recorded blocker, including unresolvable allowed
-input roots at both Module/CLI seams, unresolvable Markdown targets, and
-malformed unhashable task-status values. The Generation 4 duplicated-helper
+`4cb086fbc1f22fe4b8c2a920f20af5ad0c3b4a9b`, and
+`e81ad8f97bff79bed0ae44ad14a170b3f0c8c403` are preserved, independently
+rejected predecessors. Generation 6 retains the same interfaces and 25-path
+boundary while closing every recorded blocker, including stable allowed-root
+identity after construction, exact public API types, deterministic handling of
+NUL-bearing Markdown targets, and dangling staged destinations. The duplicated-helper
 observation is nonblocking: no shared runtime dependency is introduced solely
-to deduplicate small internal policy helpers. Generation 5 makes no retroactive
+to deduplicate small internal policy helpers. Generation 6 makes no retroactive
 PASS claim for any predecessor.
 
 ## Architecture
@@ -135,7 +136,10 @@ tests or a DEGS result.
 - JSON duplicate keys and extra fields fail closed.
 - Unhashable parsed/API values, excessive nesting, and symlink loops fail closed.
 - An unresolvable allowed input root returns a structured configuration failure
-  through each Module CLI instead of an exception traceback.
+  through each Module CLI instead of an exception traceback; its exact directory
+  identity is pinned at construction and replacement fails closed.
+- Public configuration, path, clock, and cancellation values require their exact
+  documented API types; malformed values return bounded rejection states.
 - Resolved inputs must be regular non-symlink files below an explicit allowed
   root; Staged Output uses a non-symlink existing directory.
 - The Worker/Observer Modules import no network client or subprocess facility.

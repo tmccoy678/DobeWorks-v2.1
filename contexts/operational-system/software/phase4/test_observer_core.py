@@ -208,10 +208,46 @@ class ObserverCoreTests(unittest.TestCase):
         loop.symlink_to(loop)
         with self.assertRaisesRegex(ValueError, "allowed input root"):
             ObserverCore(allowed_input_root=loop)
+        missing = self.root / "missing-root"
+        dangling = self.root / "dangling-root"
+        dangling.symlink_to(missing)
+        for invalid in ({}, missing, dangling):
+            with self.subTest(invalid=invalid):
+                with self.assertRaisesRegex(ValueError, "allowed input root"):
+                    ObserverCore(allowed_input_root=invalid)
         command = [sys.executable, "-B", str(BASE / "observer_core.py"), "--snapshot", str(self.snapshot), "--policy", str(self.policy), "--allowed-input-root", str(loop), "--now", NOW]
         completed = subprocess.run(command, text=True, capture_output=True, timeout=10, check=False)
         parsed = json.loads(completed.stdout)
         self.assertEqual((completed.returncode, completed.stderr, parsed["status"]), (2, "", "ERROR"))
+
+    def test_allowed_root_identity_drift_is_rejected(self) -> None:
+        for replacement in ("loop", "symlink", "directory"):
+            with self.subTest(replacement=replacement):
+                base = self.root / f"drift-{replacement}"
+                allowed, saved = base / "allowed", base / "saved"
+                allowed.mkdir(parents=True)
+                shutil.copy2(FIXTURES / "observer-snapshot.json", allowed / "observer-snapshot.json")
+                shutil.copy2(FIXTURES / "observer-policy.json", allowed / "observer-policy.json")
+                core = ObserverCore(allowed_input_root=allowed)
+                allowed.rename(saved)
+                if replacement == "loop":
+                    allowed.symlink_to(allowed)
+                elif replacement == "symlink":
+                    allowed.symlink_to(saved, target_is_directory=True)
+                else:
+                    allowed.mkdir()
+                    shutil.copy2(FIXTURES / "observer-snapshot.json", allowed / "observer-snapshot.json")
+                    shutil.copy2(FIXTURES / "observer-policy.json", allowed / "observer-policy.json")
+                with self.assertRaisesRegex(ObserverRejected, "PATH_REJECTED"):
+                    core.collect(allowed / "observer-snapshot.json", allowed / "observer-policy.json", NOW)
+
+    def test_public_api_types_fail_closed(self) -> None:
+        with self.assertRaisesRegex(ObserverRejected, "PATH_REJECTED"):
+            self.core().collect({}, self.policy, NOW)
+        with self.assertRaisesRegex(ObserverRejected, "PATH_REJECTED"):
+            self.core().collect(self.snapshot, {}, NOW)
+        with self.assertRaisesRegex(ObserverRejected, "INVALID_TIME"):
+            self.core().collect(self.snapshot, self.policy, bytearray(NOW.encode()))
 
     def test_core_exposes_no_action_authority(self) -> None:
         core = self.core()

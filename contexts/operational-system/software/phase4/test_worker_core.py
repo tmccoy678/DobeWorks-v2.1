@@ -133,7 +133,11 @@ class WorkerCoreTests(unittest.TestCase):
         self.assertEqual(second["state"], "REJECTED_JOB_ID_REUSE")
 
     def test_existing_destination_is_rejected(self) -> None:
-        (self.staging / "job-phase4-fixture-001").mkdir()
+        destination = self.staging / "job-phase4-fixture-001"
+        destination.mkdir()
+        self.assertEqual(self.execute()["state"], "REJECTED_DESTINATION_EXISTS")
+        destination.rmdir()
+        destination.symlink_to(self.staging / "missing-destination", target_is_directory=True)
         self.assertEqual(self.execute()["state"], "REJECTED_DESTINATION_EXISTS")
 
     def test_expired_envelope_is_rejected_without_runner(self) -> None:
@@ -364,10 +368,53 @@ class WorkerCoreTests(unittest.TestCase):
         loop.symlink_to(loop)
         with self.assertRaisesRegex(ValueError, "allowed input root"):
             WorkerCore(CONFIG_SHA256, allowed_input_root=loop)
+        missing = self.root / "missing-root"
+        dangling = self.root / "dangling-root"
+        dangling.symlink_to(missing)
+        for invalid in ({}, missing, dangling):
+            with self.subTest(invalid=invalid):
+                with self.assertRaisesRegex(ValueError, "allowed input root"):
+                    WorkerCore(CONFIG_SHA256, allowed_input_root=invalid)
         command = [sys.executable, "-B", str(BASE / "worker_core.py"), "--envelope", str(self.envelope), "--input", str(self.input_file), "--staging-root", str(self.staging), "--allowed-input-root", str(loop), "--configuration-sha256", CONFIG_SHA256, "--now", NOW]
         completed = subprocess.run(command, text=True, capture_output=True, timeout=10, check=False)
         parsed = json.loads(completed.stdout)
         self.assertEqual((completed.returncode, completed.stderr, parsed["state"]), (2, "", "ERROR_CONFIGURATION"))
+
+    def test_allowed_root_identity_drift_is_rejected(self) -> None:
+        for replacement in ("loop", "symlink", "directory"):
+            with self.subTest(replacement=replacement):
+                base = self.root / f"drift-{replacement}"
+                allowed, saved, staging = base / "allowed", base / "saved", base / "staging"
+                allowed.mkdir(parents=True)
+                staging.mkdir()
+                shutil.copy2(FIXTURES / "job-envelope.json", allowed / "job-envelope.json")
+                shutil.copy2(FIXTURES / "input-records.json", allowed / "input-records.json")
+                core = WorkerCore(CONFIG_SHA256, allowed_input_root=allowed)
+                allowed.rename(saved)
+                if replacement == "loop":
+                    allowed.symlink_to(allowed)
+                elif replacement == "symlink":
+                    allowed.symlink_to(saved, target_is_directory=True)
+                else:
+                    allowed.mkdir()
+                    shutil.copy2(FIXTURES / "job-envelope.json", allowed / "job-envelope.json")
+                    shutil.copy2(FIXTURES / "input-records.json", allowed / "input-records.json")
+                result = core.execute(allowed / "job-envelope.json", allowed / "input-records.json", staging, NOW)
+                self.assertEqual(result["state"], "REJECTED_PATH")
+
+    def test_public_api_types_fail_closed(self) -> None:
+        with self.assertRaisesRegex(ValueError, "configuration_sha256"):
+            WorkerCore({}, allowed_input_root=self.inputs)
+        cases = (
+            self.core().execute({}, self.input_file, self.staging, NOW),
+            self.core().execute(self.envelope, {}, self.staging, NOW),
+            self.core().execute(self.envelope, self.input_file, {}, NOW),
+        )
+        self.assertTrue(all(result["state"] == "REJECTED_PATH" for result in cases))
+        invalid_time = self.core().execute(self.envelope, self.input_file, self.staging, bytearray(NOW.encode()))
+        invalid_cancel = self.execute(cancellation_requested={})
+        self.assertEqual(invalid_time["state"], "REJECTED_INVALID_ENVELOPE")
+        self.assertEqual(invalid_cancel["state"], "REJECTED_INVALID_ARGUMENT")
 
     def test_core_exposes_no_promotion_operation(self) -> None:
         core = self.core()

@@ -18,7 +18,7 @@ VALIDATOR_RELATIVE = "contexts/operational-system/docs/program/v1/architecture/p
 MANIFEST_RELATIVE = "contexts/operational-system/docs/program/v1/architecture/phase-4/phase-4-sha256.txt"
 VALIDATOR = ROOT / VALIDATOR_RELATIVE
 SPEC = Path("/Users/taylor/AI-Workspace/.scratch/dobeworks-operational-system-phase4-software-core/spec.md")
-SPEC_SHA256 = "a55cf68fd597767da88b0ab768d5c58469c612924a70e2f299dd285feb9293d5"
+SPEC_SHA256 = "7ba20c5592e3f480eb384032395fb5adb117ec3b2b5c893a954ddde552a0f94a"
 PACKAGE_FILES = (
     "contexts/operational-system/README.md",
     "contexts/operational-system/docs/program/v1/program-definition.md",
@@ -312,6 +312,14 @@ class Phase4ValidatorTests(unittest.TestCase):
         loop = path.parent / "link-loop"
         loop.symlink_to(loop)
         path.write_text(path.read_text(encoding="utf-8") + "\n[loop](link-loop)\n", encoding="utf-8")
+        completed, result = self.run_validator(manifest_sha=self.rehash())
+        self.assertEqual((completed.returncode, completed.stderr, result["decision"]), (1, "", "FAIL"))
+        self.assert_finding(result, "DEAS-LINK-001")
+
+    def test_nul_link_is_deterministic_nonconformance(self) -> None:
+        relative = "contexts/operational-system/docs/program/v1/architecture/phase-4/software-core-plan.md"
+        path = self.repo / relative
+        path.write_bytes(path.read_bytes() + b"\n[nul](invalid\x00target)\n")
         completed, result = self.run_validator(manifest_sha=self.rehash())
         self.assertEqual((completed.returncode, completed.stderr, result["decision"]), (1, "", "FAIL"))
         self.assert_finding(result, "DEAS-LINK-001")

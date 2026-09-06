@@ -44,7 +44,11 @@ Generation 4 commit `4cb086fbc1f22fe4b8c2a920f20af5ad0c3b4a9b`,
 tree `b8f7cf5bb4c05a23afa5543bfb74fac0133af81f`, and manifest SHA-256
 `e8853c87b362220965f9c937afc978bf62b9c4721d4d9943718ee419540b8837`
 remain a fourth immutable rejected predecessor after both fresh reviews failed.
-This handoff describes Generation 5 only; final external records must bind its
+Generation 5 commit `e81ad8f97bff79bed0ae44ad14a170b3f0c8c403`,
+tree `120e38752e198fd3408d0fc5279b11ee2655af40`, and manifest SHA-256
+`00de173d50c2ab59d9037cb18e10d56fb53db600d7ab27066999be2255807001`
+remain a fifth immutable rejected predecessor after both fresh reviews failed.
+This handoff describes Generation 6 only; final external records must bind its
 new commit, tree, manifest, and fresh reviews.
 
 ## Historical evidence disposition
@@ -59,7 +63,7 @@ Exact identities are in [source-register.md](source-register.md).
 ## What passed and what remains future
 
 The final immutable package is intended to record successful Python compile,
-63 Module tests, 30 package-validator positive/negative/failure cases, exact
+67 Module tests, 31 package-validator positive/negative/failure cases, exact
 fixtures, source identities, evidence contracts, traceability, links, size and
 function bounds, manifest, diff hygiene, secret scan, DEGS validation and
 evaluation. External delivery and review records determine G7 and G8. Taylor

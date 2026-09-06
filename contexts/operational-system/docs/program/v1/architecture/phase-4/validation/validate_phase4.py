@@ -18,7 +18,7 @@ from pathlib import Path
 
 TASK_ID = "DEGS-T2-DW-HWSW-P4-SOFTWARE-CORE-20260906"
 BASE_COMMIT = "b24c6d677d80b5299f09cb087d263d69bd6b68af"
-SPEC_SHA256 = "a55cf68fd597767da88b0ab768d5c58469c612924a70e2f299dd285feb9293d5"
+SPEC_SHA256 = "7ba20c5592e3f480eb384032395fb5adb117ec3b2b5c893a954ddde552a0f94a"
 PREFIX = "contexts/operational-system/docs/program/v1/architecture/phase-4"
 SOFTWARE = "contexts/operational-system/software/phase4"
 MANIFEST_RELATIVE = f"{PREFIX}/phase-4-sha256.txt"
@@ -26,7 +26,7 @@ VALIDATOR_RELATIVE = f"{PREFIX}/validation/validate_phase4.py"
 MAX_FILE_BYTES = 1024 * 1024
 MAX_COMMAND_OUTPUT = 64 * 1024
 MAX_TREE_ENTRIES = 128
-EXPECTED_MODULE_TESTS = 63
+EXPECTED_MODULE_TESTS = 67
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
 MANIFEST_LINE = re.compile(r"^([0-9a-f]{64})  ([^\s].*)$")
 MARKDOWN_LINK = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
@@ -444,7 +444,7 @@ def _verify_links(root: Path, findings: list) -> None:
                 continue
             try:
                 destination = (_rooted(root, relative).parent / clean).resolve()
-            except (OSError, RuntimeError, ValidationError):
+            except (OSError, RuntimeError, ValueError, ValidationError):
                 findings.append(_finding("DEAS-LINK-001", relative, f"link cannot be resolved: {target}"))
                 continue
             if destination != root and root not in destination.parents:

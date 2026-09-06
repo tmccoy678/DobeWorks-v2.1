@@ -97,9 +97,11 @@ def _deadline_expired(_signum, _frame) -> None:
 
 
 def _utc(value: str) -> datetime:
+    if not isinstance(value, str):
+        raise WorkerRejected("REJECTED_INVALID_ENVELOPE", "timestamp is invalid")
     try:
         parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except (AttributeError, ValueError) as error:
+    except ValueError as error:
         raise WorkerRejected("REJECTED_INVALID_ENVELOPE", "timestamp is invalid") from error
     if parsed.tzinfo is None:
         raise WorkerRejected("REJECTED_INVALID_ENVELOPE", "timestamp lacks timezone")
@@ -124,10 +126,13 @@ def _load_json(raw: bytes, state: str) -> dict:
     return value
 
 
-def _read_regular(path: Path, root: Path, limit: int, limit_state: str) -> bytes:
-    candidate = Path(path)
-    allowed = Path(root).resolve()
+def _read_regular(path: Path, root: Path, root_identity: tuple, limit: int, limit_state: str) -> bytes:
     try:
+        candidate = Path(path)
+        allowed = Path(root)
+        observed = allowed.stat()
+        if allowed.is_symlink() or not allowed.is_dir() or (observed.st_dev, observed.st_ino) != root_identity:
+            raise WorkerRejected("REJECTED_PATH", "allowed input root identity changed")
         resolved = candidate.resolve(strict=True)
         if candidate.is_symlink() or (resolved != allowed and allowed not in resolved.parents):
             raise WorkerRejected("REJECTED_PATH", "input path is outside its allowed root")
@@ -136,7 +141,7 @@ def _read_regular(path: Path, root: Path, limit: int, limit_state: str) -> bytes
         if resolved.stat().st_size > limit:
             raise WorkerRejected(limit_state, "input exceeds its byte limit")
         return resolved.read_bytes()
-    except (OSError, RuntimeError) as error:
+    except (OSError, RuntimeError, TypeError, ValueError) as error:
         raise WorkerRejected("REJECTED_PATH", "input path cannot be read") from error
 
 
@@ -182,7 +187,7 @@ class WorkerCore:
         max_input_bytes: int = 128 * 1024,
         max_output_bytes: int = 128 * 1024,
     ) -> None:
-        if not SHA256.fullmatch(configuration_sha256):
+        if not isinstance(configuration_sha256, str) or not SHA256.fullmatch(configuration_sha256):
             raise ValueError("configuration_sha256 must be lowercase SHA-256")
         if not isinstance(max_input_bytes, int) or isinstance(max_input_bytes, bool) or not 1 <= max_input_bytes <= 4 * 1024 * 1024:
             raise ValueError("max_input_bytes is outside the fixed bound")
@@ -190,9 +195,14 @@ class WorkerCore:
             raise ValueError("max_output_bytes is outside the fixed bound")
         self.configuration_sha256 = configuration_sha256
         try:
-            self.allowed_input_root = Path(allowed_input_root).resolve()
-        except (OSError, RuntimeError) as error:
-            raise ValueError("allowed input root cannot be resolved") from error
+            resolved_root = Path(allowed_input_root).resolve(strict=True)
+            root_stat = resolved_root.stat()
+            if not resolved_root.is_dir():
+                raise ValueError("allowed input root is not a directory")
+        except (OSError, RuntimeError, TypeError, ValueError) as error:
+            raise ValueError("allowed input root must identify an existing directory") from error
+        self.allowed_input_root = resolved_root
+        self._allowed_input_identity = (root_stat.st_dev, root_stat.st_ino)
         self.runner = runner or SyntheticInventoryRunner()
         self.max_input_bytes = max_input_bytes
         self.max_output_bytes = max_output_bytes
@@ -208,6 +218,8 @@ class WorkerCore:
     ) -> dict:
         """Validate, execute once, and atomically stage one synthetic job."""
         try:
+            if not isinstance(cancellation_requested, bool):
+                raise WorkerRejected("REJECTED_INVALID_ARGUMENT", "cancellation_requested must be Boolean")
             prepared = self._prepare(envelope_path, input_path, staging_root, now, cancellation_requested)
         except WorkerRejected as error:
             return _result(error.job_id, error.state, 0, error.reason)
@@ -219,10 +231,13 @@ class WorkerCore:
             return _result(prepared.job_id, "FAILED_STAGE_IO", 1, "staged-output file operation failed; partial state is unaccepted")
 
     def _prepare(self, envelope_path, input_path, staging_root, now, cancelled) -> PreparedJob:
-        stage = Path(staging_root)
-        if stage.is_symlink() or not stage.is_dir():
-            raise WorkerRejected("REJECTED_PATH", "staging root must be an existing non-symlink directory")
-        envelope_raw = _read_regular(Path(envelope_path), self.allowed_input_root, MAX_ENVELOPE_BYTES, "REJECTED_ENVELOPE_LIMIT")
+        try:
+            stage = Path(staging_root)
+            if stage.is_symlink() or not stage.is_dir():
+                raise WorkerRejected("REJECTED_PATH", "staging root must be an existing non-symlink directory")
+        except (OSError, RuntimeError, TypeError, ValueError) as error:
+            raise WorkerRejected("REJECTED_PATH", "staging root cannot be read") from error
+        envelope_raw = _read_regular(envelope_path, self.allowed_input_root, self._allowed_input_identity, MAX_ENVELOPE_BYTES, "REJECTED_ENVELOPE_LIMIT")
         envelope = _load_json(envelope_raw, "REJECTED_INVALID_ENVELOPE")
         self._validate_envelope(envelope, now)
         job_id = envelope["job_id"]
@@ -232,7 +247,7 @@ class WorkerCore:
             raise WorkerRejected(state, "job identity was already observed", job_id)
         if len(self._seen_jobs) >= MAX_SEEN_JOBS:
             raise WorkerRejected("REJECTED_JOB_REGISTRY_LIMIT", "in-memory job registry reached its fixed capacity", job_id)
-        input_raw = _read_regular(Path(input_path), self.allowed_input_root, self.max_input_bytes, "REJECTED_INPUT_LIMIT")
+        input_raw = _read_regular(input_path, self.allowed_input_root, self._allowed_input_identity, self.max_input_bytes, "REJECTED_INPUT_LIMIT")
         if _sha256(input_raw) != envelope["input_sha256"]:
             raise WorkerRejected("REJECTED_INPUT_IDENTITY", "input digest differs", job_id)
         input_value = _load_json(input_raw, "REJECTED_INVALID_INPUT")
@@ -240,7 +255,7 @@ class WorkerCore:
         if cancelled:
             raise WorkerRejected("CANCELLED_BEFORE_EXECUTION", "cancellation preceded execution", job_id)
         partial, destination = stage / f".partial-{job_id}", stage / job_id
-        if partial.exists() or destination.exists():
+        if partial.exists() or partial.is_symlink() or destination.exists() or destination.is_symlink():
             raise WorkerRejected("REJECTED_DESTINATION_EXISTS", "staged destination already exists", job_id)
         self._seen_jobs[job_id] = fingerprint
         return PreparedJob(envelope, input_value, job_id, partial, destination)
