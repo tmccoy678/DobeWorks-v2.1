@@ -1,6 +1,7 @@
 # Phase 3 Architecture and Disposition Handoff
 
 - Task: `DEGS-T1-DW-HWSW-P3-ARCH-DISPOSITION-20260905`
+- Package generation: `2`
 - Package state: `READY_FOR_GIT_DELIVERY`
 - Decision scope: `PACKAGE`
 - Embedded independent review: `PENDING`
@@ -11,6 +12,8 @@
 - Device action: `NOT_SELECTED_OR_PERFORMED`
 - Public Release / broader adoption: `EXCLUDED`
 - Base commit: `bb5a0c6cc807939621c9c6efa4dae8f1e7fc1cc7`
+- Correction predecessor: `327b9aa73d16c0d012d4a5d694915984cca9e67a`
+- Predecessor manifest SHA-256: `ccdbd883a5755b45b2735b1982bce8b6b0a613fcdba16c410a88fccf47552290`
 - Package manifest: `phase-3-sha256.txt`; SHA-256 supplied externally after freeze
 
 ## Result
@@ -20,6 +23,13 @@ architecture; data, signal, authority, and threat maps; recovery, capacity,
 retention, alert, maintenance, lifecycle, retirement, fault, and Safe
 Degradation policies; updated traceability; and formal candidate Role
 Dispositions.
+
+Generation 2 corrects the predecessor's stale final plan-state label and two
+inherited references to absent `open-decisions.md`, makes both defects,
+malformed or duplicate plan states, duplicate task JSON keys, and inconsistent
+task/handoff/report lifecycle states public-validator rejection cases, and adds
+the required four-MiB exhaustion case. It changes no architecture decision,
+evidence observation, candidate, or Role Disposition.
 
 The five exact candidate devices/components each receive
 `BLOCKED_PENDING_EVIDENCE`. No candidate is qualified or qualified out because
@@ -48,6 +58,10 @@ all qualification and System Release blockers explicit.
 The manifest contains exactly the other 17 task paths in sorted order. Its own
 external SHA-256 is the package review/delivery binding identity.
 
+The immutable predecessor, its manifest, and the independent audit that found
+the defects remain preserved in the [source register](source-register.md).
+Corrected-generation validation comprises nineteen public cases.
+
 ## Open evidence gates
 
 | Candidate / system concern | Blocking evidence |
@@ -61,7 +75,7 @@ external SHA-256 is the package review/delivery binding identity.
 
 ## Delivery and review boundary
 
-The immutable package remains `READY_FOR_EXECUTION` internally and
+The corrected immutable package remains `READY_FOR_EXECUTION` internally and
 `READY_FOR_GIT_DELIVERY` at handoff. External records must bind the final
 manifest digest, commit, private pushed ref, draft pull-request head, unchanged
 base, review identities, findings, retest, and exact acceptance result without

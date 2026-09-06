@@ -147,8 +147,16 @@ def read_text(root: Path, relative: str) -> str:
 
 
 def load_json(root: Path, relative: str) -> dict[str, object]:
+    def reject_duplicate_keys(pairs: list[tuple[str, object]]) -> dict[str, object]:
+        parsed: dict[str, object] = {}
+        for key, item in pairs:
+            if key in parsed:
+                raise ValidationError(f"duplicate JSON key: {key}", relative)
+            parsed[key] = item
+        return parsed
+
     try:
-        value = json.loads(read_text(root, relative))
+        value = json.loads(read_text(root, relative), object_pairs_hook=reject_duplicate_keys)
     except json.JSONDecodeError as error:
         raise ValidationError(f"required file is not valid JSON: {relative}", relative) from error
     if not isinstance(value, dict):
@@ -276,6 +284,37 @@ def verify_task(root: Path) -> list[dict[str, str]]:
 
 def verify_lifecycle_and_trace(root: Path) -> list[dict[str, str]]:
     findings: list[dict[str, str]] = []
+    plan_path = f"{PACKAGE_PREFIX}/architecture-plan.md"
+    lifecycle_fields = (
+        (
+            plan_path,
+            "Package state:",
+            "- Package state: `PACKAGE_PASS_READY_FOR_GIT_DELIVERY`",
+            "architecture plan package state differs",
+        ),
+        (
+            f"{PACKAGE_PREFIX}/handoff.md",
+            "Package state:",
+            "- Package state: `READY_FOR_GIT_DELIVERY`",
+            "handoff package state differs",
+        ),
+        (
+            f"{PACKAGE_PREFIX}/validation/validation-report.md",
+            "**Status:**",
+            "- **Status:** PACKAGE_PASS_READY_FOR_GIT_DELIVERY",
+            "validation report package state differs",
+        ),
+    )
+    for relative, marker, expected, message in lifecycle_fields:
+        text = read_text(root, relative)
+        if [line for line in text.splitlines() if marker in line] != [expected]:
+            findings.append(finding("DEAS-PHASE-001", relative, message))
+    program_path = "contexts/operational-system/docs/program/v1/program-definition.md"
+    program = read_text(root, program_path)
+    if "`open-decisions.md`" in program:
+        findings.append(finding("DEAS-PRE-009", program_path, "stale decisions source reference remains"))
+    if program.count("`decisions.md`") != 2:
+        findings.append(finding("DEAS-PRE-009", program_path, "canonical decisions source reference count differs"))
     required_states = (
         "contexts/operational-system/README.md",
         "contexts/operational-system/docs/program/v1/program-definition.md",

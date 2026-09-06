@@ -2,11 +2,11 @@
   "schema_version": 1,
   "task_id": "DEGS-T1-DW-HWSW-P3-ARCH-DISPOSITION-20260905",
   "task_author": "Codex in Taylor AI Workbench",
-  "title": "Define and freeze Operational System Phase 3 architecture and Role Dispositions",
-  "objective": "Define and freeze the exact Phase 3 role architecture, data/authority/threat maps, recovery/capacity/lifecycle policies, fault and Safe Degradation design, and five evidence-backed Role Dispositions without device action, qualification, release, Phase 4, or broader adoption.",
+  "title": "Define, correct, and freeze Operational System Phase 3 architecture and Role Dispositions",
+  "objective": "Define and freeze the exact Phase 3 architecture and five evidence-backed Role Dispositions, then correct the frozen predecessor's audited lifecycle and source-reference defects with bounded public-seam evidence and no device action, qualification, release, Phase 4, or broader adoption.",
   "stakeholders": ["Taylor"],
   "scope": {
-    "description": "Exactly 18 private-repository documentation, task, validator, test, trace, report, handoff, and manifest paths; external review and Git delivery remain separate.",
+    "description": "One exact 18-path private package; correction generation 2 modifies exactly nine of those paths under the external correction specification while review and Git delivery remain separate.",
     "read_only": false
   },
   "non_goals": [
@@ -29,23 +29,25 @@
     "Use BLOCKED_PENDING_EVIDENCE wherever the frozen evidence supports neither qualification nor disqualification.",
     "Preserve NOT_YET_QUALIFIED and NOT_YET_RELEASED throughout the package.",
     "Keep all physical, remote, storage, credential, permission, destructive, Phase 4, release, and broader-adoption actions outside the package.",
-    "Provide a fail-closed public validator with positive, negative, boundary, source, lifecycle, and manifest tests.",
+    "Provide a fail-closed public validator with positive, negative, boundary, source, lifecycle, manifest, and input-exhaustion tests.",
+    "Reject the predecessor's stale final package-state label, malformed, duplicate, or unknown package-state fields, duplicate task JSON keys, inconsistent task/handoff/report lifecycle states, and nonexistent decisions-source references after manifest rehashing.",
+    "Preserve commit 327b9aa73d16c0d012d4a5d694915984cca9e67a, its manifest, and its independent audit as immutable predecessor evidence.",
     "Freeze the 17 non-manifest paths in one sorted SHA-256 manifest whose own digest is external."
   ],
   "acceptance_criteria": [
-    "The tracked diff contains exactly the 18 affected_files and no unrelated path.",
+    "The package contains exactly the 18 affected_files; the correction diff contains exactly the nine paths in the external correction specification and no unrelated path.",
     "The seven Phase 3 evidence records each contain all 23 canonical DEAS evidence fields exactly once.",
     "Every EV-P3 identity is produced and bidirectionally linked from the updated traceability matrix.",
     "The exact candidate inventory is CP-CANDIDATE-01, SR-CANDIDATE-01, WK-CANDIDATE-01, WK-SW-CANDIDATE-01, and OBS-CANDIDATE-01.",
     "All five frozen candidate dispositions are BLOCKED_PENDING_EVIDENCE, with candidate-specific evidence bases and reconsideration needs.",
     "The public Phase 3 validator returns package-scoped PASS and names G7, G8, and G9 as pending.",
-    "All eleven public validator cases pass, including missing/extra file, invalid disposition, missing evidence field, manifest mismatch, source drift, false qualification, invalid digest, and out-of-root rejection.",
+    "All nineteen public validator cases pass, including stale, ambiguous, or malformed package state, duplicate task status, inconsistent handoff/report lifecycle state, stale decisions source, input exhaustion, missing/extra file, invalid disposition, missing evidence field, manifest mismatch, source drift, false qualification, invalid digest, and out-of-root rejection.",
     "Canonical DEGS validate and evaluate return PASS with no warning, and Python syntax/function bounds, JSON, links, manifests, diff hygiene, and secret scan pass.",
     "The task remains READY_FOR_EXECUTION with embedded independent review and post-action validation PENDING; the handoff remains READY_FOR_GIT_DELIVERY.",
     "No device action, Phase 4, qualification, System Release, Public Release, or broader adoption occurs."
   ],
   "assumptions": [
-    "The merged C4 tree and every source identity in source-register.md remain unchanged during this generation.",
+    "The merged C4 tree, correction predecessor, independent audit, correction authority, and every canonical source identity in source-register.md remain unchanged during this generation.",
     "The Phase 2 evidence limitations and unknowns are current as evidence gaps, while all measured operational values are historical rather than current facts.",
     "No separately defined device-evidence task is selected by the instruction to define and freeze this package."
   ],
@@ -83,7 +85,7 @@
     "Combine architecture definition with device evidence or Phase 4 implementation",
     "Leave the candidate inventory or Phase 3 evidence identities implicit"
   ],
-  "selected_design": "Freeze one contract-first architecture generation with seven evidence records, exact five-candidate BLOCKED_PENDING_EVIDENCE dispositions, explicit unknowns, fail-safe states, deterministic validation, and no downstream action.",
+  "selected_design": "Freeze corrected Phase 3 generation 2 with the same architecture, seven evidence records, and five BLOCKED_PENDING_EVIDENCE dispositions; correct only the audited lifecycle/source references, add public exhaustion evidence, and perform no downstream action.",
   "affected_files": [
     "contexts/operational-system/README.md",
     "contexts/operational-system/docs/program/v1/program-definition.md",
@@ -107,7 +109,7 @@
   "backup": {
     "required": true,
     "status": "VERIFIED",
-    "evidence_path": ".scratch/dobeworks-operational-system-phase3/backup/dobeworks-pre-phase3.bundle"
+    "evidence_path": ".scratch/dobeworks-operational-system-phase3-correction-1/backup/dobeworks-pre-phase3-correction-1.bundle"
   },
   "rollback": {
     "required": true,
@@ -138,7 +140,7 @@
     "reviewer_role": "",
     "open_issues_status": "UNKNOWN",
     "retest_status": "PENDING",
-    "evidence_path": ".scratch/dobeworks-operational-system-phase3/review/final-review-index.md"
+    "evidence_path": ".scratch/dobeworks-operational-system-phase3-correction-1/review/final-review-index.md"
   },
   "human_approval": {
     "required": true,
@@ -146,14 +148,14 @@
     "approver": "Taylor",
     "approver_role": "HUMAN",
     "approval_mode": "OUT_OF_BAND",
-    "evidence_path": ".scratch/dobeworks-operational-system-phase3/spec.md"
+    "evidence_path": ".scratch/dobeworks-operational-system-phase3-correction-1/spec.md"
   },
   "recovery_validation": {"required": false, "status": "NOT_REQUIRED"},
-  "target_identity": "Merged base bb5a0c6cc807939621c9c6efa4dae8f1e7fc1cc7 plus exactly 18 Phase 3 paths and the externally bound phase-3-sha256.txt.",
+  "target_identity": "Predecessor commit 327b9aa73d16c0d012d4a5d694915984cca9e67a plus exactly nine correction paths within the same 18-path package and a newly externally bound phase-3-sha256.txt.",
   "blast_radius": "Exactly 18 private DobeWorks repository paths; no device, configuration, service, Phase 4, qualification, release, public, destructive, or broader-adoption action.",
   "stop_conditions": [
     "A base, branch, source, lock, writer, path, manifest, private-remote, or candidate identity changes unexpectedly.",
-    "Any required check fails and cannot be corrected within the exact 18-path definition authority and two correction passes.",
+    "Any required check fails and cannot be corrected within the exact nine-path correction authority.",
     "A candidate disposition would require an unsupported fact, exception, or value stronger than the frozen evidence supports.",
     "Any device, storage, content, credential, authentication, permission, physical, destructive, service, configuration, Phase 4, qualification, System Release, Public Release, or broader-adoption action would occur."
   ],

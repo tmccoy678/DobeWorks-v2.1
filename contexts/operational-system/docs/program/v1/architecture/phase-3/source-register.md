@@ -12,12 +12,16 @@
 | Post-C4 authorization assessment | workspace `.scratch/dobeworks-operational-system-post-c4-authorization/spec.md`; SHA-256 `d33265651692254e00fcad3a9f570492e949e8ab7045ce13706bca8c6d68ae41` | Records merge complete and later gates/evidence gaps |
 | Phase 3 definition authority | workspace `.scratch/dobeworks-operational-system-phase3/spec.md`; SHA-256 `82d297f1eebd18ed2f69b3db47c4a4769f23ebafb6ded06bafc000334053674e` | Exact 18-path definition/freeze authority and exclusions |
 | Pre-Phase 3 complete-history backup | workspace `.scratch/dobeworks-operational-system-phase3/backup/dobeworks-pre-phase3.bundle`; SHA-256 `a0c73287bd9ad6abf101044195b987f1bb1c0bdc08a2eb517cdd7cd10fd59236` | Verified rollback/safe-stop input; not a sole backup strategy |
+| Phase 3 generation 1 predecessor | commit `327b9aa73d16c0d012d4a5d694915984cca9e67a`; tree `0fd19c3eb7ed5adef6a333a64bd6617d920f7d03`; manifest SHA-256 `ccdbd883a5755b45b2735b1982bce8b6b0a613fcdba16c410a88fccf47552290` | Immutable reviewed predecessor; retains the two confirmed audit defects |
+| Phase 3 generation 1 independent audit | workspace `audits/dobeworks-phase3-architecture-independent-audit-20260905.md`; SHA-256 `84532bc89254b38c465eb330a435e4820973d87684cbb82d701d87e7dc6eb69c` | Exact audit input; no blocker claimed, two low defects and three risks recorded; does not close corrected-generation review |
+| Phase 3 correction authority | workspace `.scratch/dobeworks-operational-system-phase3-correction-1/spec.md`; SHA-256 `1e5393902e2488c7b78b00b8d75e71521051876be9116ef9ca82177412659458` | Exact nine-path correction, TDD, review, commit, and private delivery authority; downstream actions excluded |
+| Pre-correction complete-history backup | workspace `.scratch/dobeworks-operational-system-phase3-correction-1/backup/dobeworks-pre-phase3-correction-1.bundle`; SHA-256 `4e4045bd8edb47108ffdcd142e7548a67565439f43f313fca84edb1f842514b6` | Verified complete-history reconstruction input for generation 2 |
 | Canonical DEGS gate | workspace `governance/bin/engineering-gate.py`; SHA-256 `44c33ba743851d7befe11ebf93f2f4d9021b126f951a4587562adfca21f65c1e` | Validate/evaluate task record only; never execution or release authority |
 
-Taylor's exact current instruction is preserved in the external Phase 3
-definition record. It authorizes definition and freeze, not a device target,
-Phase 4, qualification result, System Release result, Public Release, or
-broader adoption.
+Taylor's definition and correction instructions are preserved in the two
+external Phase 3 authority records. They authorize the exact package and this
+correction generation, not a device target, Phase 4, qualification result,
+System Release result, Public Release, or broader adoption.
 
 ## Canonical source identities
 

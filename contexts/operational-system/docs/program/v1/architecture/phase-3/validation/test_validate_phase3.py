@@ -134,6 +134,89 @@ class Phase3PublicCliTests(unittest.TestCase):
             "WK-SW-CANDIDATE-01", "OBS-CANDIDATE-01",
         )}, payload["role_dispositions"])
 
+    def test_stale_plan_package_state_is_rejected_after_rehash(self) -> None:
+        path = self.root / f"{PACKAGE_PREFIX}/architecture-plan.md"
+        text = path.read_text(encoding="utf-8")
+        path.write_text(text.replace(
+            "`PACKAGE_PASS_READY_FOR_GIT_DELIVERY`",
+            "`CANDIDATE_PENDING_VALIDATION`",
+            1,
+        ), encoding="utf-8")
+        digest = refresh_manifest(self.root)
+        self.assert_rejected(self.run_cli(digest=digest), "architecture plan package state differs")
+
+    def test_ambiguous_plan_package_state_is_rejected_after_rehash(self) -> None:
+        path = self.root / f"{PACKAGE_PREFIX}/architecture-plan.md"
+        text = path.read_text(encoding="utf-8")
+        path.write_text(text.replace(
+            "- Package state: `PACKAGE_PASS_READY_FOR_GIT_DELIVERY`",
+            "- Package state: `PACKAGE_PASS_READY_FOR_GIT_DELIVERY`\n"
+            "- Package state: `CANDIDATE_PENDING_VALIDATION`",
+            1,
+        ), encoding="utf-8")
+        digest = refresh_manifest(self.root)
+        self.assert_rejected(self.run_cli(digest=digest), "architecture plan package state differs")
+
+    def test_indented_ambiguous_plan_state_is_rejected_after_rehash(self) -> None:
+        path = self.root / f"{PACKAGE_PREFIX}/architecture-plan.md"
+        text = path.read_text(encoding="utf-8")
+        path.write_text(text.replace(
+            "- Package state: `PACKAGE_PASS_READY_FOR_GIT_DELIVERY`",
+            "- Package state: `PACKAGE_PASS_READY_FOR_GIT_DELIVERY`\n"
+            " - Package state: `CANDIDATE_PENDING_VALIDATION`",
+            1,
+        ), encoding="utf-8")
+        digest = refresh_manifest(self.root)
+        self.assert_rejected(self.run_cli(digest=digest), "architecture plan package state differs")
+
+    def test_handoff_completion_state_is_rejected_after_rehash(self) -> None:
+        path = self.root / f"{PACKAGE_PREFIX}/handoff.md"
+        text = path.read_text(encoding="utf-8")
+        path.write_text(text.replace(
+            "- Package state: `READY_FOR_GIT_DELIVERY`",
+            "- Package state: `COMPLETE`",
+            1,
+        ), encoding="utf-8")
+        digest = refresh_manifest(self.root)
+        self.assert_rejected(self.run_cli(digest=digest), "handoff package state differs")
+
+    def test_validation_report_conformance_state_is_rejected_after_rehash(self) -> None:
+        path = self.root / f"{PACKAGE_PREFIX}/validation/validation-report.md"
+        text = path.read_text(encoding="utf-8")
+        path.write_text(text.replace(
+            "- **Status:** PACKAGE_PASS_READY_FOR_GIT_DELIVERY",
+            "- **Status:** OVERALL_CONFORMANCE_PASS",
+            1,
+        ), encoding="utf-8")
+        digest = refresh_manifest(self.root)
+        self.assert_rejected(self.run_cli(digest=digest), "validation report package state differs")
+
+    def test_duplicate_task_status_is_rejected_after_rehash(self) -> None:
+        path = self.root / f"{PACKAGE_PREFIX}/degs/phase3-task.json"
+        text = path.read_text(encoding="utf-8")
+        path.write_text(text.replace(
+            '  "status": "READY_FOR_EXECUTION"\n}',
+            '  "status": "COMPLETE",\n  "status": "READY_FOR_EXECUTION"\n}',
+            1,
+        ), encoding="utf-8")
+        digest = refresh_manifest(self.root)
+        self.assert_rejected(self.run_cli(digest=digest), "duplicate JSON key: status")
+
+    def test_stale_decisions_source_reference_is_rejected_after_rehash(self) -> None:
+        path = self.root / "contexts/operational-system/docs/program/v1/program-definition.md"
+        text = path.read_text(encoding="utf-8")
+        path.write_text(
+            text.replace("`decisions.md`", "`open-decisions.md`"),
+            encoding="utf-8",
+        )
+        digest = refresh_manifest(self.root)
+        self.assert_rejected(self.run_cli(digest=digest), "stale decisions source reference remains")
+
+    def test_oversized_required_input_is_rejected(self) -> None:
+        path = self.root / f"{PACKAGE_PREFIX}/architecture-plan.md"
+        path.write_bytes(b"x" * (4 * 1024 * 1024 + 1))
+        self.assert_rejected(self.run_cli(), "input exceeds 4194304 bytes")
+
     def test_missing_package_file_is_rejected(self) -> None:
         (self.root / f"{PACKAGE_PREFIX}/role-architecture.md").unlink()
         self.assert_rejected(self.run_cli(), "missing or non-regular required file")

@@ -37,7 +37,7 @@ The program is successful only if DobeWorks hardware/software v1 can support Tay
 - The Operational System becomes a distinct bounded context inside the existing private DobeWorks repository at `projects/dobeworks/contexts/operational-system/`.
 - A DobeWorks `CONTEXT-MAP.md` makes the existing root context, the new Operational System context, and their interfaces explicit.
 - The cross-context decision is recorded as DobeWorks ADR 0013; context-specific operational ADRs live inside the new context.
-- The quantitative and human-value policies in `open-decisions.md` were explicitly accepted on 2026-09-01. They govern later requirements but do not authorize later work or constitute residual-risk acceptance for an unbuilt system.
+- The quantitative and human-value policies in `decisions.md` were explicitly accepted on 2026-09-01. They govern later requirements but do not authorize later work or constitute residual-risk acceptance for an unbuilt system.
 
 ## Ownership and sources of truth
 
@@ -235,7 +235,7 @@ Legend: `A` accountable human authority, `E` executes within explicit authority,
 - Bidirectional requirements-to-evidence planning is in `traceability-matrix.md`.
 - The complete accepted applicable fault set and planned tests are in `fault-test-matrix.md`.
 - Evidence freezing, independent review, and completion chain are in `evidence-and-audit-plan.md`.
-- Quantitative and human-value decisions are isolated in `open-decisions.md`.
+- Quantitative and human-value decisions are isolated in `decisions.md`.
 - Phase 2 is governed by `phase-2-entry-criteria.md`; its C4-corrected evidence
   package is complete with unresolved gaps.
 - Phase 3 architecture and candidate dispositions are defined in

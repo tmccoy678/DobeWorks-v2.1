@@ -1,7 +1,8 @@
 # Phase 3 Architecture and Role Disposition Plan
 
 - Task: `DEGS-T1-DW-HWSW-P3-ARCH-DISPOSITION-20260905`
-- Package state: `CANDIDATE_PENDING_VALIDATION`
+- Package generation: `2`
+- Package state: `PACKAGE_PASS_READY_FOR_GIT_DELIVERY`
 - Decision scope: `PACKAGE`
 - System state: `NOT_YET_QUALIFIED`, `NOT_YET_RELEASED`
 - Authority lane: `TAYLOR_AI_WORKBENCH`
@@ -10,6 +11,9 @@
 - Overlays: `Document`, `Evidence`, `Validator`, `Python`, `AI-Assisted`, `Git`
 - Base commit: `bb5a0c6cc807939621c9c6efa4dae8f1e7fc1cc7`
 - Base tree: `6571d0c1101b9034c3c3e07deb788f85f810af92`
+- Correction predecessor: commit `327b9aa73d16c0d012d4a5d694915984cca9e67a`;
+  tree `0fd19c3eb7ed5adef6a333a64bd6617d920f7d03`; manifest SHA-256
+  `ccdbd883a5755b45b2735b1982bce8b6b0a613fcdba16c410a88fccf47552290`
 
 ## Objective and authority
 
@@ -27,6 +31,23 @@ The immediately preceding instruction authorized Phase 3 and Role Disposition
 while limiting the expansion to merge, release, qualification, Role
 Disposition, Phase 3, and device action only. Broader adoption was explicitly
 excluded. This work unit uses only the Phase 3 and Role Disposition authority.
+
+Taylor later authorized a correction generation and confirmed the existing
+Phase 3 validator CLI as its public TDD seam. The exact correction authority is
+recorded outside the immutable package at
+`.scratch/dobeworks-operational-system-phase3-correction-1/spec.md`.
+
+## Correction transformation
+
+| ID | Predecessor finding | Exact transformation |
+|---|---|---|
+| `P3-CORR-001` | Final plan retained `CANDIDATE_PENDING_VALIDATION` after package PASS | Require one exact plan state, duplicate-free task JSON, and corroborated task/handoff/report lifecycle states; reject stale, malformed, duplicate, unknown, or downstream-completion states through the public validator |
+| `P3-CORR-002` | Touched program definition retained two references to absent `open-decisions.md` | Point both references to canonical `decisions.md` and reject recurrence |
+| `P3-CORR-003` | Four-MiB bound existed without exhaustion evidence | Add a public-CLI oversized-input rejection case without changing the bound |
+
+The predecessor commit and independent audit remain immutable. This generation
+does not alter architecture, evidence observations, candidate inventory, Role
+Dispositions, accepted policy values, or downstream authority.
 
 ## Frozen inputs
 
@@ -81,7 +102,7 @@ substitutes for device or integrated qualification evidence.
 - Exact tracked mutation surface: the 18 paths in the task record.
 - Evidence variants: one architecture/disposition candidate.
 - Correction passes: at most two after the first full validation run.
-- Public validation cases: eleven, each with a ten-second subprocess timeout.
+- Public validation cases: nineteen, each with a ten-second subprocess timeout.
 - Input size: at most four MiB per validator input.
 - Package manifest: exactly 17 sorted non-self entries.
 - Candidate inventory: exactly five devices/components.
@@ -90,10 +111,11 @@ substitutes for device or integrated qualification evidence.
 
 ## Preconditions and postconditions
 
-Preconditions are the exact merged base, verified private remote, clean tracked
-state, no relevant writer, owned task lock, verified complete-history backup,
-and Taylor's Phase 3 instruction. A failed precondition is a stop, not an
-assumption.
+Preconditions are the exact merged base and correction predecessor, verified
+private remote, clean tracked state, no relevant writer, owned task lock,
+verified complete-history backup, exact independent-audit identity, and
+Taylor's Phase 3 and correction instructions. A failed precondition is a stop,
+not an assumption.
 
 Package postconditions are satisfied only when the public validator, its
 positive and negative tests, canonical DEGS validation/evaluation, link and
