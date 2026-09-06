@@ -17,18 +17,18 @@ The Git base is commit `b24c6d677d80b5299f09cb087d263d69bd6b68af`,
 tree `3008aab9ed2c86052ad35a24d4a1f108a2b07658`. The accepted Phase 3
 correction commit is `f507e927cf98992b7679e46cf536a70fc2fd9c49` with the
 same tree. The corrected external Phase 4 specification SHA-256 is
-`49ebf76d993a8b9d02147df1786b2f2647a8773cb2a5e561babafdb4bc14dc92`.
+`6ff958ddf98a63c86f1a89a78f56d8199a094c4ea19122e436e2f6f06a4703bb`.
 
 ## Synthetic input and expected-output identities
 
 | Fixture | SHA-256 | Classification and purpose |
 |---|---|---|
-| `software/phase4/fixtures/job-envelope.json` | `57fe274106d1f3a129f6fe2c8bea1d3247925b1ba51f6221b3e8c8a35cc3d894` | Synthetic immutable job contract |
-| `software/phase4/fixtures/input-records.json` | `d4dcacb9c25b2758e28a4cc218193645f004a8f880c42c515498a259e177aa36` | Synthetic non-content inventory metadata |
-| `software/phase4/fixtures/expected-result.json` | `1099ce46272a14af8ba7372857c0f634a2feb2d20ade0ce2a96a6dfdc56d6fae` | Exact expected Worker result bytes |
-| `software/phase4/fixtures/observer-policy.json` | `9246169419e7e0b8dee9280667208f2f632a83a97f13c065188df2ac5b32683b` | Exact accepted retention/timing policy values |
-| `software/phase4/fixtures/observer-snapshot.json` | `2c0d8abdcaa3d63c7517b7768ebbb7121cc7472aa7c9956dd7bf3c420498ddd1` | Synthetic minimized telemetry input |
-| `software/phase4/fixtures/expected-observer-record.json` | `711a2d9fdc2a253a672ca3e054af4e1dda3de5c295f95e4b12f8fe5ae832e6a3` | Exact expected Observer record bytes |
+| `contexts/operational-system/software/phase4/fixtures/job-envelope.json` | `57fe274106d1f3a129f6fe2c8bea1d3247925b1ba51f6221b3e8c8a35cc3d894` | Synthetic immutable job contract |
+| `contexts/operational-system/software/phase4/fixtures/input-records.json` | `d4dcacb9c25b2758e28a4cc218193645f004a8f880c42c515498a259e177aa36` | Synthetic non-content inventory metadata |
+| `contexts/operational-system/software/phase4/fixtures/expected-result.json` | `1099ce46272a14af8ba7372857c0f634a2feb2d20ade0ce2a96a6dfdc56d6fae` | Exact expected Worker result bytes |
+| `contexts/operational-system/software/phase4/fixtures/observer-policy.json` | `9246169419e7e0b8dee9280667208f2f632a83a97f13c065188df2ac5b32683b` | Exact accepted retention/timing policy values |
+| `contexts/operational-system/software/phase4/fixtures/observer-snapshot.json` | `2c0d8abdcaa3d63c7517b7768ebbb7121cc7472aa7c9956dd7bf3c420498ddd1` | Synthetic minimized telemetry input |
+| `contexts/operational-system/software/phase4/fixtures/expected-observer-record.json` | `711a2d9fdc2a253a672ca3e054af4e1dda3de5c295f95e4b12f8fe5ae832e6a3` | Exact expected Observer record bytes |
 
 The Job Envelope configuration digest
 `ba0e803fc49b7a78989a44c9c9beb9789e37980b7ce92654a89d3f364460873d`
@@ -59,14 +59,26 @@ uncertainty, and no-promotion boundary are preserved.
   `352b858fe69b54e8959cbe7451b1bc729a566d77f2ee9740373b1204effd04d5`,
   decision `FAIL`.
 - Generation 1 is preserved in Git history and is not amended, rebased,
-  relabeled, accepted, or merged. Fresh tests, identity freeze, and both fresh
-  independent reviews are required for Generation 2.
+  relabeled, accepted, or merged.
+- Rejected Generation 2 commit:
+  `a9f11d8d92d3b3ae1b04d80e3ef9de31233f4c4c`; tree
+  `ce78377371ec994721a67ca1880f1a5e313181d2`; manifest SHA-256
+  `fc4c7d13d6e06529dff8fb10a67d2f35ab1a2502d26877c3a8c2a476ea6c788c`.
+- Generation 2 Standards review: external `review/generation-2-standards.md`,
+  SHA-256 `08a743e30815065ca2e2f283f721e6b58495f5c81fa24a16c0556f9967af173f`,
+  decision `FAIL`.
+- Generation 2 Spec review: external `review/generation-2-spec.md`, SHA-256
+  `919c646ee8bff5a5f344d7136d6af26f1db2bbfce905f41bc39a8ec1164f110f`,
+  decision `FAIL`.
+- Generation 2 is preserved in Git history and is not amended, rebased,
+  relabeled, accepted, or merged. Generation 3 must close every recorded
+  blocker and receive fresh identity-bound tests and both independent reviews.
 
 ## Build and dependency provenance
 
 - Generator: Codex in Taylor AI Workbench; one initial generation after
-  public-seam red evidence and one bounded correction generation after two
-  identity-bound independent review failures.
+  public-seam red evidence and two bounded correction generations after two
+  rounds of identity-bound independent review failures.
 - Runtime: Apple-provided Python `3.9.6`; language target Python 3.9.
 - Shell used for orchestration: Bash `3.2.57` / Zsh host shell.
 - Git: `2.50.1`.

@@ -98,6 +98,11 @@ class ObserverCoreTests(unittest.TestCase):
         with self.assertRaisesRegex(ObserverRejected, "DUPLICATE_KEY"):
             self.collect()
 
+    def test_deep_json_is_rejected_without_traceback(self) -> None:
+        self.snapshot.write_text("[" * 1500 + "]" * 1500 + "\n", encoding="utf-8")
+        with self.assertRaisesRegex(ObserverRejected, "INVALID_JSON"):
+            self.collect()
+
     def test_stale_snapshot_never_implies_health(self) -> None:
         self.mutate_snapshot(sampled_at="2026-09-05T23:00:00Z")
         record = self.collect()
@@ -160,6 +165,14 @@ class ObserverCoreTests(unittest.TestCase):
     def test_invalid_retention_request_is_rejected(self) -> None:
         with self.assertRaisesRegex(ObserverRejected, "INVALID_RETENTION_REQUEST"):
             self.core().retention_decision("UNKNOWN", -1)
+
+    def test_retention_age_has_a_fixed_upper_bound(self) -> None:
+        core = self.core()
+        self.assertEqual(core.retention_decision("RAW_EVENT", 36500), "EXPIRE")
+        for age in (36501, True):
+            with self.subTest(age=age):
+                with self.assertRaisesRegex(ObserverRejected, "INVALID_RETENTION_REQUEST"):
+                    core.retention_decision("RAW_EVENT", age)
 
     def test_oversized_input_is_rejected(self) -> None:
         with self.assertRaisesRegex(ObserverRejected, "INPUT_LIMIT"):

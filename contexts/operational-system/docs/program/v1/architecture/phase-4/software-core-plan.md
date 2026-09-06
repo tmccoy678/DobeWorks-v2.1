@@ -13,18 +13,21 @@ and rollback are frozen in the external Phase 4 specification identified in
 [source-register.md](source-register.md). This package remains
 `NOT_YET_QUALIFIED` and `NOT_YET_RELEASED`.
 
-Generation 1 (`c365171e3ae7aff184d5e2ade5ec470365765009`) is a preserved,
-independently rejected predecessor. This correction generation retains the
-same interface and 25-path boundary while closing its clean-commit validator,
-bounded-diagnostic, filesystem-failure, timeout, provenance, and evidence-path
-defects. It makes no retroactive PASS claim for Generation 1.
+Generation 1 (`c365171e3ae7aff184d5e2ade5ec470365765009`) and Generation 2
+(`a9f11d8d92d3b3ae1b04d80e3ef9de31233f4c4c`) are preserved, independently
+rejected predecessors. Generation 3 retains the same interfaces and 25-path
+boundary while additionally closing deadline-control escapes, deep JSON and
+result recursion, Boolean numeric controls, in-memory registry and retention
+age ceilings, exact evidence-ID and provenance-row matching, missing-Git
+validation, and missing negative cases. It makes no retroactive PASS claim for
+either predecessor.
 
 ## Architecture
 
 ### Worker Core Module
 
 The Module hides Job Envelope parsing, policy validation, input validation,
-duplicate identity memory, the synthetic runner, state transitions, Staged
+fixed-capacity duplicate identity memory, the synthetic runner, state transitions, Staged
 Output layout, and atomic handback behind `WorkerCore.execute`. Constructor
 injection supplies only the approved configuration digest, allowed input root,
 finite byte bounds, and a bounded runner adapter. This is a deep Module: the
@@ -56,8 +59,9 @@ staged handback -/-> promotion
 Every returned state fixes `promotion` to `NOT_PERFORMED` and `retry` to
 `PROHIBITED_AUTOMATIC`. A successful process exit is not an accepted result.
 The synthetic default runner has bounded iteration and no external I/O.
-The core enforces the 1..30 second envelope deadline for its in-process runner
-with the host's main-thread interval timer and fails closed when that facility
+The core enforces the 1..30 second envelope deadline for its complete
+in-process attempt, including result serialization, validation, and atomic
+handback, with the host's main-thread interval timer and fails closed when that facility
 is unavailable or already occupied. Separate-process termination, restart,
 persistent deduplication, dispatch, and Promotion Events remain later
 integration/qualification concerns.
@@ -67,7 +71,8 @@ integration/qualification concerns.
 The Module hides schema enforcement, privacy traversal, policy identity,
 signal validation, signal-to-decision mapping, clock/freshness reasoning,
 collector self-health, provenance, and retention boundaries behind
-`ObserverCore.collect` and `ObserverCore.retention_decision`. Callers cannot
+`ObserverCore.collect` and `ObserverCore.retention_decision`. JSON nesting and
+retention-request age are explicitly bounded. Callers cannot
 obtain an implicit healthy value from invalid evidence or ask the Module to
 take action.
 

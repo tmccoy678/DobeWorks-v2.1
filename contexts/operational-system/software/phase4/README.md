@@ -13,11 +13,12 @@ policy behind one operation:
 WorkerCore(...).execute(envelope_path, input_path, staging_root, now)
 ```
 
-The Module validates closed-schema JSON, duplicate keys, exact source and
+The Module validates closed-schema JSON, duplicate keys and excessive nesting, exact source and
 configuration digests, dispatch authority, expiry, data class, job semantics,
 input shape, path confinement, byte/record/time/retry bounds, duplicate job
 identity, and a pre-execution cancellation signal. It invokes exactly one
-runner attempt under the envelope's Worker-enforced deadline, preserves
+runner attempt under the envelope's Worker-enforced deadline, including result
+serialization, validation, and atomic handback; preserves
 explicit failure or ambiguity, converts staging filesystem failures to bounded
 results, and renames a complete staging directory atomically. It never retries
 automatically or performs a Promotion Event. The default runner accepts only
@@ -52,7 +53,8 @@ ObserverCore(...).retention_decision(record_kind, age_days)
 The Module reads but never writes its inputs. It validates a closed versioned
 schema, a pseudonymous role ID, provenance hashes, clock meaning, freshness,
 dropped records, collector self-health, and an exact signal-to-decision map.
-It rejects prohibited private or secret fields at any inspected level.
+It rejects prohibited private or secret fields at any inspected level and
+fails closed on excessive JSON nesting.
 Missing, stale, dropped, failed, or time-uncertain evidence yields `UNKNOWN` or
 `TELEMETRY_UNAVAILABLE`. Retention returns `RETAIN` or `EXPIRE`; it never
 deletes. The policy fixes accepted `DEC-003` values: 30 days for raw permitted
@@ -80,10 +82,12 @@ python3 -B observer_core.py \
 | Worker bytes represented per record | 0 through 1,048,576 |
 | Worker retries | 0 |
 | Worker attempts per `execute` call | 1 |
+| Worker remembered job identities per process | 64 |
 | Envelope timeout value | 1 through 30 seconds |
 | Observer traversed privacy nodes | 256 |
 | Observer signal identities | 6 |
 | Observer dropped-record counter | 0 through 100,000 |
+| Observer retention-request age | 0 through 36,500 days |
 
 The synthetic runner has no network, subprocess, credential, device, service,
 or private-content interface. On the tested host, Worker Core uses the main

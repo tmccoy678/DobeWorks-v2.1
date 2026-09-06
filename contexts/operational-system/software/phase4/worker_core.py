@@ -24,6 +24,7 @@ SHA256 = re.compile(r"^[0-9a-f]{64}$")
 MAX_ENVELOPE_BYTES = 64 * 1024
 MAX_RECORDS = 100
 MAX_RECORD_BYTES = 1024 * 1024
+MAX_SEEN_JOBS = 64
 ENVELOPE_KEYS = {
     "cancellation", "checkpoint", "configuration_sha256", "data_classes",
     "delivery_intent", "dispatch_authority", "expected_output_sha256",
@@ -116,7 +117,7 @@ def _load_json(raw: bytes, state: str) -> dict:
 
     try:
         value = json.loads(raw.decode("utf-8"), object_pairs_hook=reject_duplicates)
-    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+    except (UnicodeDecodeError, json.JSONDecodeError, RecursionError) as error:
         raise WorkerRejected(state, "invalid UTF-8 JSON") from error
     if not isinstance(value, dict):
         raise WorkerRejected(state, "JSON root is not an object")
@@ -183,9 +184,9 @@ class WorkerCore:
     ) -> None:
         if not SHA256.fullmatch(configuration_sha256):
             raise ValueError("configuration_sha256 must be lowercase SHA-256")
-        if not 1 <= max_input_bytes <= 4 * 1024 * 1024:
+        if not isinstance(max_input_bytes, int) or isinstance(max_input_bytes, bool) or not 1 <= max_input_bytes <= 4 * 1024 * 1024:
             raise ValueError("max_input_bytes is outside the fixed bound")
-        if not 1 <= max_output_bytes <= 4 * 1024 * 1024:
+        if not isinstance(max_output_bytes, int) or isinstance(max_output_bytes, bool) or not 1 <= max_output_bytes <= 4 * 1024 * 1024:
             raise ValueError("max_output_bytes is outside the fixed bound")
         self.configuration_sha256 = configuration_sha256
         self.allowed_input_root = Path(allowed_input_root).resolve()
@@ -209,6 +210,8 @@ class WorkerCore:
             return _result(error.job_id, error.state, 0, error.reason)
         try:
             return self._run_once(prepared)
+        except WorkerRejected as error:
+            return _result(error.job_id, error.state, 0, error.reason)
         except OSError:
             return _result(prepared.job_id, "FAILED_STAGE_IO", 1, "staged-output file operation failed; partial state is unaccepted")
 
@@ -224,6 +227,8 @@ class WorkerCore:
         if job_id in self._seen_jobs:
             state = "DUPLICATE_NO_EXECUTION" if self._seen_jobs[job_id] == fingerprint else "REJECTED_JOB_ID_REUSE"
             raise WorkerRejected(state, "job identity was already observed", job_id)
+        if len(self._seen_jobs) >= MAX_SEEN_JOBS:
+            raise WorkerRejected("REJECTED_JOB_REGISTRY_LIMIT", "in-memory job registry reached its fixed capacity", job_id)
         input_raw = _read_regular(Path(input_path), self.allowed_input_root, self.max_input_bytes, "REJECTED_INPUT_LIMIT")
         if _sha256(input_raw) != envelope["input_sha256"]:
             raise WorkerRejected("REJECTED_INPUT_IDENTITY", "input digest differs", job_id)
@@ -235,10 +240,6 @@ class WorkerCore:
         if partial.exists() or destination.exists():
             raise WorkerRejected("REJECTED_DESTINATION_EXISTS", "staged destination already exists", job_id)
         self._seen_jobs[job_id] = fingerprint
-        try:
-            partial.mkdir(mode=0o700)
-        except OSError as error:
-            raise WorkerRejected("FAILED_STAGE_PREPARATION", "partial staging directory could not be created", job_id) from error
         return PreparedJob(envelope, input_value, job_id, partial, destination)
 
     def _validate_envelope(self, value: dict, now: str) -> None:
@@ -252,6 +253,9 @@ class WorkerCore:
             "cancellation": "STOP_AND_PRESERVE_PARTIAL", "handback": "ATOMIC_STAGED_OUTPUT",
             "promotion_authority": "PROHIBITED",
         }
+        retry = value.get("retry_limit")
+        if not isinstance(retry, int) or isinstance(retry, bool) or retry != 0:
+            raise WorkerRejected("REJECTED_INVALID_ENVELOPE", "retry_limit must be the integer zero")
         if any(value.get(key) != expected for key, expected in exact.items()):
             raise WorkerRejected("REJECTED_INVALID_ENVELOPE", "envelope contract value differs")
         if not isinstance(value.get("job_id"), str) or not JOB_ID.fullmatch(value["job_id"]):
@@ -261,7 +265,7 @@ class WorkerCore:
                 raise WorkerRejected("REJECTED_INVALID_ENVELOPE", f"{field} is invalid", value["job_id"])
         if value["configuration_sha256"] != self.configuration_sha256:
             raise WorkerRejected("REJECTED_CONFIGURATION_MISMATCH", "configuration digest differs", value["job_id"])
-        if not isinstance(value.get("timeout_seconds"), int) or not 1 <= value["timeout_seconds"] <= 30:
+        if not isinstance(value.get("timeout_seconds"), int) or isinstance(value["timeout_seconds"], bool) or not 1 <= value["timeout_seconds"] <= 30:
             raise WorkerRejected("REJECTED_INVALID_ENVELOPE", "timeout is outside 1..30 seconds", value["job_id"])
         if _utc(value.get("expires_at")) <= _utc(now):
             raise WorkerRejected("REJECTED_STALE", "envelope is expired", value["job_id"])
@@ -288,7 +292,7 @@ class WorkerCore:
 
     def _run_once(self, job: PreparedJob) -> dict:
         try:
-            candidate = self._call_runner(job)
+            return self._with_deadline(job)
         except WorkerCancellationRace as error:
             self._preserve_candidate(job, error.result)
             return self._fail(job, "AMBIGUOUS_CANCELLATION_RACE", "completion raced with cancellation")
@@ -302,8 +306,38 @@ class WorkerCore:
             return self._fail(job, "FAILED_NETWORK_UNAVAILABLE", "approved dependency is unavailable")
         except WorkerRejected:
             raise
+        except OSError:
+            raise
         except Exception:
             return self._fail(job, "FAILED_RUNNER", "runner raised an unclassified exception")
+
+    def _with_deadline(self, job: PreparedJob) -> dict:
+        try:
+            pending = signal.getitimer(signal.ITIMER_REAL)
+        except (AttributeError, OSError, ValueError) as error:
+            raise WorkerRejected("FAILED_TIMEOUT_CONTROL", "in-process deadline control is unavailable", job.job_id) from error
+        if pending != (0.0, 0.0):
+            raise WorkerRejected("FAILED_TIMEOUT_CONTROL", "an existing process deadline prevents bounded execution", job.job_id)
+        previous = None
+        try:
+            previous = signal.signal(signal.SIGALRM, _deadline_expired)
+            signal.setitimer(signal.ITIMER_REAL, job.envelope["timeout_seconds"])
+        except (AttributeError, OSError, ValueError) as error:
+            if previous is not None:
+                signal.signal(signal.SIGALRM, previous)
+            raise WorkerRejected("FAILED_TIMEOUT_CONTROL", "in-process deadline could not be installed", job.job_id) from error
+        try:
+            return self._attempt(job)
+        finally:
+            signal.setitimer(signal.ITIMER_REAL, 0)
+            signal.signal(signal.SIGALRM, previous)
+
+    def _attempt(self, job: PreparedJob) -> dict:
+        try:
+            job.partial.mkdir(mode=0o700)
+        except OSError as error:
+            raise WorkerRejected("FAILED_STAGE_PREPARATION", "partial staging directory could not be created", job.job_id) from error
+        candidate = self.runner(job.envelope, job.input_value)
         raw = self._preserve_candidate(job, candidate)
         if len(raw) > self.max_output_bytes:
             return self._fail(job, "FAILED_OUTPUT_LIMIT", "candidate output exceeds its byte limit")
@@ -314,32 +348,10 @@ class WorkerCore:
             return self._fail(job, "FAILED_OUTPUT_IDENTITY", "candidate output digest differs")
         return self._handback(job, digest)
 
-    def _call_runner(self, job: PreparedJob):
-        try:
-            pending = signal.getitimer(signal.ITIMER_REAL)
-        except (AttributeError, OSError, ValueError) as error:
-            raise WorkerRejected("FAILED_TIMEOUT_CONTROL", "in-process deadline control is unavailable", job.job_id) from error
-        if pending != (0.0, 0.0):
-            raise WorkerRejected("FAILED_TIMEOUT_CONTROL", "an existing process deadline prevents bounded execution", job.job_id)
-        try:
-            previous = signal.signal(signal.SIGALRM, _deadline_expired)
-            signal.setitimer(signal.ITIMER_REAL, job.envelope["timeout_seconds"])
-        except (AttributeError, OSError, ValueError) as error:
-            try:
-                signal.signal(signal.SIGALRM, previous)
-            except (AttributeError, OSError, UnboundLocalError, ValueError):
-                pass
-            raise WorkerRejected("FAILED_TIMEOUT_CONTROL", "in-process deadline could not be installed", job.job_id) from error
-        try:
-            return self.runner(job.envelope, job.input_value)
-        finally:
-            signal.setitimer(signal.ITIMER_REAL, 0)
-            signal.signal(signal.SIGALRM, previous)
-
     def _preserve_candidate(self, job: PreparedJob, candidate) -> bytes:
         try:
             raw = _encoded(candidate)
-        except (TypeError, ValueError):
+        except (RecursionError, TypeError, ValueError):
             raw = b'{"unserializable_candidate":true}\n'
         if len(raw) <= self.max_output_bytes:
             (job.partial / "result.json").write_bytes(raw)

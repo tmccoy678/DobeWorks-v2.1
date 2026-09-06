@@ -16,6 +16,7 @@ SNAPSHOT_SCHEMA = "dobeworks.observer-snapshot.v1"
 POLICY_SCHEMA = "dobeworks.observer-policy.v1"
 RECORD_SCHEMA = "dobeworks.observer-record.v1"
 MAX_NODES = 256
+MAX_RETENTION_AGE_DAYS = 36500
 ROLE_ID = re.compile(r"^[A-Z]{2}-CANDIDATE-[0-9]{2}$")
 GENERATION = re.compile(r"^[a-z0-9][a-z0-9.-]{0,63}$")
 SNAPSHOT_KEYS = {
@@ -87,7 +88,7 @@ def _load(raw: bytes) -> dict:
 
     try:
         value = json.loads(raw.decode("utf-8"), object_pairs_hook=reject_duplicates)
-    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+    except (UnicodeDecodeError, json.JSONDecodeError, RecursionError) as error:
         raise ObserverRejected("INVALID_JSON", "input is not one UTF-8 JSON value") from error
     if not isinstance(value, dict):
         raise ObserverRejected("INVALID_SCHEMA", "JSON root is not an object")
@@ -148,7 +149,7 @@ class ObserverCore:
     """Own schema, privacy, meaning, self-health, and retention decisions."""
 
     def __init__(self, allowed_input_root: Path, max_input_bytes: int = 128 * 1024) -> None:
-        if not 1 <= max_input_bytes <= 4 * 1024 * 1024:
+        if not isinstance(max_input_bytes, int) or isinstance(max_input_bytes, bool) or not 1 <= max_input_bytes <= 4 * 1024 * 1024:
             raise ValueError("max_input_bytes is outside the fixed bound")
         self.allowed_input_root = Path(allowed_input_root).resolve()
         self.max_input_bytes = max_input_bytes
@@ -170,7 +171,7 @@ class ObserverCore:
     def retention_decision(self, record_kind: str, age_days: int) -> str:
         """Return a decision only; this interface never deletes a record."""
         limits = {"RAW_EVENT": 30, "DAILY_AGGREGATE": 180}
-        if record_kind not in limits or not isinstance(age_days, int) or isinstance(age_days, bool) or age_days < 0:
+        if record_kind not in limits or not isinstance(age_days, int) or isinstance(age_days, bool) or not 0 <= age_days <= MAX_RETENTION_AGE_DAYS:
             raise ObserverRejected("INVALID_RETENTION_REQUEST", "kind or age is invalid")
         return "EXPIRE" if age_days >= limits[record_kind] else "RETAIN"
 

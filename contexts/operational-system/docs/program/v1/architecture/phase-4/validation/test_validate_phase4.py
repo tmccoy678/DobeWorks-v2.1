@@ -18,7 +18,7 @@ VALIDATOR_RELATIVE = "contexts/operational-system/docs/program/v1/architecture/p
 MANIFEST_RELATIVE = "contexts/operational-system/docs/program/v1/architecture/phase-4/phase-4-sha256.txt"
 VALIDATOR = ROOT / VALIDATOR_RELATIVE
 SPEC = Path("/Users/taylor/AI-Workspace/.scratch/dobeworks-operational-system-phase4-software-core/spec.md")
-SPEC_SHA256 = "49ebf76d993a8b9d02147df1786b2f2647a8773cb2a5e561babafdb4bc14dc92"
+SPEC_SHA256 = "6ff958ddf98a63c86f1a89a78f56d8199a094c4ea19122e436e2f6f06a4703bb"
 PACKAGE_FILES = (
     "contexts/operational-system/README.md",
     "contexts/operational-system/docs/program/v1/program-definition.md",
@@ -56,8 +56,18 @@ class Phase4ValidatorTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
         self.repo = Path(self.temporary.name) / "repo"
-        shutil.copytree(ROOT, self.repo, ignore=shutil.ignore_patterns(".git", "__pycache__"))
+        subprocess.run(["git", "clone", "--quiet", "--no-hardlinks", str(ROOT), str(self.repo)], timeout=20, check=True)
+        for relative in PACKAGE_FILES:
+            destination = self.repo / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT / relative, destination)
         self.rehash()
+        subprocess.run(["git", "-C", str(self.repo), "config", "user.name", "Phase4 Test"], timeout=10, check=True)
+        subprocess.run(["git", "-C", str(self.repo), "config", "user.email", "phase4-test@invalid"], timeout=10, check=True)
+        subprocess.run(["git", "-C", str(self.repo), "add", "--", *PACKAGE_FILES], timeout=10, check=True)
+        status = subprocess.run(["git", "-C", str(self.repo), "status", "--porcelain"], text=True, capture_output=True, timeout=10, check=True)
+        if status.stdout:
+            subprocess.run(["git", "-C", str(self.repo), "commit", "--quiet", "-m", "Phase 4 validator fixture"], timeout=20, check=True)
 
     def tearDown(self) -> None:
         self.temporary.cleanup()
@@ -75,19 +85,6 @@ class Phase4ValidatorTests(unittest.TestCase):
         command = [sys.executable, "-B", str(selected_validator), "--repository-root", str(selected_root), "--manifest-sha256", selected_manifest, "--external-spec", str(SPEC), "--external-spec-sha256", spec_sha, "--json"]
         completed = subprocess.run(command, text=True, capture_output=True, timeout=30, check=False)
         return completed, json.loads(completed.stdout)
-
-    def clean_git_repo(self) -> Path:
-        target = Path(self.temporary.name) / "clean-repo"
-        subprocess.run(["git", "clone", "--quiet", "--no-hardlinks", str(ROOT), str(target)], timeout=20, check=True)
-        for relative in PACKAGE_FILES:
-            shutil.copy2(self.repo / relative, target / relative)
-        subprocess.run(["git", "-C", str(target), "config", "user.name", "Phase4 Test"], timeout=10, check=True)
-        subprocess.run(["git", "-C", str(target), "config", "user.email", "phase4-test@invalid"], timeout=10, check=True)
-        subprocess.run(["git", "-C", str(target), "add", "--", *PACKAGE_FILES], timeout=10, check=True)
-        status = subprocess.run(["git", "-C", str(target), "status", "--porcelain"], text=True, capture_output=True, timeout=10, check=True)
-        if status.stdout:
-            subprocess.run(["git", "-C", str(target), "commit", "--quiet", "-m", "Phase 4 clean validator fixture"], timeout=20, check=True)
-        return target
 
     def mutate_text(self, relative: str, old: str, new: str) -> None:
         path = self.repo / relative
@@ -108,12 +105,18 @@ class Phase4ValidatorTests(unittest.TestCase):
         self.assertEqual(result["findings"], [])
 
     def test_clean_committed_candidate_passes(self) -> None:
-        clean_repo = self.clean_git_repo()
-        status = subprocess.run(["git", "-C", str(clean_repo), "status", "--porcelain"], text=True, capture_output=True, timeout=10, check=True)
+        status = subprocess.run(["git", "-C", str(self.repo), "status", "--porcelain"], text=True, capture_output=True, timeout=10, check=True)
         self.assertEqual((status.stdout, status.stderr), ("", ""))
-        completed, result = self.run_validator(root=clean_repo)
+        completed, result = self.run_validator()
         self.assertEqual((completed.returncode, completed.stderr), (0, ""))
         self.assertEqual((result["decision"], result["findings"]), ("PASS", []))
+
+    def test_missing_git_metadata_fails_closed(self) -> None:
+        target = Path(self.temporary.name) / "no-git-repo"
+        shutil.copytree(self.repo, target, ignore=shutil.ignore_patterns(".git"))
+        completed, result = self.run_validator(root=target)
+        self.assertEqual(completed.returncode, 1)
+        self.assert_finding(result, "DEAS-GIT-001")
 
     def test_missing_and_extra_package_files_fail(self) -> None:
         (self.repo / PACKAGE_FILES[-1]).unlink()
@@ -193,6 +196,20 @@ class Phase4ValidatorTests(unittest.TestCase):
         self.mutate_text(relative, "EV-P4-JOB-CONTRACT", "EV-P4-JOB-CONTRACT-MISSING")
         completed, result = self.run_validator(manifest_sha=self.rehash())
         self.assert_finding(result, "DEAS-TRACE-001")
+
+    def test_suffixed_evidence_identity_fails(self) -> None:
+        relative = "contexts/operational-system/docs/program/v1/architecture/phase-4/worker-core-evidence.md"
+        self.mutate_text(relative, "`EV-P4-JOB-CONTRACT`", "`EV-P4-JOB-CONTRACT-SUFFIX`")
+        completed, result = self.run_validator(manifest_sha=self.rehash())
+        self.assertEqual(completed.returncode, 1)
+        self.assert_finding(result, "DEAS-EVIDENCE-001")
+
+    def test_source_register_requires_exact_path_digest_pair(self) -> None:
+        relative = "contexts/operational-system/docs/program/v1/architecture/phase-4/source-register.md"
+        self.mutate_text(relative, "`df1644513d48022a3b9f01392fa33e391680b0d1e9341594fbc272ee44237586`", "`3f40080f3cd725db8906385abb6f7db79fadef5a231cf6bc9206b2fa43863c88`")
+        completed, result = self.run_validator(manifest_sha=self.rehash())
+        self.assertEqual(completed.returncode, 1)
+        self.assert_finding(result, "DEAS-SOURCE-001")
 
     def test_forbidden_network_import_fails(self) -> None:
         relative = "contexts/operational-system/software/phase4/worker_core.py"

@@ -183,6 +183,69 @@ class WorkerCoreTests(unittest.TestCase):
         self.assertEqual(runner.calls, 1)
         self.assertLess(time.monotonic() - started, 2.0)
 
+    def test_unavailable_or_occupied_deadline_control_fails_closed(self) -> None:
+        for response, error in ((None, OSError("synthetic unavailable")), ((1.0, 0.0), None)):
+            with self.subTest(response=response, error=error):
+                staging = self.root / f"deadline-{response is None}"
+                staging.mkdir()
+                runner = CountingRunner(result=load(FIXTURES / "expected-result.json"))
+                effect = error if error is not None else None
+                with mock.patch("worker_core.signal.getitimer", return_value=response, side_effect=effect):
+                    result = self.core(runner=runner).execute(self.envelope, self.input_file, staging, NOW)
+                self.assertEqual(result["state"], "FAILED_TIMEOUT_CONTROL")
+                self.assertEqual(result["promotion"], "NOT_PERFORMED")
+                self.assertEqual(runner.calls, 0)
+
+    def test_deep_runner_result_is_a_structured_failure(self) -> None:
+        payload = []
+        for _ in range(1500):
+            payload = [payload]
+        result = self.execute(self.core(runner=CountingRunner(result=payload)))
+        self.assertEqual(result["state"], "FAILED_OUTPUT_VALIDATION")
+        self.assertEqual(result["promotion"], "NOT_PERFORMED")
+
+    def test_deep_json_envelope_is_rejected_without_traceback(self) -> None:
+        self.envelope.write_text("[" * 1500 + "]" * 1500 + "\n", encoding="utf-8")
+        result = self.execute()
+        self.assertEqual(result["state"], "REJECTED_INVALID_ENVELOPE")
+        self.assertEqual(result["attempts"], 0)
+
+    def test_boolean_numeric_controls_are_rejected(self) -> None:
+        for field in ("timeout_seconds", "retry_limit"):
+            with self.subTest(field=field):
+                shutil.copy2(FIXTURES / "job-envelope.json", self.envelope)
+                self.mutate_envelope(**{field: True})
+                self.assertEqual(self.execute()["state"], "REJECTED_INVALID_ENVELOPE")
+        for field in ("max_input_bytes", "max_output_bytes"):
+            with self.subTest(field=field):
+                with self.assertRaises(ValueError):
+                    self.core(**{field: True})
+
+    def test_job_registry_has_a_fixed_capacity(self) -> None:
+        runner = CountingRunner(result={})
+        core = self.core(runner=runner)
+        for number in range(64):
+            self.mutate_envelope(job_id=f"bounded-job-{number:02d}")
+            result = self.execute(core)
+            self.assertEqual(result["state"], "FAILED_OUTPUT_VALIDATION")
+        self.mutate_envelope(job_id="bounded-job-64")
+        result = self.execute(core)
+        self.assertEqual(result["state"], "REJECTED_JOB_REGISTRY_LIMIT")
+        self.assertEqual((result["attempts"], runner.calls), (0, 64))
+
+    def test_expected_output_digest_mismatch_is_not_handed_back(self) -> None:
+        self.mutate_envelope(expected_output_sha256="0" * 64)
+        result = self.execute()
+        self.assertEqual(result["state"], "FAILED_OUTPUT_IDENTITY")
+        self.assertFalse((self.staging / result["job_id"]).exists())
+
+    def test_missing_required_envelope_field_is_rejected(self) -> None:
+        value = load(self.envelope)
+        del value["delivery_intent"]
+        write_json(self.envelope, value)
+        result = self.execute()
+        self.assertEqual((result["state"], result["attempts"]), ("REJECTED_INVALID_ENVELOPE", 0))
+
     def test_interruption_is_explicitly_ambiguous(self) -> None:
         runner = CountingRunner(error=WorkerInterrupted("synthetic interruption"))
         result = self.execute(self.core(runner=runner))

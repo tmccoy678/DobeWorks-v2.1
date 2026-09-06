@@ -18,7 +18,7 @@ from pathlib import Path
 
 TASK_ID = "DEGS-T2-DW-HWSW-P4-SOFTWARE-CORE-20260906"
 BASE_COMMIT = "b24c6d677d80b5299f09cb087d263d69bd6b68af"
-SPEC_SHA256 = "49ebf76d993a8b9d02147df1786b2f2647a8773cb2a5e561babafdb4bc14dc92"
+SPEC_SHA256 = "6ff958ddf98a63c86f1a89a78f56d8199a094c4ea19122e436e2f6f06a4703bb"
 PREFIX = "contexts/operational-system/docs/program/v1/architecture/phase-4"
 SOFTWARE = "contexts/operational-system/software/phase4"
 MANIFEST_RELATIVE = f"{PREFIX}/phase-4-sha256.txt"
@@ -26,7 +26,7 @@ VALIDATOR_RELATIVE = f"{PREFIX}/validation/validate_phase4.py"
 MAX_FILE_BYTES = 1024 * 1024
 MAX_COMMAND_OUTPUT = 64 * 1024
 MAX_TREE_ENTRIES = 128
-EXPECTED_MODULE_TESTS = 48
+EXPECTED_MODULE_TESTS = 57
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
 MANIFEST_LINE = re.compile(r"^([0-9a-f]{64})  ([^\s].*)$")
 MARKDOWN_LINK = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
@@ -69,6 +69,12 @@ SOURCE_IDENTITIES = {
     "contexts/operational-system/docs/program/v1/fault-test-matrix.md": "f6e025c572bac2ad7ac4b22ba481f14aa6372b63f3a8fa67ae5cff39a7d59e89",
     "contexts/operational-system/docs/program/v1/architecture/phase-3/phase-3-sha256.txt": "ba00d974a9a982e750aef49a2cd52e3a57bc9bec7020ed7131c4ba575ebacb7d",
     "contexts/operational-system/docs/program/v1/architecture/phase-3/handoff.md": "a7b7c5b4c3b578067da9bcb8b932d175d15cd15288bf0ff4b2b52f4565ef8c56",
+    f"{SOFTWARE}/fixtures/job-envelope.json": "57fe274106d1f3a129f6fe2c8bea1d3247925b1ba51f6221b3e8c8a35cc3d894",
+    f"{SOFTWARE}/fixtures/input-records.json": "d4dcacb9c25b2758e28a4cc218193645f004a8f880c42c515498a259e177aa36",
+    f"{SOFTWARE}/fixtures/expected-result.json": "1099ce46272a14af8ba7372857c0f634a2feb2d20ade0ce2a96a6dfdc56d6fae",
+    f"{SOFTWARE}/fixtures/observer-policy.json": "9246169419e7e0b8dee9280667208f2f632a83a97f13c065188df2ac5b32683b",
+    f"{SOFTWARE}/fixtures/observer-snapshot.json": "2c0d8abdcaa3d63c7517b7768ebbb7121cc7472aa7c9956dd7bf3c420498ddd1",
+    f"{SOFTWARE}/fixtures/expected-observer-record.json": "711a2d9fdc2a253a672ca3e054af4e1dda3de5c295f95e4b12f8fe5ae832e6a3",
 }
 EVIDENCE_FILES = {
     f"{PREFIX}/worker-core-evidence.md": (
@@ -284,7 +290,8 @@ def _verify_sources(root: Path, findings: list) -> None:
         actual = _sha256(_read(root, relative, findings))
         if actual != expected:
             findings.append(_finding("DEAS-SOURCE-001", relative, "frozen source identity differs"))
-        if relative not in register or expected not in register:
+        row = f"| `{relative}` | `{expected}` |"
+        if not any(line.startswith(row) for line in register.splitlines()):
             findings.append(_finding("DEAS-SOURCE-001", f"{PREFIX}/source-register.md", f"source identity omitted: {relative}"))
 
 
@@ -318,11 +325,11 @@ def _verify_evidence(root: Path, findings: list) -> None:
             findings.append(_finding("DEAS-LIFECYCLE-001", relative, "evidence status is not final package PASS"))
         if tuple(re.findall(r"`([^`]+)`", artifacts)) != EVIDENCE_ARTIFACTS[relative]:
             findings.append(_finding("DEAS-EVIDENCE-001", relative, "Artifact paths are not the exact repository-relative set"))
-        for expected in expected_ids:
-            if expected not in identity:
-                findings.append(_finding("DEAS-EVIDENCE-001", relative, f"evidence identity omitted: {expected}"))
-            else:
-                observed_ids.append(expected)
+        identities = tuple(re.findall(r"`([^`]+)`", identity))
+        if identities != expected_ids:
+            findings.append(_finding("DEAS-EVIDENCE-001", relative, "Evidence ID set or order differs"))
+        else:
+            observed_ids.extend(identities)
     if len(observed_ids) != 18 or len(set(observed_ids)) != 18:
         findings.append(_finding("DEAS-EVIDENCE-001", PREFIX, "exact 18-identity evidence set differs"))
 
@@ -500,6 +507,7 @@ def _git_paths(root: Path, arguments: list, findings: list):
 
 def _verify_git_diff(root: Path, findings: list) -> None:
     if not (root / ".git").exists():
+        findings.append(_finding("DEAS-GIT-001", ".git", "Git metadata is required for exact package identity"))
         return
     commands = (
         ["diff", "--name-only", "-z", f"{BASE_COMMIT}...HEAD", "--"],
