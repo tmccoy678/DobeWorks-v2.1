@@ -17,7 +17,7 @@ The Git base is commit `b24c6d677d80b5299f09cb087d263d69bd6b68af`,
 tree `3008aab9ed2c86052ad35a24d4a1f108a2b07658`. The accepted Phase 3
 correction commit is `f507e927cf98992b7679e46cf536a70fc2fd9c49` with the
 same tree. The corrected external Phase 4 specification SHA-256 is
-`7ba20c5592e3f480eb384032395fb5adb117ec3b2b5c893a954ddde552a0f94a`.
+`5a5a74369a60169737638d9ce7e72b8a7ee6a11c2a758ca74e04e35d008245d8`.
 
 ## Synthetic input and expected-output identities
 
@@ -107,7 +107,19 @@ uncertainty, and no-promotion boundary are preserved.
   `862faf61a4d7ecd13d428a7a6e04a608aead3d17d668bba5d7860104c0a23a40`,
   decision `FAIL`, four blockers.
 - Generation 5 is preserved in Git history and is not amended, rebased,
-  relabeled, accepted, or merged. Generation 6 must close every blocking
+  relabeled, accepted, or merged.
+- Rejected Generation 6 commit:
+  `d41338a762e221c8a72d8ee5ce30a7ee23664f3b`; tree
+  `2b8954c57c4e604ac9ff0057dd3a6e3ed18ea82a`; manifest SHA-256
+  `483234342271123a6b185bd1da892ce43b020cb5067a7e85db3ea5c01250b8b9`.
+- Generation 6 Standards review: external `review/generation-6-standards.md`,
+  SHA-256 `2f7623e1a6d946820b14fd81a3146ca49ecf11669c08c757fd6e4bafbb6a2b19`,
+  decision `FAIL`, three blockers and one nonblocking duplicated-code finding.
+- Generation 6 Spec review: external `review/generation-6-spec.md`, SHA-256
+  `d9965e15af9880a5f6a30ad51a9d253df9d40c44593ec6d9c3ce3292e75bc0b5`,
+  decision `FAIL`, two blockers.
+- Generation 6 is preserved in Git history and is not amended, rebased,
+  relabeled, accepted, or merged. Generation 7 must close every blocking
   finding and receive fresh identity-bound tests and both independent reviews.
   The duplicated-helper observation is dispositioned without creating a shared
   runtime dependency across the two otherwise self-contained deep Modules.

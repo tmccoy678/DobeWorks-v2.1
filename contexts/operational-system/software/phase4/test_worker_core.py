@@ -66,6 +66,21 @@ class BlockingRunner:
         return {}
 
 
+class MutatingPath:
+    """Perform one deterministic path-side effect when converted."""
+
+    def __init__(self, path: Path, mutation) -> None:
+        self.path = path
+        self.mutation = mutation
+        self.called = False
+
+    def __fspath__(self) -> str:
+        if not self.called:
+            self.called = True
+            self.mutation()
+        return os.fspath(self.path)
+
+
 class WorkerCoreTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
@@ -139,6 +154,44 @@ class WorkerCoreTests(unittest.TestCase):
         destination.rmdir()
         destination.symlink_to(self.staging / "missing-destination", target_is_directory=True)
         self.assertEqual(self.execute()["state"], "REJECTED_DESTINATION_EXISTS")
+
+    def test_staging_root_identity_drift_is_rejected(self) -> None:
+        for timing in ("path", "runner"):
+            with self.subTest(timing=timing):
+                base = self.root / f"stage-drift-{timing}"
+                inputs, stage, saved, outside = base / "inputs", base / "stage", base / "saved", base / "outside"
+                inputs.mkdir(parents=True)
+                stage.mkdir()
+                outside.mkdir()
+                envelope, input_file = inputs / "job-envelope.json", inputs / "input-records.json"
+                shutil.copy2(FIXTURES / "job-envelope.json", envelope)
+                shutil.copy2(FIXTURES / "input-records.json", input_file)
+
+                def replace_stage() -> None:
+                    stage.rename(saved)
+                    stage.symlink_to(outside, target_is_directory=True)
+
+                runner = None
+                envelope_arg = MutatingPath(envelope, replace_stage) if timing == "path" else envelope
+                if timing == "runner":
+                    def runner(_envelope, _input):
+                        replace_stage()
+                        return load(FIXTURES / "expected-result.json")
+                result = WorkerCore(CONFIG_SHA256, inputs, runner=runner).execute(envelope_arg, input_file, stage, NOW)
+                self.assertEqual(result["state"], "FAILED_STAGE_INTEGRITY")
+                self.assertEqual(list(outside.iterdir()), [])
+
+    def test_destination_created_by_runner_is_not_replaced(self) -> None:
+        destination = self.staging / "job-phase4-fixture-001"
+
+        def runner(_envelope, _input):
+            destination.mkdir()
+            return load(FIXTURES / "expected-result.json")
+
+        result = self.execute(self.core(runner=runner))
+        self.assertEqual(result["state"], "FAILED_ATOMIC_HANDBACK")
+        self.assertTrue(destination.is_dir())
+        self.assertEqual(list(destination.iterdir()), [])
 
     def test_expired_envelope_is_rejected_without_runner(self) -> None:
         self.mutate_envelope(expires_at="2020-01-01T00:00:00Z")
@@ -405,6 +458,8 @@ class WorkerCoreTests(unittest.TestCase):
     def test_public_api_types_fail_closed(self) -> None:
         with self.assertRaisesRegex(ValueError, "configuration_sha256"):
             WorkerCore({}, allowed_input_root=self.inputs)
+        with self.assertRaisesRegex(ValueError, "runner must be callable"):
+            self.core(runner={})
         cases = (
             self.core().execute({}, self.input_file, self.staging, NOW),
             self.core().execute(self.envelope, {}, self.staging, NOW),

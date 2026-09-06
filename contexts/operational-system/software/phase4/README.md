@@ -56,8 +56,8 @@ schema and scalar types, a pseudonymous role ID, provenance hashes, clock meanin
 dropped records, collector self-health, and an exact signal-to-decision map.
 It rejects prohibited private or secret fields at any inspected level and
 fails closed on excessive JSON nesting.
-Missing, stale, dropped, failed, or time-uncertain evidence yields `UNKNOWN` or
-`TELEMETRY_UNAVAILABLE`. Retention returns `RETAIN` or `EXPIRE`; it never
+Missing, stale, dropped, failed, schema-incompatible, or time-uncertain evidence
+yields `UNKNOWN` or `TELEMETRY_UNAVAILABLE`. Retention returns `RETAIN` or `EXPIRE`; it never
 deletes. The policy fixes accepted `DEC-003` values: 30 days for raw permitted
 events, 180 days for daily aggregates, immediate stop delivery, warnings
 within 24 hours, and weekly trend review.

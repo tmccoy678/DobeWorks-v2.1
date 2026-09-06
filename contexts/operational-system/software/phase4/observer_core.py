@@ -169,12 +169,15 @@ class ObserverCore:
 
     def collect(self, snapshot_path: Path, policy_path: Path, now: str) -> dict:
         """Validate two read-only inputs and return one minimized record."""
+        _utc(now)
         snapshot_raw = _read(snapshot_path, self.allowed_input_root, self._allowed_input_identity, self.max_input_bytes)
         policy_raw = _read(policy_path, self.allowed_input_root, self._allowed_input_identity, self.max_input_bytes)
         snapshot, policy = _load(snapshot_raw), _load(policy_raw)
         _scan_privacy(snapshot)
         _scan_privacy(policy)
         self._validate_policy(policy)
+        if snapshot.get("schema_version") != SNAPSHOT_SCHEMA:
+            return self._schema_unknown(snapshot_raw, policy_raw, now)
         signals = self._validate_snapshot(snapshot, now)
         status, freshness, failure = self._meaning_state(snapshot, signals, now)
         if status != "VALIDATED":
@@ -259,6 +262,22 @@ class ObserverCore:
             "signals": signals,
             "status": status,
         }
+
+    def _schema_unknown(self, snapshot_raw: bytes, policy_raw: bytes, now: str) -> dict:
+        snapshot = {
+            "clock_quality": "UNKNOWN",
+            "collector_status": "UNKNOWN",
+            "dropped_records": 0,
+            "heartbeat_at": "UNKNOWN",
+            "last_success_at": "UNKNOWN",
+            "role_id": "UNKNOWN",
+            "schema_version": "UNKNOWN",
+        }
+        signals = {name: "UNKNOWN" for name in DECISION_MAP}
+        return self._record(
+            snapshot, snapshot_raw, policy_raw, signals,
+            "UNKNOWN", "UNKNOWN", "SCHEMA_INCOMPATIBLE", now,
+        )
 
 
 def _parser() -> ObserverArgumentParser:

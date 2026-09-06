@@ -87,10 +87,16 @@ class ObserverCoreTests(unittest.TestCase):
         with self.assertRaisesRegex(ObserverRejected, "INVALID_SCHEMA"):
             self.collect()
 
-    def test_schema_mismatch_is_rejected(self) -> None:
+    def test_schema_mismatch_surfaces_unknown(self) -> None:
         self.mutate_snapshot(schema_version="dobeworks.observer-snapshot.v2")
-        with self.assertRaisesRegex(ObserverRejected, "SCHEMA_INCOMPATIBLE"):
-            self.collect()
+        record = self.collect()
+        self.assertEqual((record["status"], record["freshness"]), ("UNKNOWN", "UNKNOWN"))
+        self.assertEqual(record["self_health"]["failure_status"], "SCHEMA_INCOMPATIBLE")
+        self.assertTrue(all(value == "UNKNOWN" for value in record["signals"].values()))
+        command = [sys.executable, "-B", str(BASE / "observer_core.py"), "--snapshot", str(self.snapshot), "--policy", str(self.policy), "--allowed-input-root", str(self.inputs), "--now", NOW]
+        completed = subprocess.run(command, text=True, capture_output=True, timeout=10, check=False)
+        parsed = json.loads(completed.stdout)
+        self.assertEqual((completed.returncode, completed.stderr, parsed["status"]), (0, "", "UNKNOWN"))
 
     def test_duplicate_json_key_is_rejected(self) -> None:
         raw = self.policy.read_text(encoding="utf-8")

@@ -18,7 +18,7 @@ from pathlib import Path
 
 TASK_ID = "DEGS-T2-DW-HWSW-P4-SOFTWARE-CORE-20260906"
 BASE_COMMIT = "b24c6d677d80b5299f09cb087d263d69bd6b68af"
-SPEC_SHA256 = "7ba20c5592e3f480eb384032395fb5adb117ec3b2b5c893a954ddde552a0f94a"
+SPEC_SHA256 = "5a5a74369a60169737638d9ce7e72b8a7ee6a11c2a758ca74e04e35d008245d8"
 PREFIX = "contexts/operational-system/docs/program/v1/architecture/phase-4"
 SOFTWARE = "contexts/operational-system/software/phase4"
 MANIFEST_RELATIVE = f"{PREFIX}/phase-4-sha256.txt"
@@ -26,7 +26,7 @@ VALIDATOR_RELATIVE = f"{PREFIX}/validation/validate_phase4.py"
 MAX_FILE_BYTES = 1024 * 1024
 MAX_COMMAND_OUTPUT = 64 * 1024
 MAX_TREE_ENTRIES = 128
-EXPECTED_MODULE_TESTS = 67
+EXPECTED_MODULE_TESTS = 69
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
 MANIFEST_LINE = re.compile(r"^([0-9a-f]{64})  ([^\s].*)$")
 MARKDOWN_LINK = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
@@ -444,13 +444,12 @@ def _verify_links(root: Path, findings: list) -> None:
                 continue
             try:
                 destination = (_rooted(root, relative).parent / clean).resolve()
+                if destination != root and root not in destination.parents:
+                    findings.append(_finding("DEAS-LINK-001", relative, f"link escapes repository: {target}"))
+                elif not destination.exists():
+                    findings.append(_finding("DEAS-LINK-001", relative, f"unresolved link: {target}"))
             except (OSError, RuntimeError, ValueError, ValidationError):
                 findings.append(_finding("DEAS-LINK-001", relative, f"link cannot be resolved: {target}"))
-                continue
-            if destination != root and root not in destination.parents:
-                findings.append(_finding("DEAS-LINK-001", relative, f"link escapes repository: {target}"))
-            elif not destination.exists():
-                findings.append(_finding("DEAS-LINK-001", relative, f"unresolved link: {target}"))
 
 
 def _bounded_command(command: list, root: Path, timeout: float):

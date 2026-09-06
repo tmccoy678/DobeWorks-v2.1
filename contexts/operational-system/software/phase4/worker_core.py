@@ -75,13 +75,15 @@ class WorkerArgumentParser(argparse.ArgumentParser):
         raise WorkerRejected("ERROR_INVALID_ARGUMENT", message)
 
 
-@dataclass(frozen=True)
+@dataclass
 class PreparedJob:
     envelope: dict
     input_value: dict
     job_id: str
     partial: Path
     destination: Path
+    staging_identity: tuple
+    partial_identity: Optional[tuple] = None
 
 
 def _sha256(value: bytes) -> str:
@@ -145,6 +147,18 @@ def _read_regular(path: Path, root: Path, root_identity: tuple, limit: int, limi
         raise WorkerRejected("REJECTED_PATH", "input path cannot be read") from error
 
 
+def _directory_matches(path: Path, identity: tuple) -> bool:
+    try:
+        observed = path.stat()
+        return (
+            not path.is_symlink()
+            and path.is_dir()
+            and (observed.st_dev, observed.st_ino) == identity
+        )
+    except (OSError, RuntimeError, TypeError, ValueError):
+        return False
+
+
 def _result(job_id: str, state: str, attempts: int, reason: str, digest=None) -> dict:
     return {
         "attempts": attempts,
@@ -193,6 +207,8 @@ class WorkerCore:
             raise ValueError("max_input_bytes is outside the fixed bound")
         if not isinstance(max_output_bytes, int) or isinstance(max_output_bytes, bool) or not 1 <= max_output_bytes <= 4 * 1024 * 1024:
             raise ValueError("max_output_bytes is outside the fixed bound")
+        if runner is not None and not callable(runner):
+            raise ValueError("runner must be callable")
         self.configuration_sha256 = configuration_sha256
         try:
             resolved_root = Path(allowed_input_root).resolve(strict=True)
@@ -203,7 +219,7 @@ class WorkerCore:
             raise ValueError("allowed input root must identify an existing directory") from error
         self.allowed_input_root = resolved_root
         self._allowed_input_identity = (root_stat.st_dev, root_stat.st_ino)
-        self.runner = runner or SyntheticInventoryRunner()
+        self.runner = SyntheticInventoryRunner() if runner is None else runner
         self.max_input_bytes = max_input_bytes
         self.max_output_bytes = max_output_bytes
         self._seen_jobs: Dict[str, str] = {}
@@ -233,6 +249,7 @@ class WorkerCore:
     def _prepare(self, envelope_path, input_path, staging_root, now, cancelled) -> PreparedJob:
         try:
             stage = Path(staging_root)
+            stage_stat = stage.stat()
             if stage.is_symlink() or not stage.is_dir():
                 raise WorkerRejected("REJECTED_PATH", "staging root must be an existing non-symlink directory")
         except (OSError, RuntimeError, TypeError, ValueError) as error:
@@ -258,7 +275,7 @@ class WorkerCore:
         if partial.exists() or partial.is_symlink() or destination.exists() or destination.is_symlink():
             raise WorkerRejected("REJECTED_DESTINATION_EXISTS", "staged destination already exists", job_id)
         self._seen_jobs[job_id] = fingerprint
-        return PreparedJob(envelope, input_value, job_id, partial, destination)
+        return PreparedJob(envelope, input_value, job_id, partial, destination, (stage_stat.st_dev, stage_stat.st_ino))
 
     def _validate_envelope(self, value: dict, now: str) -> None:
         if set(value) != ENVELOPE_KEYS:
@@ -352,11 +369,19 @@ class WorkerCore:
             signal.signal(signal.SIGALRM, previous)
 
     def _attempt(self, job: PreparedJob) -> dict:
+        if not _directory_matches(job.partial.parent, job.staging_identity):
+            return _result(job.job_id, "FAILED_STAGE_INTEGRITY", 1, "staging root identity changed")
         try:
             job.partial.mkdir(mode=0o700)
+            partial_stat = job.partial.stat()
+            if job.partial.is_symlink() or not job.partial.is_dir():
+                raise OSError("partial staging path is not a directory")
+            job.partial_identity = (partial_stat.st_dev, partial_stat.st_ino)
         except OSError as error:
             raise WorkerRejected("FAILED_STAGE_PREPARATION", "partial staging directory could not be created", job.job_id) from error
         candidate = self.runner(job.envelope, job.input_value)
+        if not self._staging_matches(job):
+            return _result(job.job_id, "FAILED_STAGE_INTEGRITY", 1, "staging identity changed during execution")
         raw = self._preserve_candidate(job, candidate)
         if len(raw) > self.max_output_bytes:
             return self._fail(job, "FAILED_OUTPUT_LIMIT", "candidate output exceeds its byte limit")
@@ -392,7 +417,16 @@ class WorkerCore:
         count, size = value.get("record_count"), value.get("total_bytes")
         return isinstance(count, int) and not isinstance(count, bool) and sum(kinds.values()) == count and isinstance(size, int) and not isinstance(size, bool) and size >= 0
 
+    def _staging_matches(self, job: PreparedJob) -> bool:
+        return (
+            job.partial_identity is not None
+            and _directory_matches(job.partial.parent, job.staging_identity)
+            and _directory_matches(job.partial, job.partial_identity)
+        )
+
     def _fail(self, job: PreparedJob, state: str, reason: str) -> dict:
+        if not self._staging_matches(job):
+            return _result(job.job_id, "FAILED_STAGE_INTEGRITY", 1, f"{reason}; staging identity changed")
         record = _result(job.job_id, state, 1, reason)
         try:
             (job.partial / "failure.json").write_bytes(_encoded(record))
@@ -401,11 +435,17 @@ class WorkerCore:
         return record
 
     def _handback(self, job: PreparedJob, digest: str) -> dict:
+        if not self._staging_matches(job):
+            return _result(job.job_id, "FAILED_STAGE_INTEGRITY", 1, "staging identity changed before handback")
+        if job.destination.exists() or job.destination.is_symlink():
+            return self._fail(job, "FAILED_ATOMIC_HANDBACK", "staged destination appeared during execution")
         record = _result(job.job_id, "COMPLETED_UNACCEPTED", 1, "synthetic result staged", digest)
         manifest = f"{digest}  result.json\n".encode("utf-8")
         try:
             (job.partial / "result-sha256.txt").write_bytes(manifest)
             (job.partial / "handback.json").write_bytes(_encoded(record))
+            if not self._staging_matches(job) or job.destination.exists() or job.destination.is_symlink():
+                return self._fail(job, "FAILED_ATOMIC_HANDBACK", "staging identity changed before atomic handback")
             os.replace(str(job.partial), str(job.destination))
         except OSError:
             return self._fail(job, "FAILED_ATOMIC_HANDBACK", "atomic directory handback failed")

@@ -13,18 +13,20 @@ and rollback are frozen in the external Phase 4 specification identified in
 [source-register.md](source-register.md). This package remains
 `NOT_YET_QUALIFIED` and `NOT_YET_RELEASED`.
 
-Generations 1 through 5 at commits
+Generations 1 through 6 at commits
 `c365171e3ae7aff184d5e2ade5ec470365765009`,
 `a9f11d8d92d3b3ae1b04d80e3ef9de31233f4c4c`,
 `6a989b8807c376e45b6345da54d6603d495ad3cd`, and
-`4cb086fbc1f22fe4b8c2a920f20af5ad0c3b4a9b`, and
-`e81ad8f97bff79bed0ae44ad14a170b3f0c8c403` are preserved, independently
-rejected predecessors. Generation 6 retains the same interfaces and 25-path
-boundary while closing every recorded blocker, including stable allowed-root
-identity after construction, exact public API types, deterministic handling of
-NUL-bearing Markdown targets, and dangling staged destinations. The duplicated-helper
+`4cb086fbc1f22fe4b8c2a920f20af5ad0c3b4a9b`,
+`e81ad8f97bff79bed0ae44ad14a170b3f0c8c403`, and
+`d41338a762e221c8a72d8ee5ce30a7ee23664f3b` are preserved, independently
+rejected predecessors. Generation 7 retains the same interfaces and 25-path
+boundary while closing every recorded blocker: stable Staged Output directory
+identity, post-run duplicate rejection, exact runner-adapter type, explicit
+`UNKNOWN` for incompatible Observer schema, and deterministic overlong-link
+classification. The duplicated-helper
 observation is nonblocking: no shared runtime dependency is introduced solely
-to deduplicate small internal policy helpers. Generation 6 makes no retroactive
+to deduplicate small internal policy helpers. Generation 7 makes no retroactive
 PASS claim for any predecessor.
 
 ## Architecture
@@ -85,6 +87,7 @@ take action.
 |---|---|---|
 | exact schema, fresh exact clock, collector OK, no drops, complete signals | `VALIDATED` | validated synthetic values |
 | stale or collector failed | `TELEMETRY_UNAVAILABLE` | every signal `UNKNOWN` |
+| incompatible snapshot schema | `UNKNOWN` | every signal `UNKNOWN`; incompatibility recorded in self-health |
 | clock uncertain, records dropped, or signal missing | `UNKNOWN` | every signal `UNKNOWN` |
 | incompatible schema, prohibited data, invalid policy/path/value | rejection | no record |
 
@@ -141,7 +144,8 @@ tests or a DEGS result.
 - Public configuration, path, clock, and cancellation values require their exact
   documented API types; malformed values return bounded rejection states.
 - Resolved inputs must be regular non-symlink files below an explicit allowed
-  root; Staged Output uses a non-symlink existing directory.
+  root; Staged Output uses a pinned non-symlink existing directory identity and
+  rechecks partial/destination state after the runner returns.
 - The Worker/Observer Modules import no network client or subprocess facility.
 - Python 3.9.6 standard library is the complete dependency set; no package
   resolution, download, or update occurs.
