@@ -1,0 +1,25 @@
+# Security, Promotion, Identity, and Supply Evidence
+
+- **Evidence ID:** `EV-P4-SECURITY-TEST`, `EV-P4-PROMOTION-CONTRACT`, `EV-P4-SECRET-HYGIENE`, `EV-P4-ARTIFACT-IDENTITY`, `EV-P4-SUPPLY-FAILURE-TEST`
+- **Requirement/fault IDs:** `REQ-CP-005`, `REQ-CP-009`, `REQ-WK-003`, `REQ-WK-008`, `REQ-WK-009`, `REQ-OBS-001`, `REQ-OBS-004`, `REQ-ASS-002`; `FLT-JOB-004`, `FLT-JOB-005`, `FLT-NET-002`, `FLT-SUP-001`, `FLT-SUP-002`
+- **Claim under test:** Phase 4 minimizes authority and data, contains no promotion interface or network/dependency substitution path, rejects secret/private telemetry fields and unsafe paths, uses only identity-recorded Python standard-library facilities, and freezes exact source/configuration/test/artifact bytes without claiming actual integration or supply-chain qualification.
+- **Acceptance method:** Source inspection, AST import/function analysis, closed-schema/path/secret negative tests, manifest verification, upstream-source hash comparison, Python compile, exact fixture-output comparison, Git diff/index inspection, secret scan, and DEGS validation/evaluation.
+- **Exact source/configuration/role/device-safe identity/environment/target:** Base commit `b24c6d677d80b5299f09cb087d263d69bd6b68af`; base tree `3008aab9ed2c86052ad35a24d4a1f108a2b07658`; source identities in `source-register.md`; configuration SHA-256 `ba0e803fc49b7a78989a44c9c9beb9789e37980b7ce92654a89d3f364460873d`; Python 3.9.6, Bash 3.2.57, Git 2.50.1; exact 25 repository paths; no device or external service target.
+- **Procedure or command identity:** Commands in `validation/validation-report.md`, public validator `python3 -B contexts/operational-system/docs/program/v1/architecture/phase-4/validation/validate_phase4.py --repository-root . --manifest-sha256 <external-digest> --external-spec <exact-path> --external-spec-sha256 875c0e661a6e10ff3ff1e011d618feb395fb769b3f1c345b280b192fedb76caa --json`.
+- **Start time:** 2026-09-06T00:25:16-05:00
+- **End time:** 2026-09-06T00:48:47-05:00
+- **Clock-quality basis:** Execution-host wall clock in America/Chicago with one-second display precision; dependency/tool version output has no external time attestation.
+- **Expected result:** No prohibited import, secret value, unexplained warning, out-of-root path, implicit promotion, dependency download, source substitution, manifest mismatch, source drift, oversized function/file, false lifecycle claim, or untracked mutation; exact standard-library provenance and all deterministic checks pass.
+- **Actual result:** Module and validator AST/compile checks found no prohibited network/process import or over-bound function; source, fixture, JSON, link, path, diff, secret, and historical-input checks passed after one corrected operator-loop variable that had temporarily shadowed Zsh's `path` array. No package resolution, dependency download, network request by either Module, secret access, device action, Promotion Event, or controlled integration action occurred.
+- **Status:** PASS
+- **Discrepancy references:** `P4-OPEN-001`, `P4-OPEN-002`; actual operating-system packages, signing, persistent deployment, endpoint exposure, transport, update retrieval, and integration remain outside this synthetic package.
+- **Artifact paths:** `source-register.md`, `software-core-plan.md`, `validation/validation-report.md`, `phase-4-sha256.txt`, Worker/Observer sources and tests, and the external delivery/review records identified after freeze.
+- **Cryptographic identities:** Twenty-four non-manifest paths are frozen by `phase-4-sha256.txt`; its SHA-256, commit, pushed ref, PR head, and review bindings are external to immutable package bytes.
+- **Evidence owner:** Codex in Taylor AI Workbench for source, deterministic checks, and record integrity; external reviewers own review results; Taylor owns exact acceptance.
+- **Human/physical action owner:** Taylor for authority only; no authentication, physical action, credential use, destructive work, promotion, integration, merge, qualification, or release occurred.
+- **Confidentiality classification:** `C1_PRIVATE_OPERATIONAL`; synthetic fixtures are non-secret; PRIVATE PERSONAL USE - NOT FOR PUBLIC RELEASE.
+- **Recoverability classification:** Complete-history bundle SHA-256 `5b8ef9cb0b2076be7a791070757a1f2a006937af4d9a1eaee3f0369e3b127abc` plus Git/source reconstruction; this is not evidence of integrated-system recovery.
+- **Limitations:** Static/import/secret checks reduce observable risk but do not prove absence of every defect, hidden platform behavior, malicious dependency, deployed exposure, or private data at a future real collector. DEGS evaluates the record, not truth or authority.
+- **Unsupported inferences:** Supply-chain certification, real network isolation, deployed security, accepted promotion, actual integration, device qualification, System Release, Public Release, compliance, or broader adoption.
+- **Current freshness:** Current for the exact final non-self manifest and recorded local checks; live remote/base/review identity is reverified externally for delivery and acceptance.
+- **Supersession:** NONE; no Phase 4 generation predecessor exists.

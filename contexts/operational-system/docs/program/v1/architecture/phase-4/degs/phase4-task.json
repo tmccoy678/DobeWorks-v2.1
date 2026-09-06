@@ -1,0 +1,491 @@
+{
+  "schema_version": 1,
+  "task_id": "DEGS-T2-DW-HWSW-P4-SOFTWARE-CORE-20260906",
+  "task_author": "Codex in Taylor AI Workbench",
+  "title": "Define, implement, test, and freeze Phase 4 Software Core with Synthetic Fixtures",
+  "objective": "Produce one exact synthetic-only Worker Core and Observer Core package with bounded interfaces, complete Phase 4 evidence, no controlled integration action when all checks pass, and no device action, promotion, qualification, release, Phase 5, merge, or broader adoption.",
+  "stakeholders": [
+    "Taylor"
+  ],
+  "scope": {
+    "description": "Exactly 25 private DobeWorks repository paths implement two standard-library Python Modules, synthetic fixtures, evidence, one package validator, and documentation. External delivery and review records bind G7/G8/G9 without rewriting these package bytes.",
+    "read_only": false
+  },
+  "non_goals": [
+    "Dispatch or execute work on a Worker device, current Mac, Seagate, collector, service, or external endpoint",
+    "Read, copy, transform, normalize, or infer from real/private workload content, PRIVATE VAULT, credentials, tokens, recovery keys, private filenames, or full serials",
+    "Modify or retroactively relabel the initial failed or corrected representative Worker job packages",
+    "Create a Promotion Event, accepted output, authoritative state change, persistent registry, deployment, or controlled integration action",
+    "Qualify a role or system, begin Phase 5, make a System Release or Public Release, merge, or perform broader adoption",
+    "Complete or predict external Git identity, independent review, or exact G9 acceptance inside the immutable package",
+    "Amend, reset, rebase, force-push, delete, merge, or rewrite history"
+  ],
+  "authority_lane": "TAYLOR_AI_WORKBENCH",
+  "risk_tier": "TIER_2",
+  "requirements": [
+    "Implement WorkerCore.execute as the sole Job Envelope-to-Staged Output operation and expose no promotion or device-dispatch operation.",
+    "Implement ObserverCore.collect and ObserverCore.retention_decision as read-only decision operations and expose no remediation, dispatch, promotion, approval, or deletion operation.",
+    "Use only Python 3.9-compatible standard-library facilities and repository-local synthetic non-secret fixtures.",
+    "Reject duplicate keys, extra fields, identity mismatch, unsafe paths, stale inputs, invalid values, prohibited data, oversized input/output, and unsupported schema or policy.",
+    "Bound Worker input/output bytes, records, represented bytes, attempts, retries, timeout values, paths, and states; bound Observer bytes, signals, traversed nodes, counters, paths, and retention values.",
+    "Exercise the Phase 4 behavior for REQ-CP-004, REQ-CP-009, REQ-WK-004 through REQ-WK-009, REQ-OBS-001 through REQ-OBS-004, REQ-OBS-006 through REQ-OBS-008, and REQ-ASS-002.",
+    "Exercise the applicable Phase 4 behavior for FLT-WK-004, FLT-JOB-001 through FLT-JOB-008, FLT-OBS-001 through FLT-OBS-005, FLT-NET-001, FLT-NET-002, FLT-SUP-001, and FLT-SUP-002.",
+    "Produce exactly the 18 EV-P4 evidence identities defined by the external specification and bind each to the canonical 23-field evidence contract.",
+    "Freeze 24 non-manifest paths in one sorted SHA-256 manifest whose own digest remains external.",
+    "Preserve NOT_YET_QUALIFIED, NOT_YET_RELEASED, COMPLETED_UNACCEPTED, NOT_PERFORMED promotion, and no controlled integration action throughout.",
+    "Keep embedded artifact delivery identity, independent review, and post-action validation PENDING; close them only through external records bound to the frozen package."
+  ],
+  "acceptance_criteria": [
+    "The exact 25-path diff is the only tracked change from base commit b24c6d677d80b5299f09cb087d263d69bd6b68af.",
+    "All 43 Worker/Observer public tests pass through direct and CLI seams, including positive, negative, security, privacy, failure, ambiguity, atomicity, determinism, path, and boundary cases.",
+    "The public package validator passes its valid case and all negative/failure cases, then returns PACKAGE-scoped PASS with zero findings and G7/G8/G9 pending for the exact manifest.",
+    "Every Python file compiles and every function remains at or below 60 logical lines without exception.",
+    "All JSON, links, source hashes, fixture identities, manifest entries, evidence contracts, trace states, lifecycle claims, and side-effect boundaries agree.",
+    "The embedded task passes canonical DEGS schema validation and truthfully evaluates BLOCKED only on external identity/review controls.",
+    "After freeze, the external derived delivery task binds exact commit, pushed ref, PR, and independent reviews and evaluates PASS without rewriting package bytes.",
+    "Git diff/index hygiene and secret scanning pass without unexplained warning.",
+    "The initial and corrected historical Worker packages remain byte-unchanged and retain their original non-Phase-4 lifecycle labels.",
+    "When every package, delivery, and review check passes, record NO_CONTROLLED_INTEGRATION_ACTION_SELECTED and perform no controlled integration action.",
+    "Human G9 acceptance and merge remain pending and separately authorized."
+  ],
+  "assumptions": [
+    "The verified Git base, upstream sources, historical input identities, context pair, private remote, task lock, and complete-history backup remain unchanged during the work unit.",
+    "Synthetic fixtures are sufficient only for the Phase 4 software-core claim, not actual integration or qualification.",
+    "No future Phase 5 target or integration plan is selected by this instruction."
+  ],
+  "invariants": [
+    "DEGS-REQ-001",
+    "DEGS-REQ-002",
+    "DEGS-ARCH-002",
+    "DEGS-CFG-001",
+    "DEGS-CFG-002",
+    "DEGS-CFG-003",
+    "DEGS-CFG-004",
+    "DEGS-CFG-005",
+    "DEGS-CFG-006",
+    "DEGS-RISK-001",
+    "DEGS-RISK-002",
+    "DEGS-VV-001",
+    "DEGS-VV-002",
+    "DEGS-VV-003",
+    "DEGS-VV-004",
+    "DEGS-VV-005",
+    "DEGS-VV-006",
+    "DEGS-VV-007",
+    "DEGS-SEC-001",
+    "DEGS-SEC-002",
+    "DEGS-SEC-003",
+    "DEGS-SEC-006",
+    "DEGS-DATA-001",
+    "DEGS-DATA-002",
+    "DEGS-DATA-003",
+    "DEGS-AI-001",
+    "DEGS-AI-002",
+    "DEGS-AI-003",
+    "DEGS-AI-004",
+    "DEGS-AI-006",
+    "DEGS-OPS-001",
+    "DEGS-OPS-002",
+    "DEGS-OPS-004",
+    "DEGS-CONTEXT-001"
+  ],
+  "baseline": {
+    "status": "VERIFIED",
+    "evidence_path": "../source-register.md",
+    "detail": "Base commit b24c6d677d80b5299f09cb087d263d69bd6b68af and tree 3008aab9ed2c86052ad35a24d4a1f108a2b07658 matched remote main; relevant writers were zero; owned lock, exact context pair, source hashes, historical inputs, and complete-history backup were verified before mutation."
+  },
+  "alternatives": [
+    "Treat the corrected representative Worker workload as Phase 4 evidence",
+    "Implement one shallow utility that leaves policy duplicated in callers",
+    "Deploy to a Worker or collect live telemetry during Phase 4",
+    "Add third-party packages or a network-backed runner",
+    "Combine software-core proof with controlled integration or qualification"
+  ],
+  "selected_design": "Two deep Modules with small interfaces: Worker Core owns closed Job Envelope validation, bounded one-attempt state semantics, and atomic never-promoted handback; Observer Core owns closed schema/privacy/meaning/self-health/retention decisions. Both use exact synthetic fixtures and standard-library-only Python.",
+  "affected_files": [
+    "contexts/operational-system/README.md",
+    "contexts/operational-system/docs/program/v1/program-definition.md",
+    "contexts/operational-system/docs/program/v1/traceability-matrix.md",
+    "contexts/operational-system/docs/program/v1/architecture/phase-4/software-core-plan.md",
+    "contexts/operational-system/docs/program/v1/architecture/phase-4/worker-core-evidence.md",
+    "contexts/operational-system/docs/program/v1/architecture/phase-4/observer-core-evidence.md",
+    "contexts/operational-system/docs/program/v1/architecture/phase-4/security-and-supply-evidence.md",
+    "contexts/operational-system/docs/program/v1/architecture/phase-4/source-register.md",
+    "contexts/operational-system/docs/program/v1/architecture/phase-4/handoff.md",
+    "contexts/operational-system/docs/program/v1/architecture/phase-4/degs/phase4-task.json",
+    "contexts/operational-system/docs/program/v1/architecture/phase-4/validation/validate_phase4.py",
+    "contexts/operational-system/docs/program/v1/architecture/phase-4/validation/test_validate_phase4.py",
+    "contexts/operational-system/docs/program/v1/architecture/phase-4/validation/validation-report.md",
+    "contexts/operational-system/docs/program/v1/architecture/phase-4/phase-4-sha256.txt",
+    "contexts/operational-system/software/phase4/README.md",
+    "contexts/operational-system/software/phase4/worker_core.py",
+    "contexts/operational-system/software/phase4/observer_core.py",
+    "contexts/operational-system/software/phase4/test_worker_core.py",
+    "contexts/operational-system/software/phase4/test_observer_core.py",
+    "contexts/operational-system/software/phase4/fixtures/job-envelope.json",
+    "contexts/operational-system/software/phase4/fixtures/input-records.json",
+    "contexts/operational-system/software/phase4/fixtures/observer-snapshot.json",
+    "contexts/operational-system/software/phase4/fixtures/observer-policy.json",
+    "contexts/operational-system/software/phase4/fixtures/expected-result.json",
+    "contexts/operational-system/software/phase4/fixtures/expected-observer-record.json"
+  ],
+  "backup": {
+    "required": true,
+    "status": "VERIFIED",
+    "evidence_path": ".scratch/dobeworks-operational-system-phase4-software-core/backup/dobeworks-pre-phase4.bundle",
+    "detail": "The complete-history Git bundle verified and has SHA-256 5b8ef9cb0b2076be7a791070757a1f2a006937af4d9a1eaee3f0369e3b127abc; the pre-Phase-4 context pair was also copied and hashed."
+  },
+  "rollback": {
+    "required": true,
+    "status": "VERIFIED",
+    "procedure": "Preserve the base, verified complete-history bundle, pre-Phase-4 context pair, owned lock, isolated candidate, red/green/review records, manifest, and any non-force pushed commit. Do not amend, reset, rebase, force-push, delete, merge, or erase a failed generation; restore only through a separately authorized identity-checked follow-up.",
+    "evidence_path": "../handoff.md"
+  },
+  "risk_analysis": {
+    "status": "PASS",
+    "factors": {
+      "consequence": "A false software-core claim could corrupt later dispatch, privacy, promotion, or qualification decisions; fail-closed tests and explicit future boundaries constrain that consequence.",
+      "reversibility": "Repository changes are recoverable from an exact complete-history bundle and non-force Git history; no device or authoritative output is mutated.",
+      "data_sensitivity": "Only synthetic non-secret fixtures and privacy-safe historical identities are used; private content and secret values are prohibited.",
+      "operational_reach": "Twenty-five private repository paths and disposable local test directories only; no service, network, device, promotion, or integration reach.",
+      "physical_effects": "None; physical, device, storage, permission, credential, and destructive actions are excluded.",
+      "affected_party_impact": "Taylor is the sole stakeholder for this private package; unsupported downstream reliance is blocked by lifecycle and limitation labels.",
+      "ai_socio_technical_risk": "AI-authored code may omit or overstate controls; exact sources, red/green tests, fail-closed validator, independent dual-axis review, and Taylor-only acceptance constrain the risk."
+    },
+    "summary": "Tier 2 is appropriate because executable governance-adjacent software could affect later decisions, while this work remains reversible, private, synthetic, path-bounded, and non-operational.",
+    "evidence_path": "../software-core-plan.md"
+  },
+  "deterministic_controls": {
+    "status": "VERIFIED",
+    "enforced_outside_model": true,
+    "boundaries": {
+      "filesystem_write": {
+        "status": "ENFORCED",
+        "mechanism": "Exact Git path allowlist, isolated candidate repository, output-root/path tests, diff checks, and owned lock."
+      },
+      "command_execution": {
+        "status": "ENFORCED",
+        "mechanism": "Fixed local Python/Git/DEGS/test commands; Worker default runner has no subprocess interface; tests use bounded timeouts."
+      },
+      "network_egress": {
+        "status": "ENFORCED",
+        "mechanism": "Worker and Observer AST/import allowlists prohibit network clients; Module tests are local; only later private Git delivery may use the approved origin."
+      },
+      "dependency_sources": {
+        "status": "ENFORCED",
+        "mechanism": "Python standard library only; no resolver, registry, download, lockfile, or substitution path."
+      },
+      "secret_access": {
+        "status": "ENFORCED",
+        "mechanism": "Synthetic fixtures, prohibited-field traversal, source/diff secret scan, and no credential interface."
+      },
+      "approval": {
+        "status": "ENFORCED",
+        "mechanism": "Lifecycle states, no-promotion interfaces, external G7/G8/G9 records, and separate Taylor authority for acceptance and merge."
+      }
+    },
+    "denial_test": {
+      "status": "PASS",
+      "evidence_path": "../validation/validation-report.md"
+    },
+    "post_change_verification": {
+      "status": "PASS",
+      "evidence_path": "../validation/validation-report.md"
+    },
+    "evidence_path": "../security-and-supply-evidence.md"
+  },
+  "artifact_identity": {
+    "status": "PENDING"
+  },
+  "change_traceability": {
+    "status": "VERIFIED",
+    "orphan_count": 0,
+    "links": [
+      {
+        "requirement": "REQ-CP-004, REQ-WK-004 through REQ-WK-009",
+        "artifact": "Worker Core Module and Job contract",
+        "tests": [
+          "test_worker_core.py"
+        ],
+        "evidence_path": "../worker-core-evidence.md"
+      },
+      {
+        "requirement": "REQ-CP-009, REQ-OBS-001 through REQ-OBS-004, REQ-OBS-006 through REQ-OBS-008",
+        "artifact": "Observer Core Module, schema, privacy, self-health, and retention policy",
+        "tests": [
+          "test_observer_core.py"
+        ],
+        "evidence_path": "../observer-core-evidence.md"
+      },
+      {
+        "requirement": "REQ-ASS-002 and applicable Phase 4 fault boundaries",
+        "artifact": "Source register, package validator, and manifest",
+        "tests": [
+          "test_validate_phase4.py"
+        ],
+        "evidence_path": "../security-and-supply-evidence.md"
+      }
+    ],
+    "evidence_path": "../../../traceability-matrix.md"
+  },
+  "data_governance": {
+    "applicable": true,
+    "status": "VERIFIED",
+    "purpose": "Test minimum Worker job metadata and Observer decision/self-health metadata without real or private workload data.",
+    "owner": "Taylor",
+    "data_classes": [
+      "C0_PUBLIC_REFERENCE synthetic metadata",
+      "C1_PRIVATE_OPERATIONAL package identities"
+    ],
+    "necessary_fields": [
+      "Job identity and source/configuration/output digests",
+      "Synthetic path kind and byte-count records",
+      "Pseudonymous role, clock, collector, freshness, drop, signal, decision, and provenance fields"
+    ],
+    "minimum_necessary": true,
+    "provenance": "Exact fixture identities in ../source-register.md and package hashes in ../phase-4-sha256.txt.",
+    "authority": "Taylor's in-band Phase 4 steps 1-5 authorization as recorded by the external specification.",
+    "retention": "Repository fixtures/evidence follow Git evidence retention; modeled raw events expire at 30 days and daily aggregates at 180 days under DEC-003.",
+    "deletion_or_archival_conditions": "Observer returns decisions only and performs no deletion; any real archival/deletion behavior remains later authorized integration/qualification work.",
+    "access_boundary": "Private DobeWorks repository, synthetic inputs, and local disposable test directories; no private content, secrets, device, or collector access.",
+    "repurposing": {
+      "planned": false
+    },
+    "evidence_path": "../observer-core-evidence.md"
+  },
+  "threat_model": {
+    "applicable": true,
+    "status": "CURRENT",
+    "reviewed_after_last_material_change": true,
+    "threats": [
+      "Malformed, duplicate-key, stale, mismatched, oversized, symlinked, or out-of-root input",
+      "Duplicate job execution, ambiguous retry, partial handback, or implicit promotion",
+      "Prohibited private/secret telemetry, schema reinterpretation, stale health, dropped records, or clock uncertainty",
+      "Unapproved network/dependency substitution or false artifact/lifecycle identity",
+      "AI-authored omission, unsupported completion, or authority expansion"
+    ],
+    "mitigations": [
+      "Closed schemas, exact digests, path and size limits, finite iterations, zero retry, explicit states, and atomic staging",
+      "Privacy traversal, decision allowlist, self-health, unknown/unavailable behavior, and no action interfaces",
+      "Standard-library-only import policy, source/manifest verification, secret scan, and no Module network/subprocess surface",
+      "Public negative/failure tests, fail-closed package validator, external identity binding, and independent dual-axis review",
+      "Explicit limitations, separate G9/merge authority, and no controlled integration action"
+    ],
+    "evidence_path": "../software-core-plan.md"
+  },
+  "ai_assurance": {
+    "applicable": true,
+    "status": "VERIFIED",
+    "consequential": true,
+    "intended_uses": [
+      "Propose and test a synthetic Phase 4 Worker/Observer software-core design",
+      "Produce reviewable evidence for Taylor's exact acceptance decision"
+    ],
+    "unsupported_uses": [
+      "Real Worker dispatch, telemetry collection, promotion, integration, qualification, release, or broad adoption",
+      "Safety-critical, regulated, public, multi-user, or certification claims"
+    ],
+    "affected_stakeholders": [
+      "Taylor"
+    ],
+    "provenance": "Codex generated one bounded candidate from the exact sources and authority in ../source-register.md and the external specification.",
+    "foreseeable_misuse": [
+      "Treating synthetic unit evidence as deployed integration or device qualification",
+      "Treating COMPLETED_UNACCEPTED, a gate, or a review as promotion or execution authority",
+      "Extending the schemas to private content or secrets without a new governed task"
+    ],
+    "operating_bounds": [
+      "Exactly 25 tracked paths and two Modules",
+      "Synthetic fixtures only, standard library only, no Module network or device interface",
+      "One generation and deterministic public-seam tests; corrections remain within the frozen surface"
+    ],
+    "criteria": {
+      "quality": [
+        {
+          "measure": "Public positive and deterministic results",
+          "threshold": "All Module and package valid-case tests pass with exact expected bytes",
+          "evidence_path": "../validation/validation-report.md"
+        }
+      ],
+      "safety": [
+        {
+          "measure": "Authority and failure containment",
+          "threshold": "All cancellation, timeout, interruption, ambiguity, stale, drop, no-promotion, and no-action tests pass",
+          "evidence_path": "../validation/validation-report.md"
+        }
+      ],
+      "security": [
+        {
+          "measure": "Input, privacy, path, dependency, and secret controls",
+          "threshold": "All rejection tests and static/import/secret checks pass with no unexplained warning",
+          "evidence_path": "../security-and-supply-evidence.md"
+        }
+      ],
+      "fairness": [
+        {
+          "measure": "Scope and affected-party parity",
+          "threshold": "No person classification or differential decision exists; sole stakeholder and unsupported uses are explicit",
+          "evidence_path": "../software-core-plan.md"
+        }
+      ]
+    },
+    "human_decision_owner": "Taylor",
+    "override_path": "Taylor may reject or request a bounded correction; the package has no automatic override.",
+    "stop_path": "Any stop condition preserves the candidate and prevents later mutation or action.",
+    "fallback_path": "Retain the accepted Phase 3 baseline and perform no Phase 4 merge, integration, or downstream action.",
+    "rollback_path": "Use the verified complete-history bundle and non-force Git history only under a separately authorized identity check.",
+    "monitoring_and_reassessment_triggers": [
+      "Any source, fixture, requirement, configuration, dependency, environment, manifest, review, or code byte changes",
+      "Any proposed real device, private-data, deployment, integration, qualification, or release use"
+    ],
+    "retirement_condition": "Supersede this generation when its exact identity changes or a later accepted software generation replaces it; preserve it as historical evidence.",
+    "representative_tests": {
+      "status": "PASS",
+      "representative": true,
+      "adversarial": true,
+      "human_handoff": true,
+      "evidence_path": "../validation/validation-report.md"
+    },
+    "limitations": [
+      "Model generation is not independent review or human acceptance",
+      "Synthetic fixtures cannot establish actual integration, device behavior, or qualification",
+      "Static and deterministic tests do not prove absence of every defect"
+    ],
+    "evidence_path": "../software-core-plan.md"
+  },
+  "monitoring": {
+    "applicable": false,
+    "status": "NOT_APPLICABLE",
+    "reason": "The immutable Phase 4 package starts no long-running service or collector. Runtime monitoring is a later integration concern; deterministic test and validation status is recorded instead."
+  },
+  "tests": {
+    "static": [
+      {
+        "status": "PASS",
+        "evidence_path": "../validation/validation-report.md"
+      }
+    ],
+    "positive": [
+      {
+        "status": "PASS",
+        "evidence_path": "../validation/validation-report.md"
+      }
+    ],
+    "negative": [
+      {
+        "status": "PASS",
+        "evidence_path": "../validation/validation-report.md"
+      }
+    ],
+    "security": [
+      {
+        "status": "PASS",
+        "evidence_path": "../security-and-supply-evidence.md"
+      }
+    ],
+    "failure_path": [
+      {
+        "status": "PASS",
+        "evidence_path": "../validation/validation-report.md"
+      }
+    ],
+    "integration": [],
+    "end_to_end": [
+      {
+        "status": "PASS",
+        "evidence_path": "../validation/validation-report.md",
+        "detail": "Actual software-core CLI paths run from exact synthetic files to atomic Staged Output and from exact synthetic snapshot/policy to one minimized record; no role/device integration claim."
+      }
+    ]
+  },
+  "verification": {
+    "status": "PASS",
+    "evidence_path": "../validation/validation-report.md"
+  },
+  "validation": {
+    "status": "PASS",
+    "evidence_path": "../validation/validation-report.md"
+  },
+  "independent_review": {
+    "required": true,
+    "status": "PENDING",
+    "kind": "REVIEW",
+    "reviewer": "",
+    "reviewer_role": "",
+    "open_issues_status": "UNKNOWN",
+    "retest_status": "PENDING",
+    "evidence_path": ".scratch/dobeworks-operational-system-phase4-software-core/review/final-review-index.md"
+  },
+  "human_approval": {
+    "required": true,
+    "status": "APPROVED",
+    "approver": "Taylor",
+    "approver_role": "HUMAN",
+    "approval_mode": "IN_BAND",
+    "evidence_path": ".scratch/dobeworks-operational-system-phase4-software-core/spec.md"
+  },
+  "recovery_validation": {
+    "required": false,
+    "status": "NOT_REQUIRED",
+    "independently_verified": false,
+    "evidence_path": ""
+  },
+  "target_identity": "Pre-delivery candidate based on commit b24c6d677d80b5299f09cb087d263d69bd6b68af and exactly 25 affected_files; final manifest/commit/review identity remains external and PENDING.",
+  "blast_radius": "Exactly 25 private DobeWorks repository paths plus disposable local test directories and external scratch evidence; no device, private content, service, promotion, integration, qualification, release, merge, destructive, or broader-adoption action.",
+  "stop_conditions": [
+    "Base, source, remote, historical input, context, lock, writer, path, manifest, branch, or candidate identity changes unexpectedly.",
+    "A required implementation or evidence path falls outside the exact 25 tracked paths.",
+    "A test, validator, source, manifest, DEGS validation, review, or identity check fails and cannot be corrected within the frozen surface.",
+    "Real/private workload, protected content, credential, authentication, permission, physical, destructive, device, service, or uncontrolled network access becomes necessary.",
+    "A Promotion Event, accepted output, controlled integration action, Phase 5, qualification, System Release, Public Release, merge, or broader adoption would occur."
+  ],
+  "post_action_validation": {
+    "status": "PENDING",
+    "evidence_path": "../validation/validation-report.md"
+  },
+  "dry_run": {
+    "applicable": true,
+    "performed": true,
+    "status": "PASS",
+    "evidence_path": "../validation/validation-report.md",
+    "reason": "All behavior is exercised with repository-local synthetic fixtures and disposable output roots, with no production target."
+  },
+  "telemetry": {
+    "status": "SANITIZED",
+    "evidence_path": "../observer-core-evidence.md",
+    "reason": "Only synthetic minimized metadata is present; prohibited fields and PRIVATE VAULT markers fail closed."
+  },
+  "documentation": {
+    "status": "PASS",
+    "evidence_path": "../software-core-plan.md"
+  },
+  "handoff": {
+    "status": "PASS",
+    "evidence_path": "../handoff.md"
+  },
+  "secret_handling": {
+    "exposure_possible": false,
+    "controlled": true,
+    "status": "PASS",
+    "evidence_path": "../security-and-supply-evidence.md"
+  },
+  "warnings": [],
+  "unresolved_items": [
+    {
+      "severity": "INFO",
+      "status": "OPEN",
+      "message": "P4-OPEN-001: actual process termination, persistent deduplication, transport, device execution, and Promotion Event behavior remain later integration or qualification evidence."
+    },
+    {
+      "severity": "INFO",
+      "status": "OPEN",
+      "message": "P4-OPEN-002: actual collector permissions/load, clock synchronization, alert delivery, archival/deletion, and service self-health remain later integration or qualification evidence."
+    },
+    {
+      "severity": "INFO",
+      "status": "OPEN",
+      "message": "Artifact identity, independent review, post-action validation, G7, G8, G9, exact acceptance, and merge remain external to immutable package bytes."
+    }
+  ],
+  "status": "READY_FOR_EXECUTION"
+}

@@ -1,0 +1,25 @@
+# Observer Core Evidence
+
+- **Evidence ID:** `EV-P4-OBSERVER-SECURITY-TEST`, `EV-P4-OBSERVER-SCHEMA`, `EV-P4-OBSERVER-TEST`, `EV-P4-OBSERVER-PRIVACY-TEST`, `EV-P4-OBSERVER-FAILURE-TEST`, `EV-P4-RETENTION-TEST`
+- **Requirement/fault IDs:** `REQ-CP-009`, `REQ-OBS-001` through `REQ-OBS-004`, `REQ-OBS-006` through `REQ-OBS-008`; `FLT-OBS-001` through `FLT-OBS-005`
+- **Claim under test:** The synthetic Observer Core is read-only and action-incapable, accepts only versioned minimized telemetry with exact provenance and policy, exposes collector self-health, maps every allowed signal to one decision, rejects prohibited data, converts incomplete/unreliable evidence to `UNKNOWN` or `TELEMETRY_UNAVAILABLE`, and returns retention decisions without deletion.
+- **Acceptance method:** Inspection and 20 public-seam positive, negative, privacy, schema, failure, freshness, retention-boundary, determinism, path, size, authority, and CLI tests in `test_observer_core.py`.
+- **Exact source/configuration/role/device-safe identity/environment/target:** Base commit `b24c6d677d80b5299f09cb087d263d69bd6b68af`; accepted `DEC-003` values encoded by policy SHA-256 `9246169419e7e0b8dee9280667208f2f632a83a97f13c065188df2ac5b32683b`; synthetic `WK-CANDIDATE-01` role ID; Python 3.9.6 on the local candidate host; repository-local synthetic snapshot; no collector service or device target.
+- **Procedure or command identity:** `python3 -B -m unittest discover -s contexts/operational-system/software/phase4 -p 'test_*_core.py' -v`; Observer CLI documented in `../../../../../software/phase4/README.md`.
+- **Start time:** 2026-09-06T00:25:16-05:00
+- **End time:** 2026-09-06T00:48:47-05:00
+- **Clock-quality basis:** Synthetic record clock is fixed at `2026-09-06T00:01:00Z`; execution-host wall clock is America/Chicago with one-second display precision; no external time attestation.
+- **Expected result:** All Observer cases pass; the exact fixture produces byte-identical `expected-observer-record.json`; prohibited/unknown/schema-invalid data rejects; stale/failed/uncertain/dropped/missing data never implies health; retention boundaries return `EXPIRE` at 30 and 180 days without deleting anything.
+- **Actual result:** All 20 Observer cases passed through direct and CLI seams. The exact fixture produced byte-identical `expected-observer-record.json`; prohibited nested fields and PRIVATE VAULT text, unknown fields/signals, duplicate keys/signals, schema and policy mismatch, size/path/symlink violations rejected. Stale and collector-failed inputs returned `TELEMETRY_UNAVAILABLE`; uncertain clock, dropped records, and missing signals returned `UNKNOWN`; retention returned `EXPIRE` exactly at 30/180 days without a deletion interface. The initial G3 absent-implementation red remains preserved externally.
+- **Status:** PASS
+- **Discrepancy references:** `P4-OPEN-002` real collector permission denial, load, clock skew, alert delivery, archival/deletion, and service self-health remain later integration or qualification evidence.
+- **Artifact paths:** `contexts/operational-system/software/phase4/observer_core.py`, `test_observer_core.py`, observer fixture files, this record, and `validation/validation-report.md`
+- **Cryptographic identities:** Exact files are frozen by `phase-4-sha256.txt`; fixture SHA-256 values are listed in `source-register.md`; the manifest's own digest is supplied externally after freeze.
+- **Evidence owner:** Codex in Taylor AI Workbench for implementation, deterministic test execution, and record integrity; external reviewers own their review decisions.
+- **Human/physical action owner:** Taylor for authority only; no physical, remote, device, credential, permission, remediation, deletion, integration, or service action occurred.
+- **Confidentiality classification:** `C1_PRIVATE_OPERATIONAL`; fixtures contain synthetic minimized metadata only; PRIVATE PERSONAL USE - NOT FOR PUBLIC RELEASE.
+- **Recoverability classification:** `R0_REPRODUCIBLE`; exact Git source, complete-history bundle, fixtures, tests, and manifest reproduce this synthetic result; this is not a telemetry recovery claim.
+- **Limitations:** Tests prove the pure software-core seam only. They do not prove a real collector, permissions, sampling completeness under load, clock synchronization, delivery timing, alerts, durable retention, verified deletion/archive, device signals, integration, or long-running availability.
+- **Unsupported inferences:** Real Observer availability, privacy of an untested collector, device health, remediation, integration, qualification, Phase 5 readiness, System Release, Public Release, or broader adoption.
+- **Current freshness:** Current for the exact final non-self manifest and recorded Python environment after full rerun; any source, fixture, policy, environment, requirement, or byte change requires a new generation and retest.
+- **Supersession:** NONE; the Phase 2 executable-presence observation and Phase 3 design remain separate predecessor evidence, not Phase 4 test results.

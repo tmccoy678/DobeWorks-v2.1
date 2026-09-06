@@ -1,0 +1,25 @@
+# Worker Core Evidence
+
+- **Evidence ID:** `EV-P4-JOB-CONTRACT`, `EV-P4-WORKER-TEST`, `EV-P4-WORKER-NEGATIVE-TEST`, `EV-P4-WORKER-FAILURE-TEST`, `EV-P4-HANDBACK-TEST`, `EV-P4-PROMOTION-NEGATIVE-TEST`
+- **Requirement/fault IDs:** `REQ-CP-004`, `REQ-WK-004` through `REQ-WK-009`; `FLT-WK-004`, `FLT-JOB-001` through `FLT-JOB-008`, `FLT-NET-001`
+- **Claim under test:** The synthetic Worker Core accepts only one exact immutable Job Envelope/input/configuration contract, executes at most one bounded synthetic attempt, reports rejection/failure/ambiguity without automatic retry, atomically hands back integrity-identified Staged Output, and cannot promote or modify authoritative state.
+- **Acceptance method:** Inspection and 23 public-seam positive, negative, failure, boundary, determinism, CLI, and atomicity tests in `test_worker_core.py`.
+- **Exact source/configuration/role/device-safe identity/environment/target:** Base commit `b24c6d677d80b5299f09cb087d263d69bd6b68af`; configuration SHA-256 `ba0e803fc49b7a78989a44c9c9beb9789e37980b7ce92654a89d3f364460873d`; synthetic job `job-phase4-fixture-001`; `WK-SW-CANDIDATE-01` software role only; Python 3.9.6 on the local candidate host; disposable temporary staging directories; no device target.
+- **Procedure or command identity:** `python3 -B -m unittest discover -s contexts/operational-system/software/phase4 -p 'test_*_core.py' -v`; Worker CLI documented in `../../../../../software/phase4/README.md`.
+- **Start time:** 2026-09-06T00:25:16-05:00
+- **End time:** 2026-09-06T00:48:47-05:00
+- **Clock-quality basis:** Execution-host wall clock in America/Chicago with one-second display precision; external time attestation and per-test subsecond timing are NOT RECORDED.
+- **Expected result:** All Worker cases pass; exact fixture yields `COMPLETED_UNACCEPTED`, exact output SHA-256 `1099ce46272a14af8ba7372857c0f634a2feb2d20ade0ce2a96a6dfdc56d6fae`, `NOT_PERFORMED` promotion, and no partial directory; every invalid, failed, cancelled, ambiguous, oversized, unavailable, duplicate, or unsafe case fails closed with zero automatic retries and no final handback.
+- **Actual result:** All 23 Worker cases passed through direct and CLI seams. The exact fixture produced SHA-256 `1099ce46272a14af8ba7372857c0f634a2feb2d20ade0ce2a96a6dfdc56d6fae`, state `COMPLETED_UNACCEPTED`, promotion `NOT_PERFORMED`, one attempt, atomic final staging, and no partial directory. Duplicate, reuse, expiry, malformed/extra fields, configuration/input mismatch, cancellation, timeout, interruption, communication loss, cancellation race, unavailable dependency, invalid/oversized output, unsafe path, symlink, existing destination, and no-promotion cases produced their expected bounded states with no automatic retry. The initial G3 absent-implementation red remains preserved externally.
+- **Status:** PASS
+- **Discrepancy references:** `P4-OPEN-001` actual process deadline/termination and persistent cross-process job registry remain later integration concerns; no discrepancy permits promotion or a stronger claim.
+- **Artifact paths:** `contexts/operational-system/software/phase4/worker_core.py`, `test_worker_core.py`, six files under `fixtures/`, this record, and `validation/validation-report.md`
+- **Cryptographic identities:** Exact files are frozen by `phase-4-sha256.txt`; fixture SHA-256 values are listed in `source-register.md`; the manifest's own digest is supplied externally after freeze.
+- **Evidence owner:** Codex in Taylor AI Workbench for implementation, deterministic test execution, and record integrity; external reviewers own their review decisions.
+- **Human/physical action owner:** Taylor for authority only; no physical, remote, device, credential, permission, destructive, promotion, or integration action occurred.
+- **Confidentiality classification:** `C1_PRIVATE_OPERATIONAL`; fixtures contain synthetic `C0_PUBLIC_REFERENCE`-equivalent metadata only; PRIVATE PERSONAL USE - NOT FOR PUBLIC RELEASE.
+- **Recoverability classification:** `R0_REPRODUCIBLE`; exact Git source, complete-history bundle, fixtures, tests, and manifest reproduce this synthetic result; this is not an Operational System recovery claim.
+- **Limitations:** The default runner is an in-process bounded pure transform. Fault adapters report timeout/interruption/network/ambiguity semantics but do not prove process killing, persistent deduplication, real transport, device execution, restart, overload, Control Plane validation, or Promotion Event behavior.
+- **Unsupported inferences:** Actual Worker or device fitness, integration, persistent delivery, accepted output, promotion, qualification, Phase 5 readiness, System Release, Public Release, or broader adoption.
+- **Current freshness:** Current for the exact final non-self manifest and recorded Python environment after full rerun; any source, fixture, configuration, environment, requirement, or byte change requires a new generation and retest.
+- **Supersession:** NONE; the earlier failed and corrected representative Worker jobs are historical inputs, not predecessors relabeled as Phase 4.
