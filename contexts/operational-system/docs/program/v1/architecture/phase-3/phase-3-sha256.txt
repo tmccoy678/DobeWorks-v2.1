@@ -1,0 +1,17 @@
+ac5a8df273da6e00c995738ff48945136d1d559cc1356c0e55754a8150e6eebc  contexts/operational-system/README.md
+9d867c334804869d8fc416f256823d68e8942b67a562ea43fdc912a44900e22d  contexts/operational-system/docs/program/v1/architecture/phase-3/architecture-plan.md
+2f0d65a8145cb9d130065a1de36afbc9ab89d156c4b734c4906f35c366753753  contexts/operational-system/docs/program/v1/architecture/phase-3/authority-and-threat-map.md
+069cce6ab373c89dea4294fedce230eea71cba614c61621873b42a85e703b39d  contexts/operational-system/docs/program/v1/architecture/phase-3/data-and-signal-map.md
+2479b987c39083e75a2615e6ecafb7b449bb1e4271903b9ed0ad26699d97b5cd  contexts/operational-system/docs/program/v1/architecture/phase-3/degs/phase3-task.json
+db015c3dbe7eccf1499e524ac2b43f23ae00a8ab62c0adb135c08df56443ad6f  contexts/operational-system/docs/program/v1/architecture/phase-3/fault-and-safe-degradation.md
+a7b7c5b4c3b578067da9bcb8b932d175d15cd15288bf0ff4b2b52f4565ef8c56  contexts/operational-system/docs/program/v1/architecture/phase-3/handoff.md
+231d9000c747384c2cf1f117e6d8e2eec27208c310969c3494e57f78a3943377  contexts/operational-system/docs/program/v1/architecture/phase-3/operations-lifecycle-policy.md
+2658b81c234cb4c5fb0fd78ab0e114f2c70d1ee5c77f2d2ca2ddc223c6a95397  contexts/operational-system/docs/program/v1/architecture/phase-3/recovery-and-capacity-policy.md
+f721b4a7797ecacf823bd6d803441d1773e93650e5c155a29cb9311c2473c96e  contexts/operational-system/docs/program/v1/architecture/phase-3/role-architecture.md
+f4ea390a6215cdff3bf2c2862597ce61dbf2141a8cb5302a89fffa0a27aeffa2  contexts/operational-system/docs/program/v1/architecture/phase-3/role-dispositions.md
+cbc5338689030e3c95f219865fafa56c211bc6b3e12fca40916ff83833a9f6b1  contexts/operational-system/docs/program/v1/architecture/phase-3/source-register.md
+d79ef45e92f72b00430bce6ec6b5397c5717e31f0892f4cb2a52c62ededcb12f  contexts/operational-system/docs/program/v1/architecture/phase-3/validation/test_validate_phase3.py
+24a3d5f2aaeb0abbb9cd63cd972ad56ea3b55a1280acb53f7914d67b83dcc409  contexts/operational-system/docs/program/v1/architecture/phase-3/validation/validate_phase3.py
+0d047ffdedca55f1bb82d70b142dee30dd9d411f3e611dd552b41cd495fcea33  contexts/operational-system/docs/program/v1/architecture/phase-3/validation/validation-report.md
+dc4bca0bc20c2f5fe010a0cfc47fc73f69ce10162fcd14bced917ab5b09e6f4d  contexts/operational-system/docs/program/v1/program-definition.md
+f59070402767359fbaec0551f85e8421c97de10827af81d98047d2ac7684438e  contexts/operational-system/docs/program/v1/traceability-matrix.md
