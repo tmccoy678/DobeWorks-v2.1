@@ -1,0 +1,159 @@
+# Phase 4 Source and Provenance Register
+
+## Authoritative repository inputs
+
+| Source | SHA-256 | Use and boundary |
+|---|---|---|
+| `docs/standards/deas/v1/standard.md` | `df1644513d48022a3b9f01392fa33e391680b0d1e9341594fbc272ee44237586` | DEAS v1.0 rules and canonical evidence schema |
+| `docs/standards/deas/v1/deas-v1-sha256.txt` | `3f40080f3cd725db8906385abb6f7db79fadef5a231cf6bc9206b2fa43863c88` | DEAS baseline identity |
+| `contexts/operational-system/docs/program/v1/requirements.md` | `addb4d5c564866ad7115fa40b6e36189e3cb54397224d6c805a11fc431b168c0` | Normative Phase 4 requirements |
+| `contexts/operational-system/docs/program/v1/decisions.md` | `21cd53b6f0c4fc8a1da7f08266553047dac4e801ecfe72b6e49842b5e7104fe2` | Accepted values, including `DEC-003` |
+| `contexts/operational-system/docs/program/v1/evidence-and-audit-plan.md` | `531e5e1c60e032d27740962050b76dd285417993884ae7c4079efc8e4c90d537` | Required Phase 4 evidence classes |
+| `contexts/operational-system/docs/program/v1/fault-test-matrix.md` | `f6e025c572bac2ad7ac4b22ba481f14aa6372b63f3a8fa67ae5cff39a7d59e89` | Applicable fault IDs and safe behavior |
+| `contexts/operational-system/docs/program/v1/architecture/phase-3/phase-3-sha256.txt` | `ba00d974a9a982e750aef49a2cd52e3a57bc9bec7020ed7131c4ba575ebacb7d` | Accepted Phase 3 correction package identity |
+| `contexts/operational-system/docs/program/v1/architecture/phase-3/handoff.md` | `a7b7c5b4c3b578067da9bcb8b932d175d15cd15288bf0ff4b2b52f4565ef8c56` | Phase 3 architecture/disposition boundary and gaps |
+
+The Git base is commit `b24c6d677d80b5299f09cb087d263d69bd6b68af`,
+tree `3008aab9ed2c86052ad35a24d4a1f108a2b07658`. The accepted Phase 3
+correction commit is `f507e927cf98992b7679e46cf536a70fc2fd9c49` with the
+same tree. The corrected external Phase 4 specification SHA-256 is
+`e95b8369c7abaf80948e34c61c1b5f803f4ad2ecc2138d78d62a98a81135af9b`.
+
+## Synthetic input and expected-output identities
+
+| Fixture | SHA-256 | Classification and purpose |
+|---|---|---|
+| `contexts/operational-system/software/phase4/fixtures/job-envelope.json` | `57fe274106d1f3a129f6fe2c8bea1d3247925b1ba51f6221b3e8c8a35cc3d894` | Synthetic immutable job contract |
+| `contexts/operational-system/software/phase4/fixtures/input-records.json` | `d4dcacb9c25b2758e28a4cc218193645f004a8f880c42c515498a259e177aa36` | Synthetic non-content inventory metadata |
+| `contexts/operational-system/software/phase4/fixtures/expected-result.json` | `1099ce46272a14af8ba7372857c0f634a2feb2d20ade0ce2a96a6dfdc56d6fae` | Exact expected Worker result bytes |
+| `contexts/operational-system/software/phase4/fixtures/observer-policy.json` | `9246169419e7e0b8dee9280667208f2f632a83a97f13c065188df2ac5b32683b` | Exact accepted retention/timing policy values |
+| `contexts/operational-system/software/phase4/fixtures/observer-snapshot.json` | `2c0d8abdcaa3d63c7517b7768ebbb7121cc7472aa7c9956dd7bf3c420498ddd1` | Synthetic minimized telemetry input |
+| `contexts/operational-system/software/phase4/fixtures/expected-observer-record.json` | `711a2d9fdc2a253a672ca3e054af4e1dda3de5c295f95e4b12f8fe5ae832e6a3` | Exact expected Observer record bytes |
+
+The Job Envelope configuration digest
+`ba0e803fc49b7a78989a44c9c9beb9789e37980b7ce92654a89d3f364460873d`
+is SHA-256 of the exact bytes `phase4-synthetic-config-v1` followed by one LF.
+
+## Historical input evidence, preserved without relabeling
+
+| Input | Exact observed identity | Phase 4 use |
+|---|---|---|
+| Initial representative Worker job | job `wk69-repo-analysis-20260906T033104Z-022eafea`; state `FAILED_UNACCEPTED_NO_RETRY`; evidence-manifest SHA-256 `627235d58f46e0b686e5fd92ae87413f3d76d06dad710627eabbd751d6d10b67` | Historical fault/contract design input only |
+| Corrected representative Worker job | job `wk69-repo-analysis-corrected-20260906T040623Z-2d76f5c1`; state `HAND_BACK_VERIFIED_COMPLETED_UNACCEPTED`; result SHA-256 `ca48b7ffc9c607fd535a6fcb49fe3d563e5862b1c583f589dee676a2bffbbc46`; evidence-manifest SHA-256 `0cc9410ad8ad9541b98532afdb726d2930819c9ce102a533733ba498a823e7ca` | Historical contract/example input only |
+| Corrected-job acceptance package | manifest SHA-256 `bea6b7a8e0ce02563399e47e3b9fd4aeea8099a3431514ee6b6e0f3489cdf702`; state `COMPLETED_UNACCEPTED`; promotion `NOT_PERFORMED` | Confirms bounded historical acceptance and explicit non-Phase-4 scope |
+
+These `.scratch` sources remain outside Git and were not changed, copied into
+the package, re-executed, or treated as Phase 4 proof. Their original labels,
+uncertainty, and no-promotion boundary are preserved.
+
+## Correction-generation provenance
+
+- Rejected Generation 1 commit:
+  `c365171e3ae7aff184d5e2ade5ec470365765009`; tree
+  `d66364645ab9a173a7ed4fe8b99b8c9cb4bda154`; manifest SHA-256
+  `6a50cbbdb713338dc61bc51840b5b7a40c0997029aa1905f6fae2e55624ca25c`.
+- Initial Standards review: external `review/initial-standards.md`, SHA-256
+  `269d18d08ca9480fd96069b20b5e28c7874c040e1ba9201979d3ce0263150bd1`,
+  decision `FAIL`.
+- Initial Spec review: external `review/initial-spec.md`, SHA-256
+  `352b858fe69b54e8959cbe7451b1bc729a566d77f2ee9740373b1204effd04d5`,
+  decision `FAIL`.
+- Generation 1 is preserved in Git history and is not amended, rebased,
+  relabeled, accepted, or merged.
+- Rejected Generation 2 commit:
+  `a9f11d8d92d3b3ae1b04d80e3ef9de31233f4c4c`; tree
+  `ce78377371ec994721a67ca1880f1a5e313181d2`; manifest SHA-256
+  `fc4c7d13d6e06529dff8fb10a67d2f35ab1a2502d26877c3a8c2a476ea6c788c`.
+- Generation 2 Standards review: external `review/generation-2-standards.md`,
+  SHA-256 `08a743e30815065ca2e2f283f721e6b58495f5c81fa24a16c0556f9967af173f`,
+  decision `FAIL`.
+- Generation 2 Spec review: external `review/generation-2-spec.md`, SHA-256
+  `919c646ee8bff5a5f344d7136d6af26f1db2bbfce905f41bc39a8ec1164f110f`,
+  decision `FAIL`.
+- Generation 2 is preserved in Git history and is not amended, rebased,
+  relabeled, accepted, or merged.
+- Rejected Generation 3 commit:
+  `6a989b8807c376e45b6345da54d6603d495ad3cd`; tree
+  `3a3be3bb029dac9917d7f1028423822e15960629`; manifest SHA-256
+  `15855832d880abcfd0945ba9b251610ce29448ea7139d090689005f875db9a8e`.
+- Generation 3 Standards review: external `review/generation-3-standards.md`,
+  SHA-256 `b1c1b61e6894294808ad55c0af82a0f4f1da06168ec329fa004cf89fe6446487`,
+  decision `FAIL`.
+- Generation 3 Spec review: external `review/generation-3-spec.md`, SHA-256
+  `087f721c12fa82971a273ea0649917c7a31d2b3fd77546068a37028d63ab43e7`,
+  decision `FAIL`.
+- Generation 3 is preserved in Git history and is not amended, rebased,
+  relabeled, accepted, or merged.
+- Rejected Generation 4 commit:
+  `4cb086fbc1f22fe4b8c2a920f20af5ad0c3b4a9b`; tree
+  `b8f7cf5bb4c05a23afa5543bfb74fac0133af81f`; manifest SHA-256
+  `e8853c87b362220965f9c937afc978bf62b9c4721d4d9943718ee419540b8837`.
+- Generation 4 Standards review: external `review/generation-4-standards.md`,
+  SHA-256 `eabd088aa7c21ef1945574862ae88ccab97fe97f49ded1363ec6f49f50c07fc7`,
+  decision `FAIL`, three blockers and one nonblocking duplicated-code finding.
+- Generation 4 Spec review: external `review/generation-4-spec.md`, SHA-256
+  `8a94e061a4cb7871bf117a1a2cc1b1a4aeffca2b526372d50f59ec90c07069e7`,
+  decision `FAIL`, three blockers.
+- Generation 4 is preserved in Git history and is not amended, rebased,
+  relabeled, accepted, or merged.
+- Rejected Generation 5 commit:
+  `e81ad8f97bff79bed0ae44ad14a170b3f0c8c403`; tree
+  `120e38752e198fd3408d0fc5279b11ee2655af40`; manifest SHA-256
+  `00de173d50c2ab59d9037cb18e10d56fb53db600d7ab27066999be2255807001`.
+- Generation 5 Standards review: external `review/generation-5-standards.md`,
+  SHA-256 `08d0ec080eea7b3d5e0e192caaec1456e3a3e5402c0f2678f7ed4c2947301463`,
+  decision `FAIL`, three blockers and one nonblocking duplicated-code finding.
+- Generation 5 Spec review: external `review/generation-5-spec.md`, SHA-256
+  `862faf61a4d7ecd13d428a7a6e04a608aead3d17d668bba5d7860104c0a23a40`,
+  decision `FAIL`, four blockers.
+- Generation 5 is preserved in Git history and is not amended, rebased,
+  relabeled, accepted, or merged.
+- Rejected Generation 6 commit:
+  `d41338a762e221c8a72d8ee5ce30a7ee23664f3b`; tree
+  `2b8954c57c4e604ac9ff0057dd3a6e3ed18ea82a`; manifest SHA-256
+  `483234342271123a6b185bd1da892ce43b020cb5067a7e85db3ea5c01250b8b9`.
+- Generation 6 Standards review: external `review/generation-6-standards.md`,
+  SHA-256 `2f7623e1a6d946820b14fd81a3146ca49ecf11669c08c757fd6e4bafbb6a2b19`,
+  decision `FAIL`, three blockers and one nonblocking duplicated-code finding.
+- Generation 6 Spec review: external `review/generation-6-spec.md`, SHA-256
+  `d9965e15af9880a5f6a30ad51a9d253df9d40c44593ec6d9c3ce3292e75bc0b5`,
+  decision `FAIL`, two blockers.
+- Generation 6 is preserved in Git history and is not amended, rebased,
+  relabeled, accepted, or merged.
+- Rejected Generation 7 commit:
+  `a255de3dc149177fd41d8cee0d9469266c6f4d62`; tree
+  `7452f53303a9295636fef10e5fe73df6d96434d1`; manifest SHA-256
+  `54c64e4291732203871ce4baa51edbe88177a800958506fb8257ab888d57a6de`.
+- Generation 7 Standards review: external `review/generation-7-standards.md`,
+  SHA-256 `a940c51ddc0476a1a9c73e86006a96eaf704fb67fe86b1944229ef6f1cb48b3e`,
+  decision `PASS`, zero blockers and one nonblocking duplicated-code finding.
+- Generation 7 Spec review: external `review/generation-7-spec.md`, SHA-256
+  `590b0f1a81b5c14574014c259da6a280dc046eaf9de99a18d55dd3247613e868`,
+  decision `FAIL`, one mutable-runner-contract blocker and one nonblocking
+  Observer wording clarification.
+- Generation 7 is preserved in Git history and is not amended, rebased,
+  relabeled, accepted, or merged. Generation 8 must close the blocker and
+  receive fresh identity-bound tests and both independent reviews. The
+  duplicated-helper observation remains dispositioned without creating a
+  shared runtime dependency across the self-contained deep Modules.
+
+## Build and dependency provenance
+
+- Generator: Codex in Taylor AI Workbench; one initial generation after
+  public-seam red evidence and bounded correction generations after
+  identity-bound independent review failures; one candidate per generation.
+- Runtime: Apple-provided Python `3.9.6`; language target Python 3.9.
+- Shell used for orchestration: Bash `3.2.57` / Zsh host shell.
+- Git: `2.50.1`.
+- Runtime dependencies: Python standard library only.
+- Third-party packages, lockfiles, registries, downloads, installers, build
+  services, containers, network endpoints, and update substitutions: `NONE`.
+- Default Worker runner: repository-local pure synthetic transformation with
+  finite record iteration and no network or subprocess interface.
+- Observer: repository-local read-only transformation with finite privacy-node
+  traversal and no action interface.
+- Canonical engineering gate: `/Users/taylor/AI-Workspace/governance/bin/engineering-gate.py`,
+  SHA-256 `44c33ba743851d7befe11ebf93f2f4d9021b126f951a4587562adfca21f65c1e`.
+- AI boundary: one variant, exact 25 paths, deterministic tests and manifest,
+  no unsupported fact completion, no self-approval, and Taylor retains exact
+  acceptance, merge, phase, qualification, and release decisions.

@@ -1,0 +1,63 @@
+# Phase 4 Software Core Validation Report
+
+- **Evidence ID:** `EV-P4-SW-TEST`
+- **Requirement/fault IDs:** `REQ-CP-004`, `REQ-CP-009`, `REQ-WK-004` through `REQ-WK-009`, `REQ-OBS-001` through `REQ-OBS-004`, `REQ-OBS-006` through `REQ-OBS-008`, `REQ-ASS-002`, `REQ-ASS-003`; `FLT-WK-004`, `FLT-JOB-001` through `FLT-JOB-008`, `FLT-OBS-001` through `FLT-OBS-005`, `FLT-NET-001`, `FLT-NET-002`, `FLT-SUP-001`, `FLT-SUP-002`; `DEAS-PRE-001` through `DEAS-PRE-010`
+- **Claim under test:** The exact 25-path Phase 4 package implements the frozen synthetic Worker/Observer software-core interfaces, produces the exact 18 evidence identities, passes deterministic static/semantic/positive/negative/security/privacy/failure/boundary checks, preserves all authority limits, and is frozen without performing controlled integration or claiming qualification, release, merge, or human acceptance.
+- **Acceptance method:** Public red/green Module and package-validator suites, exact fixture comparison, Python compile/AST/function bounds, JSON, link, source, manifest, DEGS schema/evaluation, Git diff/index, secret, historical-input preservation, identity, and independent-review checks listed below.
+- **Exact source/configuration/role/device-safe identity/environment/target:** Base commit `b24c6d677d80b5299f09cb087d263d69bd6b68af`; base tree `3008aab9ed2c86052ad35a24d4a1f108a2b07658`; exact sources/configuration/fixtures in `../source-register.md`; Python 3.9.6; branch `operational-system/v1-phase4-software-core`; exactly 25 tracked paths; disposable synthetic staging roots; no device, collector, service, Promotion Event, or integration target.
+- **Procedure or command identity:** Commands in this report; public package seam `python3 -B contexts/operational-system/docs/program/v1/architecture/phase-4/validation/validate_phase4.py --repository-root . --manifest-sha256 <external-digest> --external-spec /Users/taylor/AI-Workspace/.scratch/dobeworks-operational-system-phase4-software-core/spec.md --external-spec-sha256 e95b8369c7abaf80948e34c61c1b5f803f4ad2ecc2138d78d62a98a81135af9b --json`.
+- **Start time:** 2026-09-06T01:12:37-05:00
+- **End time:** 2026-09-06T12:44:39-05:00
+- **Clock-quality basis:** Execution-host wall clock in America/Chicago with one-second display precision; individual test duration is recorded by the harness but external time attestation is NOT RECORDED.
+- **Expected result:** Exact package-scoped PASS with zero findings, 70 passing Module cases, all 32 package-validator cases passing, exact sources/fixtures/manifest, `NOT_YET_QUALIFIED`, `NOT_YET_RELEASED`, `NOT_PERFORMED` integration, and G7/G8/G9 pending; negative mutations fail closed with stable findings.
+- **Actual result:** Public G3 red evidence confirmed the absent Modules and validator. Generations 1 through 6 passed their then-current local checks but failed at least one independent review axis and remain immutable rejected predecessors; their exact defects and review identities are preserved in `source-register.md`. Generation 7 closed every Generation 6 blocker and passed 69 Module and 32 validator cases, but its Spec review proved that a runner could mutate authoritative envelope values and authorize forged output; its Standards review passed, and the exact candidate remains preserved and rejected. Correction Generation 8 passes all 70 Module cases and all 32 validator cases, including direct regression for detached runner input and pinned authoritative input/output/timeout bindings, and returns package-scoped PASS with zero findings. The embedded Tier 2 task passes schema validation and its pre-delivery evaluation remains expectedly `BLOCKED` only on artifact identity and independent review; external records close those controls without rewriting the package.
+- **Status:** PACKAGE_PASS_READY_FOR_GIT_DELIVERY
+- **Discrepancy references:** `P4-OPEN-001` and `P4-OPEN-002` in the task and evidence records remain explicit later-phase limitations, not package-validation failures.
+- **Artifact paths:** `contexts/operational-system/docs/program/v1/architecture/phase-4/validation/validation-report.md`, `contexts/operational-system/docs/program/v1/architecture/phase-4/validation/validate_phase4.py`, `contexts/operational-system/docs/program/v1/architecture/phase-4/validation/test_validate_phase4.py`, `contexts/operational-system/docs/program/v1/architecture/phase-4/phase-4-sha256.txt`, `contexts/operational-system/software/phase4/worker_core.py`, `contexts/operational-system/software/phase4/observer_core.py`, `contexts/operational-system/software/phase4/test_worker_core.py`, `contexts/operational-system/software/phase4/test_observer_core.py`
+- **Cryptographic identities:** Twenty-four non-manifest paths are frozen by `../phase-4-sha256.txt`; its own SHA-256, commit, pushed ref, draft PR, and independent-review identities are recorded externally after freeze.
+- **Evidence owner:** Codex in Taylor AI Workbench for deterministic execution and record integrity; external reviewers own their decisions; Taylor owns exact G9 acceptance.
+- **Human/physical action owner:** Taylor for authority only; no physical, remote, device, credential, permission, destructive, promotion, integration, qualification, release, or merge action occurred.
+- **Confidentiality classification:** `C1_PRIVATE_OPERATIONAL`; fixtures contain synthetic non-secret metadata only; PRIVATE PERSONAL USE - NOT FOR PUBLIC RELEASE.
+- **Recoverability classification:** Complete-history bundle SHA-256 `5b8ef9cb0b2076be7a791070757a1f2a006937af4d9a1eaee3f0369e3b127abc`, Git source, exact fixtures, tests, and manifest; this is not an integrated-system recovery claim.
+- **Limitations:** Software-core tests do not prove real process termination, transport, persistent state, device behavior, collector permissions/load, actual retention deletion/archive, alert delivery, Promotion Event, recovery, integration, end-to-end role behavior, qualification, or release fitness.
+- **Unsupported inferences:** G7/G8/G9 closure inside immutable bytes, actual integration, accepted output, device or role qualification, Phase 5 authority, System Release, Public Release, compliance, certification, merge, or broader adoption.
+- **Current freshness:** Current for the exact final non-self manifest and recorded environment after full rerun; any package/source/configuration/fixture/environment byte change invalidates the result and requires a new generation.
+- **Supersession:** Corrects rejected Phase 4 Generations 1 through 7 at commits `c365171e3ae7aff184d5e2ade5ec470365765009`, `a9f11d8d92d3b3ae1b04d80e3ef9de31233f4c4c`, `6a989b8807c376e45b6345da54d6603d495ad3cd`, `4cb086fbc1f22fe4b8c2a920f20af5ad0c3b4a9b`, `e81ad8f97bff79bed0ae44ad14a170b3f0c8c403`, `d41338a762e221c8a72d8ee5ce30a7ee23664f3b`, and `a255de3dc149177fd41d8cee0d9469266c6f4d62`; their exact tree, manifest, and review identities remain in `source-register.md`; historical representative Worker jobs remain separate evidence.
+
+## Deterministic check record
+
+| Check | Expected | Recorded result |
+|---|---:|---|
+| Worker/Observer G3 red | missing implementations rejected through public suites | PASS; exact external record preserved |
+| 70 Module public cases | exit 0 | PASS |
+| Package validator public cases | exit 0 | PASS; 32 cases |
+| Generation 1 through 6 independent reviews | exact identities / findings preserved | PASS; all `FAIL` decisions preserved externally as correction inputs |
+| Exact package validator | exit 0 / `PACKAGE` `PASS` / zero findings | PASS |
+| Python compile and function bounds | exit 0 | PASS; six Python paths |
+| JSON and relative links | exit 0 | PASS; seven JSON paths and all package links |
+| Source identities and non-self manifest | exit 0 | PASS |
+| Embedded DEGS task schema | `PASS` | PASS |
+| Embedded Tier 2 evaluation | expected `BLOCKED` only on external identity/review | PASS; exact expected two unmet controls |
+| Exact 25-path diff and index | exit 0 | PASS |
+| Secret scan | exit 0 / no unexplained finding | PASS; no leaks found |
+| Historical input identities | unchanged exact hashes | PASS |
+| External Standards and Spec review | no blocking finding on frozen identity | EXTERNAL / PENDING |
+| External derived Tier 2 delivery task | `PASS` after exact identity/review binding | EXTERNAL / PENDING |
+
+## Command set
+
+```sh
+python3 -B -m unittest discover -s contexts/operational-system/software/phase4 -p 'test_*_core.py' -v
+python3 -B contexts/operational-system/docs/program/v1/architecture/phase-4/validation/test_validate_phase4.py -v
+python3 -B contexts/operational-system/docs/program/v1/architecture/phase-4/validation/validate_phase4.py --repository-root . --manifest-sha256 <external-digest> --external-spec /Users/taylor/AI-Workspace/.scratch/dobeworks-operational-system-phase4-software-core/spec.md --external-spec-sha256 e95b8369c7abaf80948e34c61c1b5f803f4ad2ecc2138d78d62a98a81135af9b --json
+python3 /Users/taylor/AI-Workspace/governance/bin/engineering-gate.py validate contexts/operational-system/docs/program/v1/architecture/phase-4/degs/phase4-task.json
+python3 /Users/taylor/AI-Workspace/governance/bin/engineering-gate.py evaluate contexts/operational-system/docs/program/v1/architecture/phase-4/degs/phase4-task.json
+python3 -B -m py_compile <six Phase 4 Python paths>
+python3 -m json.tool <seven Phase 4 JSON paths>
+shasum -a 256 -c contexts/operational-system/docs/program/v1/architecture/phase-4/phase-4-sha256.txt
+git diff --check
+gitleaks git --no-banner --redact --timeout 30 .
+```
+
+Bytecode caches are directed outside the repository or removed before freeze.
+The manifest's own digest and all external gates remain external.

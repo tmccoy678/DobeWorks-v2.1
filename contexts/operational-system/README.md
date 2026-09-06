@@ -1,6 +1,6 @@
 # Operational System
 
-> **Status: PHASE 3 ARCHITECTURE/DISPOSITIONS DEFINED — `NOT_YET_QUALIFIED` — `NOT_YET_RELEASED`**
+> **Status: PHASE 4 SYNTHETIC SOFTWARE CORE PRODUCED — `NOT_YET_QUALIFIED` — `NOT_YET_RELEASED`**
 
 The Operational System is the bounded DobeWorks context for Taylor's private hardware, software, storage, worker execution, telemetry, recovery, maintenance, and retirement. It does not redefine the DobeWorks name or identity, and it is not a public service or offering.
 
@@ -15,6 +15,8 @@ The Operational System is the bounded DobeWorks context for Taylor's private har
 - [Evidence and independent-audit plan](docs/program/v1/evidence-and-audit-plan.md)
 - [Phase 2 entry criteria](docs/program/v1/phase-2-entry-criteria.md)
 - [Phase 3 architecture and disposition handoff](docs/program/v1/architecture/phase-3/handoff.md)
+- [Phase 4 software-core handoff](docs/program/v1/architecture/phase-4/handoff.md)
+- [Phase 4 Worker and Observer software](software/phase4/README.md)
 - [Program provenance](docs/program/v1/provenance.md)
 - [DobeWorks context map](../../CONTEXT-MAP.md)
 - [ADR 0013](../../docs/adr/0013-distinct-operational-system-context.md)
@@ -22,10 +24,11 @@ The Operational System is the bounded DobeWorks context for Taylor's private har
 ## Current boundary
 
 Phase 1 defines what later phases must prove, C4 preserves the Phase 2 evidence
-and its limitations, and the Phase 3 package defines architecture plus five
-`BLOCKED_PENDING_EVIDENCE` candidate dispositions. No current Mac, Seagate
-role, Worker, Observer, recovery path, or integrated system is qualified by
-these documents. Phase 3 definition does not authorize device or
-protected-content access, configuration change, implementation, Phase 4,
-deployment, destructive work, System Release, Public Release, or broader
-adoption.
+and its limitations, Phase 3 defines architecture plus five
+`BLOCKED_PENDING_EVIDENCE` candidate dispositions, and Phase 4 supplies
+synthetic-only Worker Core and Observer Core software evidence. No current Mac,
+Seagate role, Worker device, deployed Observer, recovery path, or integrated
+system is qualified by these documents. The Phase 4 package does not authorize
+device or protected-content access, deployment, a Promotion Event, controlled
+integration, Phase 5, destructive work, qualification, System Release, Public
+Release, merge, or broader adoption.
