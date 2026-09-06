@@ -203,6 +203,16 @@ class ObserverCoreTests(unittest.TestCase):
         with self.assertRaisesRegex(ObserverRejected, "PATH_REJECTED"):
             self.core().collect(loop, self.policy, NOW)
 
+    def test_symlink_loop_allowed_root_fails_closed_through_core_and_cli(self) -> None:
+        loop = self.root / "root-loop"
+        loop.symlink_to(loop)
+        with self.assertRaisesRegex(ValueError, "allowed input root"):
+            ObserverCore(allowed_input_root=loop)
+        command = [sys.executable, "-B", str(BASE / "observer_core.py"), "--snapshot", str(self.snapshot), "--policy", str(self.policy), "--allowed-input-root", str(loop), "--now", NOW]
+        completed = subprocess.run(command, text=True, capture_output=True, timeout=10, check=False)
+        parsed = json.loads(completed.stdout)
+        self.assertEqual((completed.returncode, completed.stderr, parsed["status"]), (2, "", "ERROR"))
+
     def test_core_exposes_no_action_authority(self) -> None:
         core = self.core()
         self.assertFalse(any(hasattr(core, name) for name in ("remediate", "dispatch", "promote", "approve", "delete")))

@@ -189,7 +189,10 @@ class WorkerCore:
         if not isinstance(max_output_bytes, int) or isinstance(max_output_bytes, bool) or not 1 <= max_output_bytes <= 4 * 1024 * 1024:
             raise ValueError("max_output_bytes is outside the fixed bound")
         self.configuration_sha256 = configuration_sha256
-        self.allowed_input_root = Path(allowed_input_root).resolve()
+        try:
+            self.allowed_input_root = Path(allowed_input_root).resolve()
+        except (OSError, RuntimeError) as error:
+            raise ValueError("allowed input root cannot be resolved") from error
         self.runner = runner or SyntheticInventoryRunner()
         self.max_input_bytes = max_input_bytes
         self.max_output_bytes = max_output_bytes

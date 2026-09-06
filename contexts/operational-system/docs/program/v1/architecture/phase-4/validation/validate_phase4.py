@@ -18,7 +18,7 @@ from pathlib import Path
 
 TASK_ID = "DEGS-T2-DW-HWSW-P4-SOFTWARE-CORE-20260906"
 BASE_COMMIT = "b24c6d677d80b5299f09cb087d263d69bd6b68af"
-SPEC_SHA256 = "3e139ca080367b9779f4a87cd5510af426c6d4784fb16412f51870512e3bc27e"
+SPEC_SHA256 = "a55cf68fd597767da88b0ab768d5c58469c612924a70e2f299dd285feb9293d5"
 PREFIX = "contexts/operational-system/docs/program/v1/architecture/phase-4"
 SOFTWARE = "contexts/operational-system/software/phase4"
 MANIFEST_RELATIVE = f"{PREFIX}/phase-4-sha256.txt"
@@ -26,7 +26,7 @@ VALIDATOR_RELATIVE = f"{PREFIX}/validation/validate_phase4.py"
 MAX_FILE_BYTES = 1024 * 1024
 MAX_COMMAND_OUTPUT = 64 * 1024
 MAX_TREE_ENTRIES = 128
-EXPECTED_MODULE_TESTS = 61
+EXPECTED_MODULE_TESTS = 63
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
 MANIFEST_LINE = re.compile(r"^([0-9a-f]{64})  ([^\s].*)$")
 MARKDOWN_LINK = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
@@ -355,7 +355,8 @@ def _verify_task(root: Path, findings: list) -> None:
         findings.append(_finding("DEAS-LIFECYCLE-001", relative, "embedded post-action validation must remain PENDING"))
     for field in ("verification", "validation", "documentation", "handoff", "secret_handling"):
         value = task.get(field)
-        if not isinstance(value, dict) or value.get("status") not in {"PASS", "VERIFIED"}:
+        status = value.get("status") if isinstance(value, dict) else None
+        if not isinstance(status, str) or status not in {"PASS", "VERIFIED"}:
             findings.append(_finding("DEAS-LIFECYCLE-001", relative, f"task {field} is not final package PASS"))
     artifact = task.get("artifact_identity")
     if artifact != {"status": "PENDING"}:
@@ -441,7 +442,11 @@ def _verify_links(root: Path, findings: list) -> None:
             clean = target.split("#", 1)[0]
             if not clean or re.match(r"^[a-z]+://", clean) or clean.startswith("/"):
                 continue
-            destination = (_rooted(root, relative).parent / clean).resolve()
+            try:
+                destination = (_rooted(root, relative).parent / clean).resolve()
+            except (OSError, RuntimeError, ValidationError):
+                findings.append(_finding("DEAS-LINK-001", relative, f"link cannot be resolved: {target}"))
+                continue
             if destination != root and root not in destination.parents:
                 findings.append(_finding("DEAS-LINK-001", relative, f"link escapes repository: {target}"))
             elif not destination.exists():

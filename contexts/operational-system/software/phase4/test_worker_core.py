@@ -359,6 +359,16 @@ class WorkerCoreTests(unittest.TestCase):
         result = self.core().execute(self.envelope, loop, self.staging, NOW)
         self.assertEqual(result["state"], "REJECTED_PATH")
 
+    def test_symlink_loop_allowed_root_fails_closed_through_core_and_cli(self) -> None:
+        loop = self.root / "root-loop"
+        loop.symlink_to(loop)
+        with self.assertRaisesRegex(ValueError, "allowed input root"):
+            WorkerCore(CONFIG_SHA256, allowed_input_root=loop)
+        command = [sys.executable, "-B", str(BASE / "worker_core.py"), "--envelope", str(self.envelope), "--input", str(self.input_file), "--staging-root", str(self.staging), "--allowed-input-root", str(loop), "--configuration-sha256", CONFIG_SHA256, "--now", NOW]
+        completed = subprocess.run(command, text=True, capture_output=True, timeout=10, check=False)
+        parsed = json.loads(completed.stdout)
+        self.assertEqual((completed.returncode, completed.stderr, parsed["state"]), (2, "", "ERROR_CONFIGURATION"))
+
     def test_core_exposes_no_promotion_operation(self) -> None:
         core = self.core()
         self.assertFalse(any(hasattr(core, name) for name in ("promote", "dispatch", "approve")))

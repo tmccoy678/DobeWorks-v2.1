@@ -151,7 +151,10 @@ class ObserverCore:
     def __init__(self, allowed_input_root: Path, max_input_bytes: int = 128 * 1024) -> None:
         if not isinstance(max_input_bytes, int) or isinstance(max_input_bytes, bool) or not 1 <= max_input_bytes <= 4 * 1024 * 1024:
             raise ValueError("max_input_bytes is outside the fixed bound")
-        self.allowed_input_root = Path(allowed_input_root).resolve()
+        try:
+            self.allowed_input_root = Path(allowed_input_root).resolve()
+        except (OSError, RuntimeError) as error:
+            raise ValueError("allowed input root cannot be resolved") from error
         self.max_input_bytes = max_input_bytes
 
     def collect(self, snapshot_path: Path, policy_path: Path, now: str) -> dict:

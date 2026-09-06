@@ -17,7 +17,7 @@ The Git base is commit `b24c6d677d80b5299f09cb087d263d69bd6b68af`,
 tree `3008aab9ed2c86052ad35a24d4a1f108a2b07658`. The accepted Phase 3
 correction commit is `f507e927cf98992b7679e46cf536a70fc2fd9c49` with the
 same tree. The corrected external Phase 4 specification SHA-256 is
-`3e139ca080367b9779f4a87cd5510af426c6d4784fb16412f51870512e3bc27e`.
+`a55cf68fd597767da88b0ab768d5c58469c612924a70e2f299dd285feb9293d5`.
 
 ## Synthetic input and expected-output identities
 
@@ -83,8 +83,22 @@ uncertainty, and no-promotion boundary are preserved.
   `087f721c12fa82971a273ea0649917c7a31d2b3fd77546068a37028d63ab43e7`,
   decision `FAIL`.
 - Generation 3 is preserved in Git history and is not amended, rebased,
-  relabeled, accepted, or merged. Generation 4 must close every recorded
-  blocker and receive fresh identity-bound tests and both independent reviews.
+  relabeled, accepted, or merged.
+- Rejected Generation 4 commit:
+  `4cb086fbc1f22fe4b8c2a920f20af5ad0c3b4a9b`; tree
+  `b8f7cf5bb4c05a23afa5543bfb74fac0133af81f`; manifest SHA-256
+  `e8853c87b362220965f9c937afc978bf62b9c4721d4d9943718ee419540b8837`.
+- Generation 4 Standards review: external `review/generation-4-standards.md`,
+  SHA-256 `eabd088aa7c21ef1945574862ae88ccab97fe97f49ded1363ec6f49f50c07fc7`,
+  decision `FAIL`, three blockers and one nonblocking duplicated-code finding.
+- Generation 4 Spec review: external `review/generation-4-spec.md`, SHA-256
+  `8a94e061a4cb7871bf117a1a2cc1b1a4aeffca2b526372d50f59ec90c07069e7`,
+  decision `FAIL`, three blockers.
+- Generation 4 is preserved in Git history and is not amended, rebased,
+  relabeled, accepted, or merged. Generation 5 must close every blocking
+  finding and receive fresh identity-bound tests and both independent reviews.
+  The duplicated-helper observation is dispositioned without creating a shared
+  runtime dependency across the two otherwise self-contained deep Modules.
 
 ## Build and dependency provenance
 
