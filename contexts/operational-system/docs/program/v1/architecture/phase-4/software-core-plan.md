@@ -13,14 +13,15 @@ and rollback are frozen in the external Phase 4 specification identified in
 [source-register.md](source-register.md). This package remains
 `NOT_YET_QUALIFIED` and `NOT_YET_RELEASED`.
 
-Generation 1 (`c365171e3ae7aff184d5e2ade5ec470365765009`) and Generation 2
-(`a9f11d8d92d3b3ae1b04d80e3ef9de31233f4c4c`) are preserved, independently
-rejected predecessors. Generation 3 retains the same interfaces and 25-path
-boundary while additionally closing deadline-control escapes, deep JSON and
-result recursion, Boolean numeric controls, in-memory registry and retention
-age ceilings, exact evidence-ID and provenance-row matching, missing-Git
-validation, and missing negative cases. It makes no retroactive PASS claim for
-either predecessor.
+Generations 1 through 3 at commits
+`c365171e3ae7aff184d5e2ade5ec470365765009`,
+`a9f11d8d92d3b3ae1b04d80e3ef9de31233f4c4c`, and
+`6a989b8807c376e45b6345da54d6603d495ad3cd` are preserved, independently
+rejected predecessors. Generation 4 retains the same interfaces and 25-path
+boundary while closing every recorded blocker, including parsed unhashable
+values, symlink loops, deep task JSON classification, final subprocess-wait
+bounds, in-root package symlinks, and truthful multi-generation provenance.
+It makes no retroactive PASS claim for any predecessor.
 
 ## Architecture
 
@@ -129,6 +130,7 @@ tests or a DEGS result.
 - Inputs, output paths, schemas, sizes, records, signals, time values, retries,
   attempts, traversed nodes, function size, and package paths are finite.
 - JSON duplicate keys and extra fields fail closed.
+- Unhashable parsed/API values, excessive nesting, and symlink loops fail closed.
 - Resolved inputs must be regular non-symlink files below an explicit allowed
   root; Staged Output uses a non-symlink existing directory.
 - The Worker/Observer Modules import no network client or subprocess facility.
@@ -138,7 +140,9 @@ tests or a DEGS result.
 - The public validator independently runs Module tests, verifies sources,
   evidence contracts, lifecycle semantics, code bounds, links, path allowlist,
   and the manifest. Its filesystem walk, child output, child time, and Git
-  identity output are explicitly bounded; unexpected test diagnostics fail.
+  identity output and every subprocess wait are explicitly bounded; malformed
+  deep task JSON and symlinked package files fail as package nonconformance;
+  unexpected test diagnostics fail.
 - Independent Standards and Spec reviewers examine the frozen identity outside
   the immutable package.
 

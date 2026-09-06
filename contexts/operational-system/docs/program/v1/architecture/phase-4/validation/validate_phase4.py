@@ -18,7 +18,7 @@ from pathlib import Path
 
 TASK_ID = "DEGS-T2-DW-HWSW-P4-SOFTWARE-CORE-20260906"
 BASE_COMMIT = "b24c6d677d80b5299f09cb087d263d69bd6b68af"
-SPEC_SHA256 = "6ff958ddf98a63c86f1a89a78f56d8199a094c4ea19122e436e2f6f06a4703bb"
+SPEC_SHA256 = "3e139ca080367b9779f4a87cd5510af426c6d4784fb16412f51870512e3bc27e"
 PREFIX = "contexts/operational-system/docs/program/v1/architecture/phase-4"
 SOFTWARE = "contexts/operational-system/software/phase4"
 MANIFEST_RELATIVE = f"{PREFIX}/phase-4-sha256.txt"
@@ -26,7 +26,7 @@ VALIDATOR_RELATIVE = f"{PREFIX}/validation/validate_phase4.py"
 MAX_FILE_BYTES = 1024 * 1024
 MAX_COMMAND_OUTPUT = 64 * 1024
 MAX_TREE_ENTRIES = 128
-EXPECTED_MODULE_TESTS = 57
+EXPECTED_MODULE_TESTS = 61
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
 MANIFEST_LINE = re.compile(r"^([0-9a-f]{64})  ([^\s].*)$")
 MARKDOWN_LINK = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
@@ -167,15 +167,16 @@ def _rooted(root: Path, relative: str) -> Path:
     candidate = Path(relative)
     if candidate.is_absolute():
         raise ValidationError("absolute repository-relative path is prohibited", relative)
-    resolved = (root / candidate).resolve()
-    if resolved != root and root not in resolved.parents:
+    path = root / candidate
+    parent = path.parent.resolve()
+    if parent != root and root not in parent.parents:
         raise ValidationError("path escapes repository root", relative)
-    return resolved
+    return path
 
 
 def _read(root: Path, relative: str, findings: list) -> bytes:
-    path = _rooted(root, relative)
     try:
+        path = _rooted(root, relative)
         if path.is_symlink() or not path.is_file():
             findings.append(_finding("DEAS-PATH-001", relative, "required regular file is missing"))
             return b""
@@ -184,7 +185,7 @@ def _read(root: Path, relative: str, findings: list) -> bytes:
             findings.append(_finding("DEAS-BOUND-001", relative, f"file exceeds {MAX_FILE_BYTES} bytes"))
             return b""
         return path.read_bytes()
-    except OSError:
+    except (OSError, RuntimeError, ValidationError):
         findings.append(_finding("DEAS-PATH-001", relative, "required file cannot be read"))
         return b""
 
@@ -209,7 +210,7 @@ def _json_object(root: Path, relative: str, findings: list):
 
     try:
         value = json.loads(_text(root, relative, findings), object_pairs_hook=reject_duplicates)
-    except (json.JSONDecodeError, ValueError) as error:
+    except (json.JSONDecodeError, RecursionError, ValueError) as error:
         findings.append(_finding("DEAS-LIFECYCLE-001", relative, f"invalid or duplicate-key JSON: {error}"))
         return None
     if not isinstance(value, dict):
@@ -249,7 +250,9 @@ def _verify_file_set(root: Path, findings: list) -> None:
     expected = {path for path in PACKAGE_FILES if path.startswith((PREFIX, SOFTWARE))}
     observed = set()
     for base in (_rooted(root, PREFIX), _rooted(root, SOFTWARE)):
-        if base.is_dir():
+        if base.is_symlink():
+            findings.append(_finding("DEAS-PATH-001", str(base.relative_to(root)), "package directory is a symlink"))
+        elif base.is_dir():
             observed.update(_bounded_files(root, base, findings))
     for extra in sorted(observed - expected):
         findings.append(_finding("DEAS-PATH-002", extra, "file is outside the exact package allowlist"))
@@ -411,6 +414,9 @@ def _verify_python(root: Path, findings: list) -> None:
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.end_lineno - node.lineno + 1 > 60:
                 findings.append(_finding("DEAS-PRE-004", relative, f"function exceeds 60 lines: {node.name}"))
+            if relative == VALIDATOR_RELATIVE and isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr == "wait":
+                if not any(keyword.arg == "timeout" for keyword in node.keywords):
+                    findings.append(_finding("DEAS-PRE-004", relative, "subprocess wait is not explicitly bounded"))
             if relative in module_paths and isinstance(node, (ast.Import, ast.ImportFrom)):
                 names = [alias.name.split(".")[0] for alias in node.names] if isinstance(node, ast.Import) else [(node.module or "").split(".")[0]]
                 if any(name in forbidden for name in names):
@@ -476,8 +482,11 @@ def _bounded_command(command: list, root: Path, timeout: float):
         returncode = process.wait(timeout=2)
     except subprocess.TimeoutExpired:
         process.kill()
-        returncode = process.wait()
         error = error or "TERMINATION_TIMEOUT"
+        try:
+            returncode = process.wait(timeout=2)
+        except subprocess.TimeoutExpired:
+            returncode = None
     return returncode, bytes(outputs[process.stdout]), bytes(outputs[process.stderr]), error
 
 

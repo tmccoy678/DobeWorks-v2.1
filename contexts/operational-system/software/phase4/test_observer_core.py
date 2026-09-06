@@ -147,6 +147,15 @@ class ObserverCoreTests(unittest.TestCase):
         with self.assertRaises(ObserverRejected):
             self.collect()
 
+    def test_unhashable_signal_and_api_values_are_rejected(self) -> None:
+        value = load(self.snapshot)
+        value["signals"][3]["value"] = {}
+        write_json(self.snapshot, value)
+        with self.assertRaisesRegex(ObserverRejected, "INVALID_SIGNALS"):
+            self.collect()
+        with self.assertRaisesRegex(ObserverRejected, "INVALID_RETENTION_REQUEST"):
+            self.core().retention_decision({}, 30)
+
     def test_policy_must_equal_accepted_decision(self) -> None:
         value = load(self.policy)
         value["raw_event_retention_days"] = 31
@@ -187,6 +196,12 @@ class ObserverCoreTests(unittest.TestCase):
         linked.symlink_to(self.snapshot)
         with self.assertRaisesRegex(ObserverRejected, "PATH_REJECTED"):
             self.core().collect(linked, self.policy, NOW)
+
+    def test_symlink_loop_input_is_rejected(self) -> None:
+        loop = self.inputs / "loop.json"
+        loop.symlink_to(loop)
+        with self.assertRaisesRegex(ObserverRejected, "PATH_REJECTED"):
+            self.core().collect(loop, self.policy, NOW)
 
     def test_core_exposes_no_action_authority(self) -> None:
         core = self.core()

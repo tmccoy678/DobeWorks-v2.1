@@ -17,7 +17,7 @@ The Git base is commit `b24c6d677d80b5299f09cb087d263d69bd6b68af`,
 tree `3008aab9ed2c86052ad35a24d4a1f108a2b07658`. The accepted Phase 3
 correction commit is `f507e927cf98992b7679e46cf536a70fc2fd9c49` with the
 same tree. The corrected external Phase 4 specification SHA-256 is
-`6ff958ddf98a63c86f1a89a78f56d8199a094c4ea19122e436e2f6f06a4703bb`.
+`3e139ca080367b9779f4a87cd5510af426c6d4784fb16412f51870512e3bc27e`.
 
 ## Synthetic input and expected-output identities
 
@@ -71,14 +71,26 @@ uncertainty, and no-promotion boundary are preserved.
   `919c646ee8bff5a5f344d7136d6af26f1db2bbfce905f41bc39a8ec1164f110f`,
   decision `FAIL`.
 - Generation 2 is preserved in Git history and is not amended, rebased,
-  relabeled, accepted, or merged. Generation 3 must close every recorded
+  relabeled, accepted, or merged.
+- Rejected Generation 3 commit:
+  `6a989b8807c376e45b6345da54d6603d495ad3cd`; tree
+  `3a3be3bb029dac9917d7f1028423822e15960629`; manifest SHA-256
+  `15855832d880abcfd0945ba9b251610ce29448ea7139d090689005f875db9a8e`.
+- Generation 3 Standards review: external `review/generation-3-standards.md`,
+  SHA-256 `b1c1b61e6894294808ad55c0af82a0f4f1da06168ec329fa004cf89fe6446487`,
+  decision `FAIL`.
+- Generation 3 Spec review: external `review/generation-3-spec.md`, SHA-256
+  `087f721c12fa82971a273ea0649917c7a31d2b3fd77546068a37028d63ab43e7`,
+  decision `FAIL`.
+- Generation 3 is preserved in Git history and is not amended, rebased,
+  relabeled, accepted, or merged. Generation 4 must close every recorded
   blocker and receive fresh identity-bound tests and both independent reviews.
 
 ## Build and dependency provenance
 
 - Generator: Codex in Taylor AI Workbench; one initial generation after
-  public-seam red evidence and two bounded correction generations after two
-  rounds of identity-bound independent review failures.
+  public-seam red evidence and bounded correction generations after
+  identity-bound independent review failures; one candidate per generation.
 - Runtime: Apple-provided Python `3.9.6`; language target Python 3.9.
 - Shell used for orchestration: Bash `3.2.57` / Zsh host shell.
 - Git: `2.50.1`.

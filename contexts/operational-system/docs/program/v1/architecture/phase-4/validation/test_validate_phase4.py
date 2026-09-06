@@ -18,7 +18,7 @@ VALIDATOR_RELATIVE = "contexts/operational-system/docs/program/v1/architecture/p
 MANIFEST_RELATIVE = "contexts/operational-system/docs/program/v1/architecture/phase-4/phase-4-sha256.txt"
 VALIDATOR = ROOT / VALIDATOR_RELATIVE
 SPEC = Path("/Users/taylor/AI-Workspace/.scratch/dobeworks-operational-system-phase4-software-core/spec.md")
-SPEC_SHA256 = "6ff958ddf98a63c86f1a89a78f56d8199a094c4ea19122e436e2f6f06a4703bb"
+SPEC_SHA256 = "3e139ca080367b9779f4a87cd5510af426c6d4784fb16412f51870512e3bc27e"
 PACKAGE_FILES = (
     "contexts/operational-system/README.md",
     "contexts/operational-system/docs/program/v1/program-definition.md",
@@ -169,6 +169,13 @@ class Phase4ValidatorTests(unittest.TestCase):
         completed, result = self.run_validator(manifest_sha=self.rehash())
         self.assert_finding(result, "DEAS-LIFECYCLE-001")
 
+    def test_deep_task_json_is_deterministic_nonconformance(self) -> None:
+        relative = "contexts/operational-system/docs/program/v1/architecture/phase-4/degs/phase4-task.json"
+        (self.repo / relative).write_text('{"nested":' * 1500 + "0" + "}" * 1500 + "\n", encoding="utf-8")
+        completed, result = self.run_validator(manifest_sha=self.rehash())
+        self.assertEqual((completed.returncode, completed.stderr, result["decision"]), (1, "", "FAIL"))
+        self.assert_finding(result, "DEAS-LIFECYCLE-001")
+
     def test_false_task_and_handoff_lifecycle_fail(self) -> None:
         task = "contexts/operational-system/docs/program/v1/architecture/phase-4/degs/phase4-task.json"
         self.mutate_text(task, '"status": "READY_FOR_EXECUTION"', '"status": "COMPLETE"')
@@ -224,6 +231,12 @@ class Phase4ValidatorTests(unittest.TestCase):
         path.write_text(path.read_text(encoding="utf-8") + "\nimport subprocess\n", encoding="utf-8")
         completed, result = self.run_validator(manifest_sha=self.rehash())
         self.assert_finding(result, "DEAS-SECURITY-001")
+
+    def test_unbounded_subprocess_wait_fails(self) -> None:
+        self.mutate_text(VALIDATOR_RELATIVE, "process.wait(timeout=2)", "process.wait()")
+        completed, result = self.run_validator(manifest_sha=self.rehash())
+        self.assertEqual(completed.returncode, 1)
+        self.assert_finding(result, "DEAS-PRE-004")
 
     def test_malformed_python_fails_without_validator_traceback(self) -> None:
         relative = "contexts/operational-system/software/phase4/worker_core.py"
@@ -289,6 +302,17 @@ class Phase4ValidatorTests(unittest.TestCase):
         completed, result = self.run_validator(root=link)
         self.assertEqual((completed.returncode, result["decision"]), (2, "ERROR"))
         self.assert_finding(result, "DEAS-INPUT-001")
+
+    def test_in_root_symlinked_package_file_fails(self) -> None:
+        relative = "contexts/operational-system/software/phase4/fixtures/job-envelope.json"
+        path = self.repo / relative
+        target = self.repo / ".git" / "phase4-symlink-target.json"
+        shutil.copy2(path, target)
+        path.unlink()
+        path.symlink_to(target)
+        completed, result = self.run_validator(manifest_sha=self.rehash())
+        self.assertEqual((completed.returncode, result["decision"]), (1, "FAIL"))
+        self.assert_finding(result, "DEAS-PATH-001")
 
 
 if __name__ == "__main__":

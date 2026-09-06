@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import shutil
@@ -160,6 +161,14 @@ class WorkerCoreTests(unittest.TestCase):
         value["records"][0]["bytes"] = 121
         write_json(self.input_file, value)
         self.assertEqual(self.execute()["state"], "REJECTED_INPUT_IDENTITY")
+
+    def test_unhashable_record_kind_is_rejected(self) -> None:
+        value = load(self.input_file)
+        value["records"][0]["kind"] = {}
+        write_json(self.input_file, value)
+        digest = hashlib.sha256(self.input_file.read_bytes()).hexdigest()
+        self.mutate_envelope(input_sha256=digest)
+        self.assertEqual(self.execute()["state"], "REJECTED_INVALID_INPUT")
 
     def test_cancellation_before_execution_is_bounded(self) -> None:
         runner = CountingRunner(result={})
@@ -343,6 +352,12 @@ class WorkerCoreTests(unittest.TestCase):
         linked_stage.symlink_to(self.staging, target_is_directory=True)
         second = self.core().execute(self.envelope, self.input_file, linked_stage, NOW)
         self.assertEqual((first["state"], second["state"]), ("REJECTED_PATH", "REJECTED_PATH"))
+
+    def test_symlink_loop_input_is_rejected(self) -> None:
+        loop = self.inputs / "loop.json"
+        loop.symlink_to(loop)
+        result = self.core().execute(self.envelope, loop, self.staging, NOW)
+        self.assertEqual(result["state"], "REJECTED_PATH")
 
     def test_core_exposes_no_promotion_operation(self) -> None:
         core = self.core()

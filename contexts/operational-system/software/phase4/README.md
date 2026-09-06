@@ -15,7 +15,8 @@ WorkerCore(...).execute(envelope_path, input_path, staging_root, now)
 
 The Module validates closed-schema JSON, duplicate keys and excessive nesting, exact source and
 configuration digests, dispatch authority, expiry, data class, job semantics,
-input shape, path confinement, byte/record/time/retry bounds, duplicate job
+input shape and scalar types, path confinement including symlink loops,
+byte/record/time/retry bounds, duplicate job
 identity, and a pre-execution cancellation signal. It invokes exactly one
 runner attempt under the envelope's Worker-enforced deadline, including result
 serialization, validation, and atomic handback; preserves
@@ -51,7 +52,7 @@ ObserverCore(...).retention_decision(record_kind, age_days)
 ```
 
 The Module reads but never writes its inputs. It validates a closed versioned
-schema, a pseudonymous role ID, provenance hashes, clock meaning, freshness,
+schema and scalar types, a pseudonymous role ID, provenance hashes, clock meaning, freshness,
 dropped records, collector self-health, and an exact signal-to-decision map.
 It rejects prohibited private or secret fields at any inspected level and
 fails closed on excessive JSON nesting.

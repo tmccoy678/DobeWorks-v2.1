@@ -136,7 +136,7 @@ def _read_regular(path: Path, root: Path, limit: int, limit_state: str) -> bytes
         if resolved.stat().st_size > limit:
             raise WorkerRejected(limit_state, "input exceeds its byte limit")
         return resolved.read_bytes()
-    except OSError as error:
+    except (OSError, RuntimeError) as error:
         raise WorkerRejected("REJECTED_PATH", "input path cannot be read") from error
 
 
@@ -281,10 +281,11 @@ class WorkerCore:
             if not isinstance(record, dict) or set(record) != {"path", "kind", "bytes"}:
                 raise WorkerRejected("REJECTED_INVALID_INPUT", "record field set differs", job_id)
             path = record.get("path")
+            kind = record.get("kind")
             size = record.get("bytes")
             if not isinstance(path, str) or Path(path).is_absolute() or ".." in Path(path).parts:
                 raise WorkerRejected("REJECTED_INVALID_INPUT", "record path is unsafe", job_id)
-            if path in paths or record.get("kind") not in {"markdown", "python"}:
+            if path in paths or not isinstance(kind, str) or kind not in {"markdown", "python"}:
                 raise WorkerRejected("REJECTED_INVALID_INPUT", "record identity or kind differs", job_id)
             if not isinstance(size, int) or isinstance(size, bool) or not 0 <= size <= MAX_RECORD_BYTES:
                 raise WorkerRejected("REJECTED_INVALID_INPUT", "record byte count is invalid", job_id)

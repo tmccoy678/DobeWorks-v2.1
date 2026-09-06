@@ -107,7 +107,7 @@ def _read(path: Path, root: Path, limit: int) -> bytes:
         if resolved.stat().st_size > limit:
             raise ObserverRejected("INPUT_LIMIT", "input exceeds its byte limit")
         return resolved.read_bytes()
-    except OSError as error:
+    except (OSError, RuntimeError) as error:
         raise ObserverRejected("PATH_REJECTED", "input cannot be read") from error
 
 
@@ -142,7 +142,7 @@ def _valid_signal(name: str, value) -> bool:
         "role_freshness": {"CURRENT", "STALE", "UNKNOWN"},
         "storage_presence": {"PRESENT", "ABSENT", "UNKNOWN"},
     }
-    return name in allowed and value in allowed[name]
+    return name in allowed and isinstance(value, str) and value in allowed[name]
 
 
 class ObserverCore:
@@ -171,7 +171,7 @@ class ObserverCore:
     def retention_decision(self, record_kind: str, age_days: int) -> str:
         """Return a decision only; this interface never deletes a record."""
         limits = {"RAW_EVENT": 30, "DAILY_AGGREGATE": 180}
-        if record_kind not in limits or not isinstance(age_days, int) or isinstance(age_days, bool) or not 0 <= age_days <= MAX_RETENTION_AGE_DAYS:
+        if not isinstance(record_kind, str) or record_kind not in limits or not isinstance(age_days, int) or isinstance(age_days, bool) or not 0 <= age_days <= MAX_RETENTION_AGE_DAYS:
             raise ObserverRejected("INVALID_RETENTION_REQUEST", "kind or age is invalid")
         return "EXPIRE" if age_days >= limits[record_kind] else "RETAIN"
 
@@ -186,9 +186,9 @@ class ObserverCore:
             raise ObserverRejected("SCHEMA_INCOMPATIBLE", "snapshot schema version differs")
         if not isinstance(snapshot.get("role_id"), str) or not ROLE_ID.fullmatch(snapshot["role_id"]):
             raise ObserverRejected("INVALID_SCHEMA", "role_id is not pseudonymous")
-        if snapshot.get("collector_status") not in {"OK", "FAILED"}:
+        if not isinstance(snapshot.get("collector_status"), str) or snapshot["collector_status"] not in {"OK", "FAILED"}:
             raise ObserverRejected("INVALID_SCHEMA", "collector status differs")
-        if snapshot.get("clock_quality") not in {"SYNTHETIC_EXACT", "UNKNOWN"}:
+        if not isinstance(snapshot.get("clock_quality"), str) or snapshot["clock_quality"] not in {"SYNTHETIC_EXACT", "UNKNOWN"}:
             raise ObserverRejected("INVALID_SCHEMA", "clock quality differs")
         dropped = snapshot.get("dropped_records")
         if not isinstance(dropped, int) or isinstance(dropped, bool) or not 0 <= dropped <= 100000:
@@ -206,7 +206,7 @@ class ObserverCore:
             if not isinstance(item, dict) or set(item) != {"name", "value"}:
                 raise ObserverRejected("INVALID_SIGNALS", "signal field set differs")
             name = item.get("name")
-            if name not in DECISION_MAP or name in result or not _valid_signal(name, item.get("value")):
+            if not isinstance(name, str) or name not in DECISION_MAP or name in result or not _valid_signal(name, item.get("value")):
                 raise ObserverRejected("INVALID_SIGNALS", "signal identity or value differs")
             result[name] = item["value"]
         return {name: result.get(name, "UNKNOWN") for name in DECISION_MAP}
