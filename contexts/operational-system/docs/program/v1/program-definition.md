@@ -3,6 +3,8 @@
 - **Status:** `PHASE_1_BASELINE_ACCEPTED`
 - **System status:** `NOT_YET_QUALIFIED`, `NOT_YET_RELEASED`
 - **Phase:** 1 of 8 — Program Definition
+- **Current governed package:** Phase 3 architecture and Role Dispositions,
+  [frozen separately](architecture/phase-3/handoff.md)
 - **Authority lane:** `TAYLOR_AI_WORKBENCH`
 - **DEGS risk tier:** `TIER_1`
 - **Canonical home:** `projects/dobeworks/contexts/operational-system/`
@@ -120,12 +122,12 @@ Provide Taylor with a private, recoverable, evidence-backed operational foundati
 
 | Role or asset | Mission contract | Allowed authority/data | Current status |
 |---|---|---|---|
-| Taylor | Make value judgments; authorize phases, credentials, physical actions, destructive work, exceptions, residual risk, and final release | Human-only decisions and protected actions | `OWNER`; Phase 1 authorized only |
-| Candidate current Mac | Proposed Control Plane and authoritative operational state | Approved private work products, configuration, evidence, dispatch, validation, promotion, recovery orchestration | `BLOCKED_PENDING_EVIDENCE`; historical baseline only |
-| Seagate Portable Drive | Candidate Storage Resource for separately classified roles | No sole-copy important data; no role until topology, redundancy, capacity, integrity, restore, and retirement evidence exist | `BLOCKED_PENDING_EVIDENCE`; contents not inspected |
-| Candidate 2015 MacBook | Optional rebuildable Worker | Replaceable tooling, approved inputs, caches, job metadata, temporary artifacts; no authority or sole-copy important data | `BLOCKED_PENDING_EVIDENCE`; exact device facts `UNKNOWN` |
-| Worker software | Validate Job Envelopes, execute bounded job classes, stage output and status | Job-specific minimum data and privileges | `NOT_IMPLEMENTED` |
-| Observer | Report local, minimal, read-only operational metadata and self-health | Permitted metadata only; no content, secrets, private names, remediation, or promotion | `NOT_IMPLEMENTED` |
+| Taylor | Make value judgments; authorize phases, credentials, physical actions, destructive work, exceptions, residual risk, and final release | Human-only decisions and protected actions | `OWNER`; Phase 3 definition/freeze authorized; downstream action remains separate |
+| Candidate current Mac | Proposed Control Plane and authoritative operational state | Approved private work products, configuration, evidence, dispatch, validation, promotion, recovery orchestration | `BLOCKED_PENDING_EVIDENCE`; Phase 3 disposition review pending |
+| Seagate Portable Drive | Candidate Storage Resource for separately classified roles | No sole-copy important data; no role until topology, redundancy, capacity, integrity, restore, and retirement evidence exist | `BLOCKED_PENDING_EVIDENCE`; Phase 3 disposition review pending; contents not inspected |
+| Candidate 2015 MacBook | Optional rebuildable Worker | Replaceable tooling, approved inputs, caches, job metadata, temporary artifacts; no authority or sole-copy important data | `BLOCKED_PENDING_EVIDENCE`; Phase 3 disposition review pending; exact device facts `UNKNOWN` |
+| Worker software | Validate Job Envelopes, execute bounded job classes, stage output and status | Job-specific minimum data and privileges | `BLOCKED_PENDING_EVIDENCE`; Phase 3 disposition review pending; not implemented |
+| Observer | Report local, minimal, read-only operational metadata and self-health | Permitted metadata only; no content, secrets, private names, remediation, or promotion | `BLOCKED_PENDING_EVIDENCE`; Phase 3 disposition review pending; not implemented |
 | DEGS gate | Evaluate the form and recorded status of task evidence | Read defined task records; no execution, approval, or truth claim | External canonical system, policy 1.1.0 `ACTIVE` |
 | Independent auditor | Challenge sufficiency, traceability, independence, and open issues in a Frozen Evidence Set | Read fixed evidence only; no mutation or residual-risk acceptance | Planned for completion review; readiness time-sensitive |
 
@@ -234,7 +236,12 @@ Legend: `A` accountable human authority, `E` executes within explicit authority,
 - The complete accepted applicable fault set and planned tests are in `fault-test-matrix.md`.
 - Evidence freezing, independent review, and completion chain are in `evidence-and-audit-plan.md`.
 - Quantitative and human-value decisions are isolated in `open-decisions.md`.
-- Phase 2 is governed by `phase-2-entry-criteria.md` and remains unauthorized.
+- Phase 2 is governed by `phase-2-entry-criteria.md`; its C4-corrected evidence
+  package is complete with unresolved gaps.
+- Phase 3 architecture and candidate dispositions are defined in
+  `architecture/phase-3/` and remain pending external review and delivery.
+- Phase 4, device action, qualification, and System Release remain separate and
+  are not authorized by the Phase 3 package.
 
 ## Phase 1 acceptance record
 

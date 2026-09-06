@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "task_id": "DEGS-T1-DW-HWSW-P3-ARCH-DISPOSITION-20260905",
+  "task_author": "Codex in Taylor AI Workbench",
+  "title": "Define and freeze Operational System Phase 3 architecture and Role Dispositions",
+  "objective": "Define and freeze the exact Phase 3 role architecture, data/authority/threat maps, recovery/capacity/lifecycle policies, fault and Safe Degradation design, and five evidence-backed Role Dispositions without device action, qualification, release, Phase 4, or broader adoption.",
+  "stakeholders": ["Taylor"],
+  "scope": {
+    "description": "Exactly 18 private-repository documentation, task, validator, test, trace, report, handoff, and manifest paths; external review and Git delivery remain separate.",
+    "read_only": false
+  },
+  "non_goals": [
+    "Recollect, normalize, reinterpret, or replace Phase 2 observations",
+    "Access or operate the current Mac, Seagate, 2015 MacBook, Worker, Observer, credentials, permissions, private content, or PRIVATE VAULT",
+    "Assign QUALIFIED_FOR_BOUNDED_ROLE or QUALIFIED_OUT without the requirement-specific objective evidence",
+    "Implement software, configure a service, integrate hardware, begin Phase 4, or run a fault, restore, rebuild, update, retirement, or end-to-end exercise",
+    "Qualify or release the Operational System, accept residual risk, authorize Public Release, or perform broader adoption",
+    "Complete or predict external review, pushed ref, pull-request, merge, or final acceptance identity inside the immutable package",
+    "Amend, rebase, reset, force-push, delete, merge, or rewrite history"
+  ],
+  "authority_lane": "TAYLOR_AI_WORKBENCH",
+  "risk_tier": "TIER_1",
+  "requirements": [
+    "Use the merged C4 commit bb5a0c6cc807939621c9c6efa4dae8f1e7fc1cc7 and exact frozen source identities.",
+    "Apply DEAS Strict with Document, Evidence, Validator, Python, AI-Assisted, and Git overlays to exactly 18 paths.",
+    "Produce every planned Phase 3 evidence identity required by the traceability matrix while separating design evidence from implementation and qualification evidence.",
+    "Define roles, Storage Role candidates, classified flows, minimum signals, authority, threats, accepted RPO/RTO, capacity gaps, lifecycle controls, and all 37 fault mappings.",
+    "Give exactly five candidate devices/components exactly one evidence-backed Role Disposition each.",
+    "Use BLOCKED_PENDING_EVIDENCE wherever the frozen evidence supports neither qualification nor disqualification.",
+    "Preserve NOT_YET_QUALIFIED and NOT_YET_RELEASED throughout the package.",
+    "Keep all physical, remote, storage, credential, permission, destructive, Phase 4, release, and broader-adoption actions outside the package.",
+    "Provide a fail-closed public validator with positive, negative, boundary, source, lifecycle, and manifest tests.",
+    "Freeze the 17 non-manifest paths in one sorted SHA-256 manifest whose own digest is external."
+  ],
+  "acceptance_criteria": [
+    "The tracked diff contains exactly the 18 affected_files and no unrelated path.",
+    "The seven Phase 3 evidence records each contain all 23 canonical DEAS evidence fields exactly once.",
+    "Every EV-P3 identity is produced and bidirectionally linked from the updated traceability matrix.",
+    "The exact candidate inventory is CP-CANDIDATE-01, SR-CANDIDATE-01, WK-CANDIDATE-01, WK-SW-CANDIDATE-01, and OBS-CANDIDATE-01.",
+    "All five frozen candidate dispositions are BLOCKED_PENDING_EVIDENCE, with candidate-specific evidence bases and reconsideration needs.",
+    "The public Phase 3 validator returns package-scoped PASS and names G7, G8, and G9 as pending.",
+    "All eleven public validator cases pass, including missing/extra file, invalid disposition, missing evidence field, manifest mismatch, source drift, false qualification, invalid digest, and out-of-root rejection.",
+    "Canonical DEGS validate and evaluate return PASS with no warning, and Python syntax/function bounds, JSON, links, manifests, diff hygiene, and secret scan pass.",
+    "The task remains READY_FOR_EXECUTION with embedded independent review and post-action validation PENDING; the handoff remains READY_FOR_GIT_DELIVERY.",
+    "No device action, Phase 4, qualification, System Release, Public Release, or broader adoption occurs."
+  ],
+  "assumptions": [
+    "The merged C4 tree and every source identity in source-register.md remain unchanged during this generation.",
+    "The Phase 2 evidence limitations and unknowns are current as evidence gaps, while all measured operational values are historical rather than current facts.",
+    "No separately defined device-evidence task is selected by the instruction to define and freeze this package."
+  ],
+  "invariants": [
+    "DEGS-SEC-003",
+    "DEGS-SEC-002",
+    "DEGS-AI-004",
+    "DEGS-DATA-001",
+    "DEGS-RISK-003",
+    "DEGS-CFG-001",
+    "DEGS-SEC-004",
+    "DEGS-SEC-005",
+    "DEGS-SEC-006",
+    "DEGS-AI-003",
+    "DEGS-AI-002",
+    "DEGS-AI-006",
+    "DEGS-OPS-002",
+    "DEGS-OPS-004",
+    "DEGS-DATA-002",
+    "DEGS-DATA-003",
+    "DEGS-RISK-006",
+    "DEGS-OPS-001",
+    "DEGS-CFG-002",
+    "DEGS-CFG-003",
+    "DEGS-REQ-001"
+  ],
+  "baseline": {
+    "status": "VERIFIED",
+    "evidence_path": "../source-register.md"
+  },
+  "alternatives": [
+    "Treat the Phase 2 package as a qualification result",
+    "Assign a bounded role from component presence or age",
+    "Invent missing capacity, lifecycle, support, or recovery values",
+    "Combine architecture definition with device evidence or Phase 4 implementation",
+    "Leave the candidate inventory or Phase 3 evidence identities implicit"
+  ],
+  "selected_design": "Freeze one contract-first architecture generation with seven evidence records, exact five-candidate BLOCKED_PENDING_EVIDENCE dispositions, explicit unknowns, fail-safe states, deterministic validation, and no downstream action.",
+  "affected_files": [
+    "contexts/operational-system/README.md",
+    "contexts/operational-system/docs/program/v1/program-definition.md",
+    "contexts/operational-system/docs/program/v1/traceability-matrix.md",
+    "contexts/operational-system/docs/program/v1/architecture/phase-3/architecture-plan.md",
+    "contexts/operational-system/docs/program/v1/architecture/phase-3/authority-and-threat-map.md",
+    "contexts/operational-system/docs/program/v1/architecture/phase-3/data-and-signal-map.md",
+    "contexts/operational-system/docs/program/v1/architecture/phase-3/degs/phase3-task.json",
+    "contexts/operational-system/docs/program/v1/architecture/phase-3/fault-and-safe-degradation.md",
+    "contexts/operational-system/docs/program/v1/architecture/phase-3/handoff.md",
+    "contexts/operational-system/docs/program/v1/architecture/phase-3/operations-lifecycle-policy.md",
+    "contexts/operational-system/docs/program/v1/architecture/phase-3/phase-3-sha256.txt",
+    "contexts/operational-system/docs/program/v1/architecture/phase-3/recovery-and-capacity-policy.md",
+    "contexts/operational-system/docs/program/v1/architecture/phase-3/role-architecture.md",
+    "contexts/operational-system/docs/program/v1/architecture/phase-3/role-dispositions.md",
+    "contexts/operational-system/docs/program/v1/architecture/phase-3/source-register.md",
+    "contexts/operational-system/docs/program/v1/architecture/phase-3/validation/test_validate_phase3.py",
+    "contexts/operational-system/docs/program/v1/architecture/phase-3/validation/validate_phase3.py",
+    "contexts/operational-system/docs/program/v1/architecture/phase-3/validation/validation-report.md"
+  ],
+  "backup": {
+    "required": true,
+    "status": "VERIFIED",
+    "evidence_path": ".scratch/dobeworks-operational-system-phase3/backup/dobeworks-pre-phase3.bundle"
+  },
+  "rollback": {
+    "required": true,
+    "status": "VERIFIED",
+    "procedure": "Preserve the exact merged base, complete-history bundle, owned lock, candidate bytes, manifest, test output, and any later immutable commit. Do not amend, reset, rebase, force-push, delete, merge, or automatically erase failed work; use an identity-checked follow-up for restoration.",
+    "evidence_path": "../handoff.md"
+  },
+  "risk_analysis": {
+    "status": "NOT_REQUIRED",
+    "summary": "Tier 1 reversible private-repository architecture, documentation, validator, test, trace, and manifest work with exact paths, frozen sources, fail-closed validation, and no operational action."
+  },
+  "tests": {
+    "static": [{"status": "PASS", "evidence_path": "../validation/validation-report.md"}],
+    "positive": [{"status": "PASS", "evidence_path": "../validation/validation-report.md"}],
+    "negative": [{"status": "PASS", "evidence_path": "../validation/validation-report.md"}],
+    "security": [{"status": "PASS", "evidence_path": "../validation/validation-report.md"}],
+    "failure_path": [{"status": "PASS", "evidence_path": "../validation/validation-report.md"}],
+    "integration": [{"status": "PASS", "evidence_path": "../validation/validation-report.md"}],
+    "end_to_end": []
+  },
+  "verification": {"status": "PASS", "evidence_path": "../validation/validation-report.md"},
+  "validation": {"status": "PASS", "evidence_path": "../validation/validation-report.md"},
+  "independent_review": {
+    "required": true,
+    "status": "PENDING",
+    "kind": "REVIEW",
+    "reviewer": "",
+    "reviewer_role": "",
+    "open_issues_status": "UNKNOWN",
+    "retest_status": "PENDING",
+    "evidence_path": ".scratch/dobeworks-operational-system-phase3/review/final-review-index.md"
+  },
+  "human_approval": {
+    "required": true,
+    "status": "APPROVED",
+    "approver": "Taylor",
+    "approver_role": "HUMAN",
+    "approval_mode": "OUT_OF_BAND",
+    "evidence_path": ".scratch/dobeworks-operational-system-phase3/spec.md"
+  },
+  "recovery_validation": {"required": false, "status": "NOT_REQUIRED"},
+  "target_identity": "Merged base bb5a0c6cc807939621c9c6efa4dae8f1e7fc1cc7 plus exactly 18 Phase 3 paths and the externally bound phase-3-sha256.txt.",
+  "blast_radius": "Exactly 18 private DobeWorks repository paths; no device, configuration, service, Phase 4, qualification, release, public, destructive, or broader-adoption action.",
+  "stop_conditions": [
+    "A base, branch, source, lock, writer, path, manifest, private-remote, or candidate identity changes unexpectedly.",
+    "Any required check fails and cannot be corrected within the exact 18-path definition authority and two correction passes.",
+    "A candidate disposition would require an unsupported fact, exception, or value stronger than the frozen evidence supports.",
+    "Any device, storage, content, credential, authentication, permission, physical, destructive, service, configuration, Phase 4, qualification, System Release, Public Release, or broader-adoption action would occur."
+  ],
+  "post_action_validation": {"status": "PENDING", "evidence_path": "../validation/validation-report.md"},
+  "dry_run": {
+    "applicable": true,
+    "performed": true,
+    "status": "PASS",
+    "evidence_path": "../validation/validation-report.md"
+  },
+  "telemetry": {"status": "NOT_REQUIRED", "reason": "This Tier 1 definition package creates no running component or telemetry source."},
+  "documentation": {"status": "PASS", "evidence_path": "../architecture-plan.md"},
+  "handoff": {"status": "PASS", "evidence_path": "../handoff.md"},
+  "secret_handling": {
+    "exposure_possible": false,
+    "controlled": true,
+    "status": "PASS",
+    "evidence_path": "../validation/validation-report.md"
+  },
+  "warnings": [],
+  "unresolved_items": [
+    {"severity": "CRITICAL", "status": "OPEN", "message": "Current Mac capacity, authoritative-copy, recovery, fault, and integration evidence remains incomplete."},
+    {"severity": "CRITICAL", "status": "OPEN", "message": "Seagate topology freshness, health, redundancy, integrity, capacity, restore, lifecycle, and role fitness remain incomplete."},
+    {"severity": "CRITICAL", "status": "OPEN", "message": "2015 MacBook exact device, support, recovery, exposure, and workload evidence is absent."},
+    {"severity": "CRITICAL", "status": "OPEN", "message": "Worker software and Observer are not implemented or tested."},
+    {"severity": "CRITICAL", "status": "OPEN", "message": "Required Phase 4 through Phase 7 integrated evidence does not exist; qualification and System Release remain blocked."}
+  ],
+  "status": "READY_FOR_EXECUTION"
+}
