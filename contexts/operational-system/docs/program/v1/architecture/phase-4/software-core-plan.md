@@ -13,6 +13,12 @@ and rollback are frozen in the external Phase 4 specification identified in
 [source-register.md](source-register.md). This package remains
 `NOT_YET_QUALIFIED` and `NOT_YET_RELEASED`.
 
+Generation 1 (`c365171e3ae7aff184d5e2ade5ec470365765009`) is a preserved,
+independently rejected predecessor. This correction generation retains the
+same interface and 25-path boundary while closing its clean-commit validator,
+bounded-diagnostic, filesystem-failure, timeout, provenance, and evidence-path
+defects. It makes no retroactive PASS claim for Generation 1.
+
 ## Architecture
 
 ### Worker Core Module
@@ -50,8 +56,11 @@ staged handback -/-> promotion
 Every returned state fixes `promotion` to `NOT_PERFORMED` and `retry` to
 `PROHIBITED_AUTOMATIC`. A successful process exit is not an accepted result.
 The synthetic default runner has bounded iteration and no external I/O.
-Actual process deadlines, restart, persistent deduplication, dispatch, and
-Promotion Events are explicitly later integration/qualification concerns.
+The core enforces the 1..30 second envelope deadline for its in-process runner
+with the host's main-thread interval timer and fails closed when that facility
+is unavailable or already occupied. Separate-process termination, restart,
+persistent deduplication, dispatch, and Promotion Events remain later
+integration/qualification concerns.
 
 ### Observer Core Module
 
@@ -89,7 +98,7 @@ The only Phase 4 job class is `synthetic_repository_inventory`.
 | Side effects | New files under one caller-provided disposable staging root only |
 | Retry/backoff | zero retries; no backoff because automatic retry is prohibited |
 | Interruption | preserve partial staging and report `AMBIGUOUS_INTERRUPTED` |
-| Timeout | envelope value 1..30 seconds; bounded runner reports timeout; no retry or promotion |
+| Timeout | envelope value 1..30 seconds; Worker-enforced in-process deadline; no retry or promotion |
 | Cancellation | before execution: no mutation; race: preserve partial result and report ambiguity |
 | Stale job | expired envelope rejects before execution |
 | Checkpoint | `NONE`; partial staging is evidence, not a resumable checkpoint |
@@ -123,7 +132,8 @@ tests or a DEGS result.
 - Exact fixtures and expected bytes make nondeterminism observable.
 - The public validator independently runs Module tests, verifies sources,
   evidence contracts, lifecycle semantics, code bounds, links, path allowlist,
-  and the manifest.
+  and the manifest. Its filesystem walk, child output, child time, and Git
+  identity output are explicitly bounded; unexpected test diagnostics fail.
 - Independent Standards and Spec reviewers examine the frozen identity outside
   the immutable package.
 

@@ -9,8 +9,10 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from worker_core import (
     WorkerAmbiguousCompletion,
@@ -49,6 +51,18 @@ class CountingRunner:
         if self.error is not None:
             raise self.error
         return self.result
+
+
+class BlockingRunner:
+    """Block long enough for Worker Core's own deadline to interrupt it."""
+
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def __call__(self, envelope: dict, input_value: dict) -> dict:
+        self.calls += 1
+        time.sleep(5)
+        return {}
 
 
 class WorkerCoreTests(unittest.TestCase):
@@ -160,6 +174,15 @@ class WorkerCoreTests(unittest.TestCase):
         self.assertEqual(result["retry"], "PROHIBITED_AUTOMATIC")
         self.assertEqual(runner.calls, 1)
 
+    def test_core_enforces_the_envelope_deadline(self) -> None:
+        self.mutate_envelope(timeout_seconds=1)
+        runner = BlockingRunner()
+        started = time.monotonic()
+        result = self.execute(self.core(runner=runner))
+        self.assertEqual(result["state"], "FAILED_TIMEOUT")
+        self.assertEqual(runner.calls, 1)
+        self.assertLess(time.monotonic() - started, 2.0)
+
     def test_interruption_is_explicitly_ambiguous(self) -> None:
         runner = CountingRunner(error=WorkerInterrupted("synthetic interruption"))
         result = self.execute(self.core(runner=runner))
@@ -193,6 +216,46 @@ class WorkerCoreTests(unittest.TestCase):
         self.assertEqual(result["state"], "FAILED_OUTPUT_VALIDATION")
         self.assertEqual(result["promotion"], "NOT_PERFORMED")
         self.assertTrue((self.staging / ".partial-job-phase4-fixture-001").is_dir())
+
+    def test_partial_directory_creation_failure_is_structured(self) -> None:
+        with mock.patch.object(Path, "mkdir", side_effect=OSError("synthetic mkdir failure")):
+            result = self.execute()
+        self.assertEqual(result["state"], "FAILED_STAGE_PREPARATION")
+        self.assertEqual(result["promotion"], "NOT_PERFORMED")
+
+    def test_result_write_failure_is_structured(self) -> None:
+        original = Path.write_bytes
+
+        def fail_result(path, payload):
+            if path.name == "result.json":
+                raise OSError("synthetic result write failure")
+            return original(path, payload)
+
+        with mock.patch.object(Path, "write_bytes", autospec=True, side_effect=fail_result):
+            result = self.execute()
+        self.assertEqual(result["state"], "FAILED_STAGE_IO")
+        self.assertEqual(result["attempts"], 1)
+
+    def test_handback_write_and_rename_failures_are_structured(self) -> None:
+        original = Path.write_bytes
+        for target in ("result-sha256.txt", "handback.json"):
+            with self.subTest(target=target):
+                staging = self.root / target.replace(".", "-")
+                staging.mkdir()
+
+                def fail_target(path, payload):
+                    if path.name == target:
+                        raise OSError("synthetic handback write failure")
+                    return original(path, payload)
+
+                with mock.patch.object(Path, "write_bytes", autospec=True, side_effect=fail_target):
+                    result = self.core().execute(self.envelope, self.input_file, staging, NOW)
+                self.assertEqual(result["state"], "FAILED_ATOMIC_HANDBACK")
+        rename_stage = self.root / "rename-failure"
+        rename_stage.mkdir()
+        with mock.patch("worker_core.os.replace", side_effect=OSError("synthetic rename failure")):
+            result = self.core().execute(self.envelope, self.input_file, rename_stage, NOW)
+        self.assertEqual(result["state"], "FAILED_ATOMIC_HANDBACK")
 
     def test_oversized_input_is_rejected(self) -> None:
         self.assertEqual(self.execute(self.core(max_input_bytes=1))["state"], "REJECTED_INPUT_LIMIT")

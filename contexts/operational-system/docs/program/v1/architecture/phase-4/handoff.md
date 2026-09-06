@@ -26,6 +26,14 @@ SHA-256, Git commit, pushed ref, draft PR, unchanged base, and independent
 review decisions are intentionally bound by external delivery records after
 freeze; this handoff does not predict them.
 
+The first candidate commit
+`c365171e3ae7aff184d5e2ade5ec470365765009`, tree
+`d66364645ab9a173a7ed4fe8b99b8c9cb4bda154`, and manifest SHA-256
+`6a50cbbdb713338dc61bc51840b5b7a40c0997029aa1905f6fae2e55624ca25c`
+remain an immutable rejected predecessor. Both initial independent reviews
+failed it. This handoff describes the correction generation only; final
+external records must bind its new commit, tree, manifest, and fresh reviews.
+
 ## Historical evidence disposition
 
 The initial failed Worker job remains `FAILED_UNACCEPTED_NO_RETRY`. The
@@ -38,7 +46,7 @@ Exact identities are in [source-register.md](source-register.md).
 ## What passed and what remains future
 
 The final immutable package is intended to record successful Python compile,
-43 Module tests, package-validator positive/negative/failure cases, exact
+48 Module tests, package-validator positive/negative/failure cases, exact
 fixtures, source identities, evidence contracts, traceability, links, size and
 function bounds, manifest, diff hygiene, secret scan, DEGS validation and
 evaluation. External delivery and review records determine G7 and G8. Taylor

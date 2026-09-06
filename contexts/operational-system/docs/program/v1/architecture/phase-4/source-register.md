@@ -16,8 +16,8 @@
 The Git base is commit `b24c6d677d80b5299f09cb087d263d69bd6b68af`,
 tree `3008aab9ed2c86052ad35a24d4a1f108a2b07658`. The accepted Phase 3
 correction commit is `f507e927cf98992b7679e46cf536a70fc2fd9c49` with the
-same tree. The external Phase 4 specification SHA-256 is
-`875c0e661a6e10ff3ff1e011d618feb395fb769b3f1c345b280b192fedb76caa`.
+same tree. The corrected external Phase 4 specification SHA-256 is
+`49ebf76d993a8b9d02147df1786b2f2647a8773cb2a5e561babafdb4bc14dc92`.
 
 ## Synthetic input and expected-output identities
 
@@ -46,10 +46,27 @@ These `.scratch` sources remain outside Git and were not changed, copied into
 the package, re-executed, or treated as Phase 4 proof. Their original labels,
 uncertainty, and no-promotion boundary are preserved.
 
+## Correction-generation provenance
+
+- Rejected Generation 1 commit:
+  `c365171e3ae7aff184d5e2ade5ec470365765009`; tree
+  `d66364645ab9a173a7ed4fe8b99b8c9cb4bda154`; manifest SHA-256
+  `6a50cbbdb713338dc61bc51840b5b7a40c0997029aa1905f6fae2e55624ca25c`.
+- Initial Standards review: external `review/initial-standards.md`, SHA-256
+  `269d18d08ca9480fd96069b20b5e28c7874c040e1ba9201979d3ce0263150bd1`,
+  decision `FAIL`.
+- Initial Spec review: external `review/initial-spec.md`, SHA-256
+  `352b858fe69b54e8959cbe7451b1bc729a566d77f2ee9740373b1204effd04d5`,
+  decision `FAIL`.
+- Generation 1 is preserved in Git history and is not amended, rebased,
+  relabeled, accepted, or merged. Fresh tests, identity freeze, and both fresh
+  independent reviews are required for Generation 2.
+
 ## Build and dependency provenance
 
-- Generator: Codex in Taylor AI Workbench, one constrained candidate
-  generation after public-seam red evidence.
+- Generator: Codex in Taylor AI Workbench; one initial generation after
+  public-seam red evidence and one bounded correction generation after two
+  identity-bound independent review failures.
 - Runtime: Apple-provided Python `3.9.6`; language target Python 3.9.
 - Shell used for orchestration: Bash `3.2.57` / Zsh host shell.
 - Git: `2.50.1`.
@@ -60,7 +77,7 @@ uncertainty, and no-promotion boundary are preserved.
   finite record iteration and no network or subprocess interface.
 - Observer: repository-local read-only transformation with finite privacy-node
   traversal and no action interface.
-- Canonical engineering gate: `/Users/taylor/AI-Workspace/degs/engineering-gate.py`,
+- Canonical engineering gate: `/Users/taylor/AI-Workspace/governance/bin/engineering-gate.py`,
   SHA-256 `44c33ba743851d7befe11ebf93f2f4d9021b126f951a4587562adfca21f65c1e`.
 - AI boundary: one variant, exact 25 paths, deterministic tests and manifest,
   no unsupported fact completion, no self-approval, and Taylor retains exact

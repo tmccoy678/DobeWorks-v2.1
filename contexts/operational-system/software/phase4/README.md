@@ -17,10 +17,11 @@ The Module validates closed-schema JSON, duplicate keys, exact source and
 configuration digests, dispatch authority, expiry, data class, job semantics,
 input shape, path confinement, byte/record/time/retry bounds, duplicate job
 identity, and a pre-execution cancellation signal. It invokes exactly one
-bounded runner attempt, preserves explicit failure or ambiguity, and renames a
-complete staging directory atomically. It never retries automatically or
-performs a Promotion Event. The default runner accepts only the synthetic
-repository-inventory fixture.
+runner attempt under the envelope's Worker-enforced deadline, preserves
+explicit failure or ambiguity, converts staging filesystem failures to bounded
+results, and renames a complete staging directory atomically. It never retries
+automatically or performs a Promotion Event. The default runner accepts only
+the synthetic repository-inventory fixture.
 
 CLI example, using a disposable staging directory:
 
@@ -85,11 +86,14 @@ python3 -B observer_core.py \
 | Observer dropped-record counter | 0 through 100,000 |
 
 The synthetic runner has no network, subprocess, credential, device, service,
-or private-content interface. Injected test adapters report timeout,
+or private-content interface. On the tested host, Worker Core uses the main
+thread's interval timer to enforce its in-process deadline and fails closed if
+that timer is unavailable or already occupied. Injected test adapters exercise
 interruption, ambiguity, cancellation-race, and unavailable-dependency states;
-actual process termination and device behavior remain future integration and
-qualification evidence. The Observer has no remediation, dispatch, promotion,
-approval, deletion, network, or service interface.
+separate-process termination, non-main-thread execution, and device behavior
+remain future integration and qualification evidence. The Observer has no
+remediation, dispatch, promotion, approval, deletion, network, or service
+interface.
 
 ## Tests
 

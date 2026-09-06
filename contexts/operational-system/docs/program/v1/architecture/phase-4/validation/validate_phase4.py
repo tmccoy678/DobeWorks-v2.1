@@ -7,21 +7,26 @@ import argparse
 import ast
 import hashlib
 import json
+import os
 import re
+import selectors
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 
 TASK_ID = "DEGS-T2-DW-HWSW-P4-SOFTWARE-CORE-20260906"
 BASE_COMMIT = "b24c6d677d80b5299f09cb087d263d69bd6b68af"
-SPEC_SHA256 = "875c0e661a6e10ff3ff1e011d618feb395fb769b3f1c345b280b192fedb76caa"
+SPEC_SHA256 = "49ebf76d993a8b9d02147df1786b2f2647a8773cb2a5e561babafdb4bc14dc92"
 PREFIX = "contexts/operational-system/docs/program/v1/architecture/phase-4"
 SOFTWARE = "contexts/operational-system/software/phase4"
 MANIFEST_RELATIVE = f"{PREFIX}/phase-4-sha256.txt"
 VALIDATOR_RELATIVE = f"{PREFIX}/validation/validate_phase4.py"
 MAX_FILE_BYTES = 1024 * 1024
-MAX_TEST_OUTPUT = 4 * 1024 * 1024
+MAX_COMMAND_OUTPUT = 64 * 1024
+MAX_TREE_ENTRIES = 128
+EXPECTED_MODULE_TESTS = 48
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
 MANIFEST_LINE = re.compile(r"^([0-9a-f]{64})  ([^\s].*)$")
 MARKDOWN_LINK = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
@@ -79,6 +84,34 @@ EVIDENCE_FILES = {
         "EV-P4-ARTIFACT-IDENTITY", "EV-P4-SUPPLY-FAILURE-TEST",
     ),
     f"{PREFIX}/validation/validation-report.md": ("EV-P4-SW-TEST",),
+}
+EVIDENCE_ARTIFACTS = {
+    f"{PREFIX}/worker-core-evidence.md": (
+        f"{PREFIX}/worker-core-evidence.md",
+        f"{PREFIX}/validation/validation-report.md",
+        f"{SOFTWARE}/worker_core.py", f"{SOFTWARE}/test_worker_core.py",
+        f"{SOFTWARE}/fixtures/job-envelope.json", f"{SOFTWARE}/fixtures/input-records.json",
+        f"{SOFTWARE}/fixtures/expected-result.json",
+    ),
+    f"{PREFIX}/observer-core-evidence.md": (
+        f"{PREFIX}/observer-core-evidence.md",
+        f"{PREFIX}/validation/validation-report.md",
+        f"{SOFTWARE}/observer_core.py", f"{SOFTWARE}/test_observer_core.py",
+        f"{SOFTWARE}/fixtures/observer-snapshot.json", f"{SOFTWARE}/fixtures/observer-policy.json",
+        f"{SOFTWARE}/fixtures/expected-observer-record.json",
+    ),
+    f"{PREFIX}/security-and-supply-evidence.md": (
+        f"{PREFIX}/security-and-supply-evidence.md", f"{PREFIX}/source-register.md",
+        f"{PREFIX}/software-core-plan.md", f"{PREFIX}/validation/validation-report.md",
+        MANIFEST_RELATIVE, f"{SOFTWARE}/worker_core.py", f"{SOFTWARE}/observer_core.py",
+        f"{SOFTWARE}/test_worker_core.py", f"{SOFTWARE}/test_observer_core.py",
+    ),
+    f"{PREFIX}/validation/validation-report.md": (
+        f"{PREFIX}/validation/validation-report.md", VALIDATOR_RELATIVE,
+        f"{PREFIX}/validation/test_validate_phase4.py", MANIFEST_RELATIVE,
+        f"{SOFTWARE}/worker_core.py", f"{SOFTWARE}/observer_core.py",
+        f"{SOFTWARE}/test_worker_core.py", f"{SOFTWARE}/test_observer_core.py",
+    ),
 }
 TRACE_REQUIREMENTS = {
     "REQ-CP-004": ("EV-P4-JOB-CONTRACT", "EV-P4-WORKER-TEST"),
@@ -179,6 +212,31 @@ def _json_object(root: Path, relative: str, findings: list):
     return value
 
 
+def _bounded_files(root: Path, base: Path, findings: list) -> set:
+    observed = set()
+    pending = [base]
+    entries_seen = 0
+    while pending:
+        current = pending.pop()
+        try:
+            with os.scandir(current) as entries:
+                for entry in entries:
+                    entries_seen += 1
+                    relative = str(Path(entry.path).relative_to(root))
+                    if entries_seen > MAX_TREE_ENTRIES:
+                        findings.append(_finding("DEAS-BOUND-002", str(base.relative_to(root)), "package tree exceeds its entry bound"))
+                        return observed
+                    if entry.is_symlink():
+                        observed.add(relative)
+                    elif entry.is_dir(follow_symlinks=False):
+                        pending.append(Path(entry.path))
+                    elif entry.is_file(follow_symlinks=False):
+                        observed.add(relative)
+        except OSError:
+            findings.append(_finding("DEAS-PATH-001", str(current.relative_to(root)), "package tree cannot be read"))
+    return observed
+
+
 def _verify_file_set(root: Path, findings: list) -> None:
     for relative in PACKAGE_FILES:
         _read(root, relative, findings)
@@ -186,7 +244,7 @@ def _verify_file_set(root: Path, findings: list) -> None:
     observed = set()
     for base in (_rooted(root, PREFIX), _rooted(root, SOFTWARE)):
         if base.is_dir():
-            observed.update(str(path.relative_to(root)) for path in base.rglob("*") if path.is_file())
+            observed.update(_bounded_files(root, base, findings))
     for extra in sorted(observed - expected):
         findings.append(_finding("DEAS-PATH-002", extra, "file is outside the exact package allowlist"))
 
@@ -254,9 +312,12 @@ def _verify_evidence(root: Path, findings: list) -> None:
                 findings.append(_finding("DEAS-EVIDENCE-001", relative, f"label count/value differs: {label}"))
         identity = next((line for line in lines if line.startswith("- **Evidence ID:** ")), "")
         status = next((line for line in lines if line.startswith("- **Status:** ")), "")
+        artifacts = next((line for line in lines if line.startswith("- **Artifact paths:** ")), "")
         accepted_status = "PACKAGE_PASS_READY_FOR_GIT_DELIVERY" if relative.endswith("validation-report.md") else "PASS"
         if status != f"- **Status:** {accepted_status}":
             findings.append(_finding("DEAS-LIFECYCLE-001", relative, "evidence status is not final package PASS"))
+        if tuple(re.findall(r"`([^`]+)`", artifacts)) != EVIDENCE_ARTIFACTS[relative]:
+            findings.append(_finding("DEAS-EVIDENCE-001", relative, "Artifact paths are not the exact repository-relative set"))
         for expected in expected_ids:
             if expected not in identity:
                 findings.append(_finding("DEAS-EVIDENCE-001", relative, f"evidence identity omitted: {expected}"))
@@ -335,7 +396,7 @@ def _python_tree(root: Path, relative: str, findings: list):
 def _verify_python(root: Path, findings: list) -> None:
     module_paths = (f"{SOFTWARE}/worker_core.py", f"{SOFTWARE}/observer_core.py")
     python_paths = tuple(path for path in PACKAGE_FILES if path.endswith(".py"))
-    forbidden = {"socket", "urllib", "http", "requests", "multiprocessing"}
+    forbidden = {"socket", "urllib", "http", "requests", "multiprocessing", "subprocess"}
     for relative in python_paths:
         tree = _python_tree(root, relative, findings)
         if tree is None:
@@ -350,6 +411,8 @@ def _verify_python(root: Path, findings: list) -> None:
     interfaces = {module_paths[0]: {"execute"}, module_paths[1]: {"collect", "retention_decision"}}
     for relative, allowed in interfaces.items():
         tree = _python_tree(root, relative, findings)
+        if tree is None:
+            continue
         target = "WorkerCore" if relative.endswith("worker_core.py") else "ObserverCore"
         class_node = next((node for node in tree.body if isinstance(node, ast.ClassDef) and node.name == target), None)
         public = {node.name for node in class_node.body if isinstance(node, ast.FunctionDef) and not node.name.startswith("_")} if class_node else set()
@@ -372,30 +435,85 @@ def _verify_links(root: Path, findings: list) -> None:
                 findings.append(_finding("DEAS-LINK-001", relative, f"unresolved link: {target}"))
 
 
-def _run_module_tests(root: Path, findings: list) -> None:
-    command = [sys.executable, "-B", "-m", "unittest", "discover", "-s", SOFTWARE, "-p", "test_*_core.py", "-v"]
+def _bounded_command(command: list, root: Path, timeout: float):
     try:
-        completed = subprocess.run(command, cwd=root, text=True, capture_output=True, timeout=30, check=False)
-    except (OSError, subprocess.TimeoutExpired):
-        findings.append(_finding("DEAS-TEST-001", SOFTWARE, "Module public tests could not complete within 30 seconds"))
+        process = subprocess.Popen(command, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
+    except OSError:
+        return None, b"", b"", "START_FAILED"
+    selector = selectors.DefaultSelector()
+    outputs = {process.stdout: bytearray(), process.stderr: bytearray()}
+    for stream in outputs:
+        selector.register(stream, selectors.EVENT_READ)
+    deadline = time.monotonic() + timeout
+    error = None
+    while selector.get_map() and error is None:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            error = "TIMEOUT"
+            break
+        for key, _ in selector.select(min(remaining, 0.1)):
+            chunk = os.read(key.fileobj.fileno(), min(65536, MAX_COMMAND_OUTPUT + 1 - sum(map(len, outputs.values()))))
+            if chunk:
+                outputs[key.fileobj].extend(chunk)
+                if sum(map(len, outputs.values())) > MAX_COMMAND_OUTPUT:
+                    error = "OUTPUT_LIMIT"
+                    break
+            else:
+                selector.unregister(key.fileobj)
+    if error is not None and process.poll() is None:
+        process.kill()
+    for stream in outputs:
+        stream.close()
+    selector.close()
+    try:
+        returncode = process.wait(timeout=2)
+    except subprocess.TimeoutExpired:
+        process.kill()
+        returncode = process.wait()
+        error = error or "TERMINATION_TIMEOUT"
+    return returncode, bytes(outputs[process.stdout]), bytes(outputs[process.stderr]), error
+
+
+def _run_module_tests(root: Path, findings: list) -> None:
+    command = [sys.executable, "-B", "-m", "unittest", "discover", "-s", SOFTWARE, "-p", "test_*_core.py", "-q"]
+    code, stdout, stderr, error = _bounded_command(command, root, 30)
+    if error is not None or code != 0:
+        detail = (stdout + stderr)[:1000].decode("utf-8", errors="replace").replace("\n", " ")
+        findings.append(_finding("DEAS-TEST-001", SOFTWARE, f"Module public tests failed, timed out, or exceeded output bound: {error or code}; {detail}"))
         return
-    output_size = len(completed.stdout.encode()) + len(completed.stderr.encode())
-    if completed.returncode != 0 or output_size > MAX_TEST_OUTPUT:
-        detail = (completed.stdout + completed.stderr)[:1000].replace("\n", " ")
-        findings.append(_finding("DEAS-TEST-001", SOFTWARE, f"Module public tests failed or exhausted output bound: {detail}"))
+    grammar = rb"-{70}\nRan " + str(EXPECTED_MODULE_TESTS).encode() + rb" tests in [0-9.]+s\n\nOK\n?"
+    if stdout or re.fullmatch(grammar, stderr) is None:
+        findings.append(_finding("DEAS-TEST-001", SOFTWARE, "Module test diagnostics differ from the exact quiet-success grammar"))
+
+
+def _git_paths(root: Path, arguments: list, findings: list):
+    code, stdout, stderr, error = _bounded_command(["git", *arguments], root, 10)
+    if error is not None or code != 0 or stderr:
+        findings.append(_finding("DEAS-GIT-001", ".git", f"Git identity command failed: {error or code}"))
+        return None
+    try:
+        return {item.decode("utf-8") for item in stdout.split(b"\0") if item}
+    except UnicodeDecodeError:
+        findings.append(_finding("DEAS-GIT-001", ".git", "Git path output is not UTF-8"))
+        return None
 
 
 def _verify_git_diff(root: Path, findings: list) -> None:
     if not (root / ".git").exists():
         return
-    command = ["git", "status", "--porcelain=v1", "--untracked-files=all"]
-    try:
-        completed = subprocess.run(command, cwd=root, text=True, capture_output=True, timeout=10, check=False)
-    except (OSError, subprocess.TimeoutExpired):
-        findings.append(_finding("DEAS-GIT-001", ".git", "Git diff could not complete"))
-        return
-    observed = tuple(sorted(line[3:] for line in completed.stdout.splitlines() if len(line) >= 4))
-    if completed.returncode != 0 or completed.stderr or observed != tuple(sorted(PACKAGE_FILES)):
+    commands = (
+        ["diff", "--name-only", "-z", f"{BASE_COMMIT}...HEAD", "--"],
+        ["diff", "--name-only", "-z", "--"],
+        ["diff", "--cached", "--name-only", "-z", "--"],
+        ["ls-files", "--others", "--exclude-standard", "-z"],
+    )
+    observed = set()
+    for command in commands:
+        paths = _git_paths(root, command, findings)
+        if paths is None:
+            return
+        observed.update(paths)
+    if tuple(sorted(observed)) != tuple(sorted(PACKAGE_FILES)):
         findings.append(_finding("DEAS-GIT-001", ".git", "Git diff identity differs from exact package"))
 
 
@@ -454,6 +572,9 @@ def main(argv=None) -> int:
         digest = "UNKNOWN"
         rule_id = getattr(error, "rule_id", "DEAS-INPUT-001")
         result = _payload("ERROR", digest, [_finding(rule_id, getattr(error, "path", VALIDATOR_RELATIVE), str(error))])
+        exit_code = 2
+    except Exception as error:
+        result = _payload("ERROR", "UNKNOWN", [_finding("DEAS-EXEC-001", VALIDATOR_RELATIVE, f"unexpected validator error: {type(error).__name__}")])
         exit_code = 2
     sys.stdout.write(json.dumps(result, sort_keys=True, separators=(",", ":")) + "\n")
     return exit_code

@@ -66,6 +66,15 @@ class ObserverCoreTests(unittest.TestCase):
         with self.assertRaisesRegex(ObserverRejected, "PROHIBITED_DATA"):
             self.collect()
 
+    def test_credential_and_secret_aliases_are_rejected(self) -> None:
+        for field in ("credentials", "password", "private-key", "secret_value"):
+            with self.subTest(field=field):
+                value = load(FIXTURES / "observer-snapshot.json")
+                value["signals"][0][field] = "synthetic-placeholder"
+                write_json(self.snapshot, value)
+                with self.assertRaisesRegex(ObserverRejected, "PROHIBITED_DATA"):
+                    self.collect()
+
     def test_private_vault_text_is_rejected(self) -> None:
         value = load(self.snapshot)
         value["signals"][0]["value"] = "PRIVATE VAULT"

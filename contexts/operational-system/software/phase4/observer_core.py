@@ -40,9 +40,10 @@ DECISION_MAP = {
     "storage_presence": "DECIDE_STORAGE_AVAILABILITY",
 }
 PROHIBITED_KEYS = {
-    "content", "credential", "file_content", "filename", "full_serial",
-    "private_filename", "private_vault", "prompt", "recovery_key", "serial",
-    "token",
+    "api_key", "auth", "authorization", "content", "credential", "credentials",
+    "file_content", "filename", "full_serial", "password", "private_filename",
+    "private_key", "private_vault", "prompt", "recovery_key", "secret",
+    "secret_value", "serial", "token", "tokens",
 }
 
 

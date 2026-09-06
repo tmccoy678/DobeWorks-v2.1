@@ -37,7 +37,7 @@
   ],
   "acceptance_criteria": [
     "The exact 25-path diff is the only tracked change from base commit b24c6d677d80b5299f09cb087d263d69bd6b68af.",
-    "All 43 Worker/Observer public tests pass through direct and CLI seams, including positive, negative, security, privacy, failure, ambiguity, atomicity, determinism, path, and boundary cases.",
+    "All 48 Worker/Observer public tests pass through direct and CLI seams, including positive, negative, security, privacy, failure, ambiguity, atomicity, enforced-deadline, deterministic filesystem-failure, determinism, path, and boundary cases.",
     "The public package validator passes its valid case and all negative/failure cases, then returns PACKAGE-scoped PASS with zero findings and G7/G8/G9 pending for the exact manifest.",
     "Every Python file compiles and every function remains at or below 60 logical lines without exception.",
     "All JSON, links, source hashes, fixture identities, manifest entries, evidence contracts, trace states, lifecycle claims, and side-effect boundaries agree.",
@@ -474,7 +474,7 @@
     {
       "severity": "INFO",
       "status": "OPEN",
-      "message": "P4-OPEN-001: actual process termination, persistent deduplication, transport, device execution, and Promotion Event behavior remain later integration or qualification evidence."
+      "message": "P4-OPEN-001: separate-process termination, non-main-thread execution, persistent deduplication, transport, device execution, and Promotion Event behavior remain later integration or qualification evidence."
     },
     {
       "severity": "INFO",

@@ -18,7 +18,7 @@ VALIDATOR_RELATIVE = "contexts/operational-system/docs/program/v1/architecture/p
 MANIFEST_RELATIVE = "contexts/operational-system/docs/program/v1/architecture/phase-4/phase-4-sha256.txt"
 VALIDATOR = ROOT / VALIDATOR_RELATIVE
 SPEC = Path("/Users/taylor/AI-Workspace/.scratch/dobeworks-operational-system-phase4-software-core/spec.md")
-SPEC_SHA256 = "875c0e661a6e10ff3ff1e011d618feb395fb769b3f1c345b280b192fedb76caa"
+SPEC_SHA256 = "49ebf76d993a8b9d02147df1786b2f2647a8773cb2a5e561babafdb4bc14dc92"
 PACKAGE_FILES = (
     "contexts/operational-system/README.md",
     "contexts/operational-system/docs/program/v1/program-definition.md",
@@ -70,10 +70,24 @@ class Phase4ValidatorTests(unittest.TestCase):
 
     def run_validator(self, manifest_sha=None, spec_sha=SPEC_SHA256, root=None):
         selected_root = root or self.repo
-        selected_manifest = manifest_sha or digest(self.repo / MANIFEST_RELATIVE)
-        command = [sys.executable, "-B", str(VALIDATOR), "--repository-root", str(selected_root), "--manifest-sha256", selected_manifest, "--external-spec", str(SPEC), "--external-spec-sha256", spec_sha, "--json"]
+        selected_manifest = manifest_sha or digest(selected_root / MANIFEST_RELATIVE)
+        selected_validator = selected_root / VALIDATOR_RELATIVE
+        command = [sys.executable, "-B", str(selected_validator), "--repository-root", str(selected_root), "--manifest-sha256", selected_manifest, "--external-spec", str(SPEC), "--external-spec-sha256", spec_sha, "--json"]
         completed = subprocess.run(command, text=True, capture_output=True, timeout=30, check=False)
         return completed, json.loads(completed.stdout)
+
+    def clean_git_repo(self) -> Path:
+        target = Path(self.temporary.name) / "clean-repo"
+        subprocess.run(["git", "clone", "--quiet", "--no-hardlinks", str(ROOT), str(target)], timeout=20, check=True)
+        for relative in PACKAGE_FILES:
+            shutil.copy2(self.repo / relative, target / relative)
+        subprocess.run(["git", "-C", str(target), "config", "user.name", "Phase4 Test"], timeout=10, check=True)
+        subprocess.run(["git", "-C", str(target), "config", "user.email", "phase4-test@invalid"], timeout=10, check=True)
+        subprocess.run(["git", "-C", str(target), "add", "--", *PACKAGE_FILES], timeout=10, check=True)
+        status = subprocess.run(["git", "-C", str(target), "status", "--porcelain"], text=True, capture_output=True, timeout=10, check=True)
+        if status.stdout:
+            subprocess.run(["git", "-C", str(target), "commit", "--quiet", "-m", "Phase 4 clean validator fixture"], timeout=20, check=True)
+        return target
 
     def mutate_text(self, relative: str, old: str, new: str) -> None:
         path = self.repo / relative
@@ -92,6 +106,14 @@ class Phase4ValidatorTests(unittest.TestCase):
         self.assertEqual(result["decision_scope"], "PACKAGE")
         self.assertEqual(result["external_gates_pending"], ["G7", "G8", "G9"])
         self.assertEqual(result["findings"], [])
+
+    def test_clean_committed_candidate_passes(self) -> None:
+        clean_repo = self.clean_git_repo()
+        status = subprocess.run(["git", "-C", str(clean_repo), "status", "--porcelain"], text=True, capture_output=True, timeout=10, check=True)
+        self.assertEqual((status.stdout, status.stderr), ("", ""))
+        completed, result = self.run_validator(root=clean_repo)
+        self.assertEqual((completed.returncode, completed.stderr), (0, ""))
+        self.assertEqual((result["decision"], result["findings"]), ("PASS", []))
 
     def test_missing_and_extra_package_files_fail(self) -> None:
         (self.repo / PACKAGE_FILES[-1]).unlink()
@@ -178,6 +200,43 @@ class Phase4ValidatorTests(unittest.TestCase):
         path.write_text(path.read_text(encoding="utf-8") + "\nimport socket\n", encoding="utf-8")
         completed, result = self.run_validator(manifest_sha=self.rehash())
         self.assert_finding(result, "DEAS-SECURITY-001")
+
+    def test_forbidden_subprocess_import_fails(self) -> None:
+        relative = "contexts/operational-system/software/phase4/observer_core.py"
+        path = self.repo / relative
+        path.write_text(path.read_text(encoding="utf-8") + "\nimport subprocess\n", encoding="utf-8")
+        completed, result = self.run_validator(manifest_sha=self.rehash())
+        self.assert_finding(result, "DEAS-SECURITY-001")
+
+    def test_malformed_python_fails_without_validator_traceback(self) -> None:
+        relative = "contexts/operational-system/software/phase4/worker_core.py"
+        (self.repo / relative).write_text("def malformed(:\n", encoding="utf-8")
+        completed, result = self.run_validator(manifest_sha=self.rehash())
+        self.assertEqual((completed.returncode, completed.stderr), (1, ""))
+        self.assertEqual(result["decision"], "FAIL")
+        self.assert_finding(result, "DEAS-STATIC-001")
+
+    def test_artifact_paths_must_be_exact_and_repository_relative(self) -> None:
+        relative = "contexts/operational-system/docs/program/v1/architecture/phase-4/worker-core-evidence.md"
+        self.mutate_text(relative, "`contexts/operational-system/software/phase4/worker_core.py`", "`worker_core.py`")
+        completed, result = self.run_validator(manifest_sha=self.rehash())
+        self.assert_finding(result, "DEAS-EVIDENCE-001")
+
+    def test_package_tree_entry_bound_fails_closed(self) -> None:
+        base = self.repo / "contexts/operational-system/docs/program/v1/architecture/phase-4"
+        for number in range(129):
+            (base / f"synthetic-extra-{number:03d}").mkdir()
+        completed, result = self.run_validator()
+        self.assertEqual(completed.returncode, 1)
+        self.assert_finding(result, "DEAS-BOUND-002")
+
+    def test_unexpected_module_test_diagnostics_fail(self) -> None:
+        relative = "contexts/operational-system/software/phase4/test_worker_core.py"
+        path = self.repo / relative
+        path.write_text(path.read_text(encoding="utf-8") + '\nsys.stderr.write("unexpected diagnostic\\n")\n', encoding="utf-8")
+        completed, result = self.run_validator(manifest_sha=self.rehash())
+        self.assertEqual(completed.returncode, 1)
+        self.assert_finding(result, "DEAS-TEST-001")
 
     def test_function_bound_fails(self) -> None:
         relative = "contexts/operational-system/software/phase4/worker_core.py"

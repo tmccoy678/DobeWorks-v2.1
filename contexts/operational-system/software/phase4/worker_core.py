@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 import re
+import signal
 import sys
 from dataclasses import dataclass
 from datetime import datetime
@@ -88,6 +89,10 @@ def _sha256(value: bytes) -> str:
 
 def _encoded(value: dict) -> bytes:
     return (json.dumps(value, indent=2, sort_keys=True) + "\n").encode("utf-8")
+
+
+def _deadline_expired(_signum, _frame) -> None:
+    raise WorkerTimeout("runner deadline expired")
 
 
 def _utc(value: str) -> datetime:
@@ -200,9 +205,12 @@ class WorkerCore:
         """Validate, execute once, and atomically stage one synthetic job."""
         try:
             prepared = self._prepare(envelope_path, input_path, staging_root, now, cancellation_requested)
-            return self._run_once(prepared)
         except WorkerRejected as error:
             return _result(error.job_id, error.state, 0, error.reason)
+        try:
+            return self._run_once(prepared)
+        except OSError:
+            return _result(prepared.job_id, "FAILED_STAGE_IO", 1, "staged-output file operation failed; partial state is unaccepted")
 
     def _prepare(self, envelope_path, input_path, staging_root, now, cancelled) -> PreparedJob:
         stage = Path(staging_root)
@@ -227,7 +235,10 @@ class WorkerCore:
         if partial.exists() or destination.exists():
             raise WorkerRejected("REJECTED_DESTINATION_EXISTS", "staged destination already exists", job_id)
         self._seen_jobs[job_id] = fingerprint
-        partial.mkdir(mode=0o700)
+        try:
+            partial.mkdir(mode=0o700)
+        except OSError as error:
+            raise WorkerRejected("FAILED_STAGE_PREPARATION", "partial staging directory could not be created", job_id) from error
         return PreparedJob(envelope, input_value, job_id, partial, destination)
 
     def _validate_envelope(self, value: dict, now: str) -> None:
@@ -277,7 +288,7 @@ class WorkerCore:
 
     def _run_once(self, job: PreparedJob) -> dict:
         try:
-            candidate = self.runner(job.envelope, job.input_value)
+            candidate = self._call_runner(job)
         except WorkerCancellationRace as error:
             self._preserve_candidate(job, error.result)
             return self._fail(job, "AMBIGUOUS_CANCELLATION_RACE", "completion raced with cancellation")
@@ -289,6 +300,8 @@ class WorkerCore:
             return self._fail(job, "AMBIGUOUS_COMPLETION", "completion acknowledgement is unavailable")
         except WorkerNetworkUnavailable:
             return self._fail(job, "FAILED_NETWORK_UNAVAILABLE", "approved dependency is unavailable")
+        except WorkerRejected:
+            raise
         except Exception:
             return self._fail(job, "FAILED_RUNNER", "runner raised an unclassified exception")
         raw = self._preserve_candidate(job, candidate)
@@ -300,6 +313,28 @@ class WorkerCore:
         if digest != job.envelope["expected_output_sha256"]:
             return self._fail(job, "FAILED_OUTPUT_IDENTITY", "candidate output digest differs")
         return self._handback(job, digest)
+
+    def _call_runner(self, job: PreparedJob):
+        try:
+            pending = signal.getitimer(signal.ITIMER_REAL)
+        except (AttributeError, OSError, ValueError) as error:
+            raise WorkerRejected("FAILED_TIMEOUT_CONTROL", "in-process deadline control is unavailable", job.job_id) from error
+        if pending != (0.0, 0.0):
+            raise WorkerRejected("FAILED_TIMEOUT_CONTROL", "an existing process deadline prevents bounded execution", job.job_id)
+        try:
+            previous = signal.signal(signal.SIGALRM, _deadline_expired)
+            signal.setitimer(signal.ITIMER_REAL, job.envelope["timeout_seconds"])
+        except (AttributeError, OSError, ValueError) as error:
+            try:
+                signal.signal(signal.SIGALRM, previous)
+            except (AttributeError, OSError, UnboundLocalError, ValueError):
+                pass
+            raise WorkerRejected("FAILED_TIMEOUT_CONTROL", "in-process deadline could not be installed", job.job_id) from error
+        try:
+            return self.runner(job.envelope, job.input_value)
+        finally:
+            signal.setitimer(signal.ITIMER_REAL, 0)
+            signal.signal(signal.SIGALRM, previous)
 
     def _preserve_candidate(self, job: PreparedJob, candidate) -> bytes:
         try:
@@ -337,9 +372,9 @@ class WorkerCore:
     def _handback(self, job: PreparedJob, digest: str) -> dict:
         record = _result(job.job_id, "COMPLETED_UNACCEPTED", 1, "synthetic result staged", digest)
         manifest = f"{digest}  result.json\n".encode("utf-8")
-        (job.partial / "result-sha256.txt").write_bytes(manifest)
-        (job.partial / "handback.json").write_bytes(_encoded(record))
         try:
+            (job.partial / "result-sha256.txt").write_bytes(manifest)
+            (job.partial / "handback.json").write_bytes(_encoded(record))
             os.replace(str(job.partial), str(job.destination))
         except OSError:
             return self._fail(job, "FAILED_ATOMIC_HANDBACK", "atomic directory handback failed")
