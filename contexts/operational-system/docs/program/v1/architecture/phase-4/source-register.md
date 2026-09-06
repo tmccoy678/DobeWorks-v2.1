@@ -17,7 +17,7 @@ The Git base is commit `b24c6d677d80b5299f09cb087d263d69bd6b68af`,
 tree `3008aab9ed2c86052ad35a24d4a1f108a2b07658`. The accepted Phase 3
 correction commit is `f507e927cf98992b7679e46cf536a70fc2fd9c49` with the
 same tree. The corrected external Phase 4 specification SHA-256 is
-`5a5a74369a60169737638d9ce7e72b8a7ee6a11c2a758ca74e04e35d008245d8`.
+`e95b8369c7abaf80948e34c61c1b5f803f4ad2ecc2138d78d62a98a81135af9b`.
 
 ## Synthetic input and expected-output identities
 
@@ -119,10 +119,23 @@ uncertainty, and no-promotion boundary are preserved.
   `d9965e15af9880a5f6a30ad51a9d253df9d40c44593ec6d9c3ce3292e75bc0b5`,
   decision `FAIL`, two blockers.
 - Generation 6 is preserved in Git history and is not amended, rebased,
-  relabeled, accepted, or merged. Generation 7 must close every blocking
-  finding and receive fresh identity-bound tests and both independent reviews.
-  The duplicated-helper observation is dispositioned without creating a shared
-  runtime dependency across the two otherwise self-contained deep Modules.
+  relabeled, accepted, or merged.
+- Rejected Generation 7 commit:
+  `a255de3dc149177fd41d8cee0d9469266c6f4d62`; tree
+  `7452f53303a9295636fef10e5fe73df6d96434d1`; manifest SHA-256
+  `54c64e4291732203871ce4baa51edbe88177a800958506fb8257ab888d57a6de`.
+- Generation 7 Standards review: external `review/generation-7-standards.md`,
+  SHA-256 `a940c51ddc0476a1a9c73e86006a96eaf704fb67fe86b1944229ef6f1cb48b3e`,
+  decision `PASS`, zero blockers and one nonblocking duplicated-code finding.
+- Generation 7 Spec review: external `review/generation-7-spec.md`, SHA-256
+  `590b0f1a81b5c14574014c259da6a280dc046eaf9de99a18d55dd3247613e868`,
+  decision `FAIL`, one mutable-runner-contract blocker and one nonblocking
+  Observer wording clarification.
+- Generation 7 is preserved in Git history and is not amended, rebased,
+  relabeled, accepted, or merged. Generation 8 must close the blocker and
+  receive fresh identity-bound tests and both independent reviews. The
+  duplicated-helper observation remains dispositioned without creating a
+  shared runtime dependency across the self-contained deep Modules.
 
 ## Build and dependency provenance
 

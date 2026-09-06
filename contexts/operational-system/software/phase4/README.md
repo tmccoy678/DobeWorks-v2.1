@@ -18,12 +18,15 @@ configuration digests, dispatch authority, expiry, data class, job semantics,
 input shape and scalar types, path confinement including symlink loops,
 byte/record/time/retry bounds, duplicate job
 identity, and a pre-execution cancellation signal. It invokes exactly one
-runner attempt under the envelope's Worker-enforced deadline, including result
+runner attempt on detached envelope/input values under the envelope's
+Worker-enforced deadline, including result
 serialization, validation, and atomic handback; preserves
 explicit failure or ambiguity, converts staging filesystem failures to bounded
 results, and renames a complete staging directory atomically. It never retries
 automatically or performs a Promotion Event. The default runner accepts only
-the synthetic repository-inventory fixture.
+the synthetic repository-inventory fixture. Authoritative input/output digests
+and the timeout remain pinned inside Worker Core and cannot be changed by an
+injected runner.
 
 CLI example, using a disposable staging directory:
 

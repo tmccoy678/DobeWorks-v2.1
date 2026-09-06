@@ -18,7 +18,7 @@ VALIDATOR_RELATIVE = "contexts/operational-system/docs/program/v1/architecture/p
 MANIFEST_RELATIVE = "contexts/operational-system/docs/program/v1/architecture/phase-4/phase-4-sha256.txt"
 VALIDATOR = ROOT / VALIDATOR_RELATIVE
 SPEC = Path("/Users/taylor/AI-Workspace/.scratch/dobeworks-operational-system-phase4-software-core/spec.md")
-SPEC_SHA256 = "5a5a74369a60169737638d9ce7e72b8a7ee6a11c2a758ca74e04e35d008245d8"
+SPEC_SHA256 = "e95b8369c7abaf80948e34c61c1b5f803f4ad2ecc2138d78d62a98a81135af9b"
 PACKAGE_FILES = (
     "contexts/operational-system/README.md",
     "contexts/operational-system/docs/program/v1/program-definition.md",

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import os
@@ -80,6 +81,9 @@ class PreparedJob:
     envelope: dict
     input_value: dict
     job_id: str
+    input_sha256: str
+    expected_output_sha256: str
+    timeout_seconds: int
     partial: Path
     destination: Path
     staging_identity: tuple
@@ -275,7 +279,11 @@ class WorkerCore:
         if partial.exists() or partial.is_symlink() or destination.exists() or destination.is_symlink():
             raise WorkerRejected("REJECTED_DESTINATION_EXISTS", "staged destination already exists", job_id)
         self._seen_jobs[job_id] = fingerprint
-        return PreparedJob(envelope, input_value, job_id, partial, destination, (stage_stat.st_dev, stage_stat.st_ino))
+        return PreparedJob(
+            envelope, input_value, job_id, envelope["input_sha256"],
+            envelope["expected_output_sha256"], envelope["timeout_seconds"],
+            partial, destination, (stage_stat.st_dev, stage_stat.st_ino),
+        )
 
     def _validate_envelope(self, value: dict, now: str) -> None:
         if set(value) != ENVELOPE_KEYS:
@@ -357,7 +365,7 @@ class WorkerCore:
         previous = None
         try:
             previous = signal.signal(signal.SIGALRM, _deadline_expired)
-            signal.setitimer(signal.ITIMER_REAL, job.envelope["timeout_seconds"])
+            signal.setitimer(signal.ITIMER_REAL, job.timeout_seconds)
         except (AttributeError, OSError, ValueError) as error:
             if previous is not None:
                 signal.signal(signal.SIGALRM, previous)
@@ -379,7 +387,7 @@ class WorkerCore:
             job.partial_identity = (partial_stat.st_dev, partial_stat.st_ino)
         except OSError as error:
             raise WorkerRejected("FAILED_STAGE_PREPARATION", "partial staging directory could not be created", job.job_id) from error
-        candidate = self.runner(job.envelope, job.input_value)
+        candidate = self.runner(copy.deepcopy(job.envelope), copy.deepcopy(job.input_value))
         if not self._staging_matches(job):
             return _result(job.job_id, "FAILED_STAGE_INTEGRITY", 1, "staging identity changed during execution")
         raw = self._preserve_candidate(job, candidate)
@@ -388,7 +396,7 @@ class WorkerCore:
         if not self._valid_result(candidate, job):
             return self._fail(job, "FAILED_OUTPUT_VALIDATION", "candidate output schema or semantics differ")
         digest = _sha256(raw)
-        if digest != job.envelope["expected_output_sha256"]:
+        if digest != job.expected_output_sha256:
             return self._fail(job, "FAILED_OUTPUT_IDENTITY", "candidate output digest differs")
         return self._handback(job, digest)
 
@@ -407,7 +415,7 @@ class WorkerCore:
             return False
         if value.get("schema_version") != RESULT_SCHEMA or value.get("job_id") != job.job_id:
             return False
-        if value.get("input_sha256") != job.envelope["input_sha256"]:
+        if value.get("input_sha256") != job.input_sha256:
             return False
         kinds = value.get("kinds")
         if not isinstance(kinds, dict) or any(key not in {"markdown", "python"} for key in kinds):

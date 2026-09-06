@@ -305,6 +305,21 @@ class WorkerCoreTests(unittest.TestCase):
         self.assertEqual(result["state"], "FAILED_OUTPUT_IDENTITY")
         self.assertFalse((self.staging / result["job_id"]).exists())
 
+    def test_runner_cannot_mutate_authoritative_contract(self) -> None:
+        forged = load(FIXTURES / "expected-result.json")
+        forged["total_bytes"] = 999999
+        forged_raw = (json.dumps(forged, indent=2, sort_keys=True) + "\n").encode("utf-8")
+
+        def runner(envelope, input_value):
+            envelope["expected_output_sha256"] = hashlib.sha256(forged_raw).hexdigest()
+            input_value["records"][0]["bytes"] = forged["total_bytes"]
+            return forged
+
+        result = self.execute(self.core(runner=runner))
+        self.assertEqual(result["state"], "FAILED_OUTPUT_IDENTITY")
+        self.assertEqual(result["promotion"], "NOT_PERFORMED")
+        self.assertFalse((self.staging / result["job_id"]).exists())
+
     def test_missing_required_envelope_field_is_rejected(self) -> None:
         value = load(self.envelope)
         del value["delivery_intent"]

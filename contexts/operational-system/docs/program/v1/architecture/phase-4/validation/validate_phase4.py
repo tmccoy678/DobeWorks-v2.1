@@ -18,7 +18,7 @@ from pathlib import Path
 
 TASK_ID = "DEGS-T2-DW-HWSW-P4-SOFTWARE-CORE-20260906"
 BASE_COMMIT = "b24c6d677d80b5299f09cb087d263d69bd6b68af"
-SPEC_SHA256 = "5a5a74369a60169737638d9ce7e72b8a7ee6a11c2a758ca74e04e35d008245d8"
+SPEC_SHA256 = "e95b8369c7abaf80948e34c61c1b5f803f4ad2ecc2138d78d62a98a81135af9b"
 PREFIX = "contexts/operational-system/docs/program/v1/architecture/phase-4"
 SOFTWARE = "contexts/operational-system/software/phase4"
 MANIFEST_RELATIVE = f"{PREFIX}/phase-4-sha256.txt"
@@ -26,7 +26,7 @@ VALIDATOR_RELATIVE = f"{PREFIX}/validation/validate_phase4.py"
 MAX_FILE_BYTES = 1024 * 1024
 MAX_COMMAND_OUTPUT = 64 * 1024
 MAX_TREE_ENTRIES = 128
-EXPECTED_MODULE_TESTS = 69
+EXPECTED_MODULE_TESTS = 70
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
 MANIFEST_LINE = re.compile(r"^([0-9a-f]{64})  ([^\s].*)$")
 MARKDOWN_LINK = re.compile(r"\[[^\]]+\]\(([^)]+)\)")

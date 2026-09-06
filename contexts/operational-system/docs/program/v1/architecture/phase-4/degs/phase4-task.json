@@ -37,7 +37,7 @@
   ],
   "acceptance_criteria": [
     "The exact 25-path diff is the only tracked change from base commit b24c6d677d80b5299f09cb087d263d69bd6b68af.",
-    "All 69 Worker/Observer public tests pass through direct and CLI seams, including positive, negative, security, privacy, failure, ambiguity, atomicity, complete-attempt deadline control, deep-JSON/result handling, exact parsed/API and runner types, registry/retention ceilings, stable allowed-root and Staged Output identity, schema-incompatible unknown semantics, symlink loops, deterministic filesystem failure, determinism, path, and boundary cases.",
+    "All 70 Worker/Observer public tests pass through direct and CLI seams, including positive, negative, security, privacy, failure, ambiguity, atomicity, complete-attempt deadline control, deep-JSON/result handling, exact parsed/API and runner types, detached runner inputs with pinned authoritative bindings, registry/retention ceilings, stable allowed-root and Staged Output identity, schema-incompatible unknown semantics, symlink loops, deterministic filesystem failure, determinism, path, and boundary cases.",
     "The public package validator passes its valid case and all negative/failure cases, then returns PACKAGE-scoped PASS with zero findings and G7/G8/G9 pending for the exact manifest.",
     "Every Python file compiles and every function remains at or below 60 logical lines without exception.",
     "All JSON, links, source hashes, fixture identities, manifest entries, evidence contracts, trace states, lifecycle claims, and side-effect boundaries agree.",

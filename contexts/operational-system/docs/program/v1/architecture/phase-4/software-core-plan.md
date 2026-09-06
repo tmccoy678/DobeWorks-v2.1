@@ -13,20 +13,23 @@ and rollback are frozen in the external Phase 4 specification identified in
 [source-register.md](source-register.md). This package remains
 `NOT_YET_QUALIFIED` and `NOT_YET_RELEASED`.
 
-Generations 1 through 6 at commits
+Generations 1 through 7 at commits
 `c365171e3ae7aff184d5e2ade5ec470365765009`,
 `a9f11d8d92d3b3ae1b04d80e3ef9de31233f4c4c`,
 `6a989b8807c376e45b6345da54d6603d495ad3cd`, and
 `4cb086fbc1f22fe4b8c2a920f20af5ad0c3b4a9b`,
 `e81ad8f97bff79bed0ae44ad14a170b3f0c8c403`, and
-`d41338a762e221c8a72d8ee5ce30a7ee23664f3b` are preserved, independently
-rejected predecessors. Generation 7 retains the same interfaces and 25-path
-boundary while closing every recorded blocker: stable Staged Output directory
+`d41338a762e221c8a72d8ee5ce30a7ee23664f3b`, and
+`a255de3dc149177fd41d8cee0d9469266c6f4d62` are preserved rejected
+predecessors. Generation 8 retains the same interfaces and 25-path boundary
+while closing the remaining recorded blocker: the runner receives detached
+data while the Worker retains authoritative input, output, and timeout
+bindings. It also preserves Generation 7 closure of stable Staged Output
 identity, post-run duplicate rejection, exact runner-adapter type, explicit
 `UNKNOWN` for incompatible Observer schema, and deterministic overlong-link
 classification. The duplicated-helper
 observation is nonblocking: no shared runtime dependency is introduced solely
-to deduplicate small internal policy helpers. Generation 7 makes no retroactive
+to deduplicate small internal policy helpers. Generation 8 makes no retroactive
 PASS claim for any predecessor.
 
 ## Architecture
@@ -65,7 +68,9 @@ staged handback -/-> promotion
 
 Every returned state fixes `promotion` to `NOT_PERFORMED` and `retry` to
 `PROHIBITED_AUTOMATIC`. A successful process exit is not an accepted result.
-The synthetic default runner has bounded iteration and no external I/O.
+The synthetic default runner has bounded iteration and no external I/O. Every
+runner receives detached envelope/input data; authoritative digests and timeout
+remain pinned inside the Module across adapter invocation.
 The core enforces the 1..30 second envelope deadline for its complete
 in-process attempt, including result serialization, validation, and atomic
 handback, with the host's main-thread interval timer and fails closed when that facility
@@ -89,7 +94,7 @@ take action.
 | stale or collector failed | `TELEMETRY_UNAVAILABLE` | every signal `UNKNOWN` |
 | incompatible snapshot schema | `UNKNOWN` | every signal `UNKNOWN`; incompatibility recorded in self-health |
 | clock uncertain, records dropped, or signal missing | `UNKNOWN` | every signal `UNKNOWN` |
-| incompatible schema, prohibited data, invalid policy/path/value | rejection | no record |
+| malformed or schema-invalid content, prohibited data, invalid policy/path/value | rejection | no record |
 
 The six allowed signals map one-to-one to named decision purposes. They carry
 no file content, private filename, prompt, credential, token, recovery key,
@@ -146,6 +151,8 @@ tests or a DEGS result.
 - Resolved inputs must be regular non-symlink files below an explicit allowed
   root; Staged Output uses a pinned non-symlink existing directory identity and
   rechecks partial/destination state after the runner returns.
+- The runner receives detached JSON values and cannot mutate the authoritative
+  input/output digest or timeout bindings used for validation and handback.
 - The Worker/Observer Modules import no network client or subprocess facility.
 - Python 3.9.6 standard library is the complete dependency set; no package
   resolution, download, or update occurs.
