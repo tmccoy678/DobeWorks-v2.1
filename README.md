@@ -1,5 +1,9 @@
 # DobeWorks — v2.1 development draft
 
+## Figures and references
+
+[Read the illustrated system guide](docs/figures/README.md) for the relevant PDF figures and reflowable HTML equivalents. The [44-work APA reference edition](references/engineering-foundations-references.pdf) includes a [source-verification audit](references/verification.md).
+
 ## Public-data benchmark
 
 **318 of 318 public inputs produced controlled, unusable telemetry outcomes. Both native controls passed.** See [benchmark results and reproduction](benchmarks/benchmark.md).
