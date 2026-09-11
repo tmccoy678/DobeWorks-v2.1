@@ -47,7 +47,7 @@
     },
     {
       "path": "docs/figures/degs-core-walkthrough.html",
-      "sha256": "dc1c0681c119177b98c484ab4eb654a8e872fcfacd5d0aa9ec0bdc66ef858e91"
+      "sha256": "d3cfaf3e31c77837872f09a943883f92e368ea0961daadd41194eda4dd1f9dbf"
     },
     {
       "path": "docs/figures/dobeworks-operating-architecture.html",
@@ -55,7 +55,7 @@
     },
     {
       "path": "docs/figures/dobeworks-phase2-validator-code-map.html",
-      "sha256": "29c5d9b8ee703d9fc714f6adf6d30d05fde0f22b32473cb373f011aa623ee972"
+      "sha256": "b86cc60427fa2d3f7344da8b342c772961318a2868ab3d3fdd5df5f450b35293"
     },
     {
       "path": "docs/figures/trashpickup-treasurepickup-overview.html",
@@ -146,7 +146,7 @@
   "accessibility_limit": "Tagged and structurally checked; not certified PDF/UA. Reading with a specific screen reader was not tested.",
   "benchmark_scope": "Existing recorded results only; runtime suites not rerun for this documentation change.",
   "build": {
-    "renderer_sha256": "478e2b595f65d76fb6060f7b2cb6de8f105d4d5d7d77fa55adb1068829293d28",
+    "renderer_sha256": "f0a283225836d5042c3746c24906f015f42e7952e0fe17b96eb9ac6c6a4c57b8",
     "checker_sha256": "4edc19e54af79b952f23eba8f1de9430a6f3d24472bf66fa2786d8ca19b1349d",
     "method": "Local ReportLab authoring, pypdf tagging, Poppler render inspection; no external design service."
   }

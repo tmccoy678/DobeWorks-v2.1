@@ -3,9 +3,9 @@
 <h2>Complete privacy-edited source</h2><pre>
 0001  #!/usr/bin/env python3
 0002  &quot;&quot;&quot;Validate the bounded Phase 2 Generation 2 documentation correction.&quot;&quot;&quot;
-0003  
+0003&#32;&#32;
 0004  from __future__ import annotations
-0005  
+0005&#32;&#32;
 0006  import argparse
 0007  import hashlib
 0008  import json
@@ -17,8 +17,8 @@
 0014  import sys
 0015  import time
 0016  from pathlib import Path
-0017  
-0018  
+0017&#32;&#32;
+0018&#32;&#32;
 0019  MAX_TEXT_BYTES = 4 * 1024 * 1024
 0020  GIT_TIMEOUT_SECONDS = 2
 0021  DEGS_TIMEOUT_SECONDS = 5
@@ -51,7 +51,7 @@
 0048  DISCREPANCY_REFERENCES = re.compile(
 0049      r&quot;(?:NONE|\x60P2-G2-DISC-\d{3}\x60(?:, \x60P2-G2-DISC-\d{3}\x60)*)&quot;
 0050  )
-0051  
+0051&#32;&#32;
 0052  PACKAGE_FILES = frozenset(
 0053      {
 0054          &quot;qualification-plan.md&quot;,
@@ -104,7 +104,7 @@
 0101      &#x27;--identity-manifest-sha256 &quot;$DEAS_GENERATION_2_MANIFEST_SHA256&quot; &#x27;
 0102      &quot;--json --repository-root .&quot;
 0103  )
-0104  
+0104&#32;&#32;
 0105  GENERATION_1_UNCHANGED = {
 0106      &quot;discrepancies-and-unknowns.md&quot;: (
 0107          &quot;f218d8b2441fee8b47f212ebeaf3a66cdc840e2dc055d58724dfe20bd88071fb&quot;
@@ -151,11 +151,11 @@
 0148          &quot;**End time:**&quot;: &quot;NOT RECORDED&quot;,
 0149      }
 0150  )
-0151  
-0152  
+0151&#32;&#32;
+0152&#32;&#32;
 0153  class ValidationError(Exception):
 0154      &quot;&quot;&quot;A deterministic input, execution, or repository-boundary failure.&quot;&quot;&quot;
-0155  
+0155&#32;&#32;
 0156      def __init__(
 0157          self,
 0158          message: str,
@@ -166,23 +166,23 @@
 0163          super().__init__(message)
 0164          self.path = path
 0165          self.rule_id = rule_id
-0166  
-0167  
+0166&#32;&#32;
+0167&#32;&#32;
 0168  class Phase2ArgumentParser(argparse.ArgumentParser):
 0169      &quot;&quot;&quot;Convert parser failures into the structured validator error seam.&quot;&quot;&quot;
-0170  
+0170&#32;&#32;
 0171      def error(self, message: str) -&gt; None:
 0172          raise ValidationError(
 0173              f&quot;invalid arguments: {message}&quot;,
 0174              path=&quot;command-line&quot;,
 0175              rule_id=&quot;DEAS-PRE-007&quot;,
 0176          )
-0177  
-0178  
+0177&#32;&#32;
+0178&#32;&#32;
 0179  def sha256_bytes(value: bytes) -&gt; str:
 0180      return hashlib.sha256(value).hexdigest()
-0181  
-0182  
+0181&#32;&#32;
+0182&#32;&#32;
 0183  def bounded_bytes(path: Path, label: str) -&gt; bytes:
 0184      if path.is_symlink() or not path.is_file():
 0185          raise ValidationError(f&quot;missing or non-regular required file: {label}&quot;)
@@ -196,15 +196,15 @@
 0193          return path.read_bytes()
 0194      except OSError as error:
 0195          raise ValidationError(f&quot;cannot read required file: {label}&quot;) from error
-0196  
-0197  
+0196&#32;&#32;
+0197&#32;&#32;
 0198  def bounded_text(path: Path, label: str) -&gt; str:
 0199      try:
 0200          return bounded_bytes(path, label).decode(&quot;utf-8&quot;)
 0201      except UnicodeDecodeError as error:
 0202          raise ValidationError(f&quot;required file is not UTF-8: {label}&quot;) from error
-0203  
-0204  
+0203&#32;&#32;
+0204&#32;&#32;
 0205  def rooted_path(root: Path, relative: str) -&gt; Path:
 0206      relative_path = Path(relative)
 0207      if relative_path.is_absolute():
@@ -213,24 +213,24 @@
 0210      if path != root and root not in path.parents:
 0211          raise ValidationError(f&quot;artifact path escapes its root: {relative}&quot;)
 0212      return path
-0213  
-0214  
+0213&#32;&#32;
+0214&#32;&#32;
 0215  def rooted_bytes(root: Path, relative: str) -&gt; bytes:
 0216      return bounded_bytes(rooted_path(root, relative), relative)
-0217  
-0218  
+0217&#32;&#32;
+0218&#32;&#32;
 0219  def rooted_text(root: Path, relative: str) -&gt; str:
 0220      return bounded_text(rooted_path(root, relative), relative)
-0221  
-0222  
+0221&#32;&#32;
+0222&#32;&#32;
 0223  def terminate_process_group(process: subprocess.Popen[bytes]) -&gt; None:
 0224      try:
 0225          os.killpg(process.pid, signal.SIGKILL)
 0226      except ProcessLookupError:
 0227          pass
 0228      process.wait()
-0229  
-0230  
+0229&#32;&#32;
+0230&#32;&#32;
 0231  def collect_bounded_output(
 0232      process: subprocess.Popen[bytes],
 0233      label: str,
@@ -271,8 +271,8 @@
 0268              if stream is not None:
 0269                  stream.close()
 0270      return bytes(buffers[&quot;stdout&quot;]), bytes(buffers[&quot;stderr&quot;])
-0271  
-0272  
+0271&#32;&#32;
+0272&#32;&#32;
 0273  def run_bounded(
 0274      command: list[str],
 0275      cwd: Path,
@@ -291,8 +291,8 @@
 0288          raise ValidationError(f&quot;{label} execution failed&quot;) from error
 0289      stdout, stderr = collect_bounded_output(process, label, timeout_seconds)
 0290      return subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
-0291  
-0292  
+0291&#32;&#32;
+0292&#32;&#32;
 0293  def parse_manifest(
 0294      root: Path,
 0295      relative: str,
@@ -313,15 +313,15 @@
 0310      if ordered != sorted(ordered) or frozenset(ordered) != expected_paths:
 0311          raise ValidationError(f&quot;manifest path set or order differs: {relative}&quot;)
 0312      return entries
-0313  
-0314  
+0313&#32;&#32;
+0314&#32;&#32;
 0315  def verify_manifest_entries(root: Path, entries: dict[str, str], label: str) -&gt; None:
 0316      for relative, expected in entries.items():
 0317          actual = sha256_bytes(rooted_bytes(root, relative))
 0318          if actual != expected:
 0319              raise ValidationError(f&quot;{label} hash mismatch: {relative}&quot;)
-0320  
-0321  
+0320&#32;&#32;
+0321&#32;&#32;
 0322  def verify_package_file_set() -&gt; None:
 0323      paths = tuple(PACKAGE_ROOT.rglob(&quot;*&quot;))
 0324      symlinks = [path for path in paths if path.is_symlink()]
@@ -334,8 +334,8 @@
 0331          missing = sorted(PACKAGE_FILES - actual)
 0332          extra = sorted(actual - PACKAGE_FILES)
 0333          raise ValidationError(f&quot;Phase 2 package file set differs: {missing=}, {extra=}&quot;)
-0334  
-0335  
+0334&#32;&#32;
+0335&#32;&#32;
 0336  def verify_manifests(repository_root: Path) -&gt; None:
 0337      evidence_entries = parse_manifest(
 0338          PACKAGE_ROOT,
@@ -349,8 +349,8 @@
 0346          frozenset(GENERATION_2_ARTIFACTS),
 0347      )
 0348      verify_manifest_entries(repository_root, generation_entries, &quot;Generation 2 manifest&quot;)
-0349  
-0350  
+0349&#32;&#32;
+0350&#32;&#32;
 0351  def load_json(root: Path, relative: str, label: str) -&gt; dict[str, object]:
 0352      try:
 0353          value = json.loads(rooted_text(root, relative))
@@ -359,8 +359,8 @@
 0356      if not isinstance(value, dict):
 0357          raise ValidationError(f&quot;{label} root is not an object&quot;)
 0358      return value
-0359  
-0360  
+0359&#32;&#32;
+0360&#32;&#32;
 0361  def load_evidence_labels(repository_root: Path) -&gt; tuple[str, ...]:
 0362      standard = rooted_text(repository_root, &quot;docs/standards/deas/v1/standard.md&quot;)
 0363      try:
@@ -376,23 +376,23 @@
 0373      if len(labels) != 23 or len(set(labels)) != 23:
 0374          raise ValidationError(&quot;canonical evidence schema field set differs&quot;)
 0375      return labels
-0376  
-0377  
+0376&#32;&#32;
+0377&#32;&#32;
 0378  def evidence_values(record: str, label: str) -&gt; list[str]:
 0379      pattern = re.compile(
 0380          rf&quot;^- {re.escape(label)}[ \t]+(.+)$&quot;,
 0381          re.MULTILINE,
 0382      )
 0383      return [match.group(1).strip() for match in pattern.finditer(record)]
-0384  
-0385  
+0384&#32;&#32;
+0385&#32;&#32;
 0386  def evidence_contract_complete(record: str, labels: tuple[str, ...]) -&gt; bool:
 0387      return all(
 0388          len(values := evidence_values(record, label)) == 1 and bool(values[0])
 0389          for label in labels
 0390      )
-0391  
-0392  
+0391&#32;&#32;
+0392&#32;&#32;
 0393  def verify_evidence_gap_fields(record: str, relative: str) -&gt; None:
 0394      expected_fields = EVIDENCE_GAP_EXPECTATIONS[relative]
 0395      for label, expected in expected_fields.items():
@@ -402,8 +402,8 @@
 0399                  path=relative,
 0400                  rule_id=&quot;DEAS-EVIDENCE-001&quot;,
 0401              )
-0402  
-0403  
+0402&#32;&#32;
+0403&#32;&#32;
 0404  def read_generation_1_blob(repository_root: Path, relative: str) -&gt; bytes:
 0405      result = run_bounded(
 0406          [&quot;git&quot;, &quot;-C&quot;, str(repository_root), &quot;show&quot;, f&quot;{GENERATION_1_COMMIT}:{relative}&quot;],
@@ -416,16 +416,16 @@
 0413      if result.stderr:
 0414          raise ValidationError(&quot;Generation 1 Git emitted diagnostics&quot;)
 0415      return result.stdout
-0416  
-0417  
+0416&#32;&#32;
+0417&#32;&#32;
 0418  def ordered_line_subsequence(original: bytes, corrected: bytes) -&gt; bool:
 0419      corrected_lines = iter(corrected.splitlines(keepends=True))
 0420      return all(
 0421          any(candidate == line for candidate in corrected_lines)
 0422          for line in original.splitlines(keepends=True)
 0423      )
-0424  
-0425  
+0424&#32;&#32;
+0425&#32;&#32;
 0426  def verify_original_observations(
 0427      repository_root: Path,
 0428      labels: tuple[str, ...],
@@ -455,8 +455,8 @@
 0452          )
 0453          if roles != [b&quot;not assigned&quot;]:
 0454              raise ValidationError(f&quot;Role Disposition differs: {relative}&quot;)
-0455  
-0456  
+0455&#32;&#32;
+0456&#32;&#32;
 0457  def verify_unchanged_generation_1(repository_root: Path) -&gt; None:
 0458      for relative, expected_hash in GENERATION_1_UNCHANGED.items():
 0459          repository_relative = f&quot;{PACKAGE_PREFIX}/{relative}&quot;
@@ -464,8 +464,8 @@
 0461          current = rooted_bytes(PACKAGE_ROOT, relative)
 0462          if sha256_bytes(original) != expected_hash or current != original:
 0463              raise ValidationError(f&quot;unchanged Generation 1 artifact differs: {relative}&quot;)
-0464  
-0465  
+0464&#32;&#32;
+0465&#32;&#32;
 0466  def verify_phase_history(repository_root: Path) -&gt; None:
 0467      plan = rooted_text(PACKAGE_ROOT, &quot;qualification-plan.md&quot;)
 0468      trace = rooted_text(
@@ -498,12 +498,12 @@
 0495      )
 0496      if &quot;- [ ]&quot; in entry or any(marker not in entry for marker in entry_markers):
 0497          raise ValidationError(&quot;Phase 2 historical entry disposition is incomplete&quot;)
-0498  
-0499  
+0498&#32;&#32;
+0499&#32;&#32;
 0500  def record_status_is(value: object, status: str) -&gt; bool:
 0501      return isinstance(value, dict) and value.get(&quot;status&quot;) == status
-0502  
-0503  
+0502&#32;&#32;
+0503&#32;&#32;
 0504  def verify_generation_2_task(repository_root: Path) -&gt; None:
 0505      relative = f&quot;{PACKAGE_PREFIX}/degs/phase2-generation-2-task.json&quot;
 0506      task = load_json(repository_root, relative, &quot;Generation 2 DEGS task&quot;)
@@ -547,8 +547,8 @@
 0544          and review.get(&quot;evidence_path&quot;) == REVIEW_EVIDENCE_PATH
 0545      ):
 0546          raise ValidationError(&quot;Generation 2 package and delivery lifecycle differ&quot;)
-0547  
-0548  
+0547&#32;&#32;
+0548&#32;&#32;
 0549  def verify_generation_2_report(
 0550      repository_root: Path,
 0551      labels: tuple[str, ...],
@@ -580,8 +580,8 @@
 0577          and DISCREPANCY_REFERENCES.fullmatch(discrepancies[0]) is not None
 0578      ):
 0579          raise ValidationError(&quot;Generation 2 report discrepancy evidence differs&quot;)
-0580  
-0581  
+0580&#32;&#32;
+0581&#32;&#32;
 0582  def find_engineering_gate(repository_root: Path) -&gt; Path:
 0583      for root in (repository_root, *repository_root.parents):
 0584          candidate = root / ENGINEERING_GATE_RELATIVE
@@ -589,8 +589,8 @@
 0586              verify_engineering_gate_identity(candidate)
 0587              return candidate
 0588      raise ValidationError(&quot;canonical DEGS gate is unavailable&quot;)
-0589  
-0590  
+0589&#32;&#32;
+0590&#32;&#32;
 0591  def verify_engineering_gate_identity(gate: Path) -&gt; None:
 0592      actual = sha256_bytes(bounded_bytes(gate, ENGINEERING_GATE_RELATIVE))
 0593      if actual != ENGINEERING_GATE_SHA256:
@@ -599,8 +599,8 @@
 0596              path=ENGINEERING_GATE_RELATIVE,
 0597              rule_id=&quot;DEAS-PRE-003&quot;,
 0598          )
-0599  
-0600  
+0599&#32;&#32;
+0600&#32;&#32;
 0601  def verify_degs_result(
 0602      result: subprocess.CompletedProcess[bytes],
 0603      action: str,
@@ -637,8 +637,8 @@
 0634      )
 0635      if not valid:
 0636          raise ValidationError(f&quot;Generation 2 DEGS {action} schema differs&quot;)
-0637  
-0638  
+0637&#32;&#32;
+0638&#32;&#32;
 0639  def verify_generation_2_degs(repository_root: Path) -&gt; None:
 0640      gate = find_engineering_gate(repository_root)
 0641      task = repository_root / f&quot;{PACKAGE_PREFIX}/degs/phase2-generation-2-task.json&quot;
@@ -651,8 +651,8 @@
 0648          )
 0649          verify_degs_result(result, action)
 0650          verify_engineering_gate_identity(gate)
-0651  
-0652  
+0651&#32;&#32;
+0652&#32;&#32;
 0653  def verify_generation_records(repository_root: Path) -&gt; None:
 0654      history = rooted_text(PACKAGE_ROOT, &quot;generation-history.md&quot;)
 0655      source = rooted_text(PACKAGE_ROOT, &quot;source-register.md&quot;)
@@ -685,8 +685,8 @@
 0682          and GENERATION_2_TASK_ID in handoff
 0683      ):
 0684          raise ValidationError(&quot;Generation 2 handoff state differs&quot;)
-0685  
-0686  
+0685&#32;&#32;
+0686&#32;&#32;
 0687  def verify_privacy_boundary() -&gt; None:
 0688      texts: list[str] = []
 0689      total = 0
@@ -715,8 +715,8 @@
 0712              raise ValidationError(f&quot;prohibited or secret-like material: {label}&quot;)
 0713      if &quot;QUALIFIED_FOR_BOUNDED_ROLE&quot; in combined or &quot;QUALIFIED_OUT&quot; in combined:
 0714          raise ValidationError(&quot;a forbidden Role Disposition is present&quot;)
-0715  
-0716  
+0715&#32;&#32;
+0716&#32;&#32;
 0717  def validate_generation_2(repository_root: Path) -&gt; None:
 0718      verify_package_file_set()
 0719      verify_manifests(repository_root)
@@ -729,8 +729,8 @@
 0726      verify_generation_records(repository_root)
 0727      verify_privacy_boundary()
 0728      verify_generation_2_degs(repository_root)
-0729  
-0730  
+0729&#32;&#32;
+0730&#32;&#32;
 0731  def parse_arguments(arguments: list[str]) -&gt; argparse.Namespace:
 0732      parser = Phase2ArgumentParser(
 0733          description=&quot;Validate Phase 2 Generation 2 through its public seam.&quot;
@@ -739,8 +739,8 @@
 0736      parser.add_argument(&quot;--generation&quot;, required=True, type=int, choices=(2,))
 0737      parser.add_argument(&quot;--json&quot;, required=True, action=&quot;store_true&quot;)
 0738      return parser.parse_args(arguments)
-0739  
-0740  
+0739&#32;&#32;
+0740&#32;&#32;
 0741  def error_payload(error: ValidationError) -&gt; dict[str, object]:
 0742      return {
 0743          &quot;decision&quot;: &quot;ERROR&quot;,
@@ -755,8 +755,8 @@
 0752          &quot;generation&quot;: 2,
 0753          &quot;schema_version&quot;: 2,
 0754      }
-0755  
-0756  
+0755&#32;&#32;
+0756&#32;&#32;
 0757  def main() -&gt; int:
 0758      raw_arguments = sys.argv[1:]
 0759      json_requested = &quot;--json&quot; in raw_arguments
@@ -789,8 +789,8 @@
 0786      }
 0787      print(json.dumps(payload, sort_keys=True))
 0788      return 0
-0789  
-0790  
+0789&#32;&#32;
+0790&#32;&#32;
 0791  if __name__ == &quot;__main__&quot;:
 0792      sys.exit(main())
 </pre>
