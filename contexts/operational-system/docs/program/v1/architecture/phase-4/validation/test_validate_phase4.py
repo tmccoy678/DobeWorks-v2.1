@@ -58,14 +58,20 @@ class Phase4ValidatorTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.repo = Path(self.temporary.name) / "repo"
         self.addCleanup(self.temporary.cleanup)
-        subprocess.run(
+        result = subprocess.run(
             ["git", "clone", "--quiet", "--no-hardlinks", "--no-checkout",
-             str(ROOT), str(self.repo)], check=True, timeout=20,
+             str(ROOT), str(self.repo)], check=False, capture_output=True, text=True, timeout=20,
         )
-        subprocess.run(
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        self.assertEqual(result.stderr, "")
+        self.assertEqual(result.stdout, "")
+        result = subprocess.run(
             ["git", "-C", str(self.repo), "checkout", "--quiet", "--detach",
-             PACKAGE_COMMIT], check=True, timeout=20,
+             PACKAGE_COMMIT], check=False, capture_output=True, text=True, timeout=20,
         )
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        self.assertEqual(result.stderr, "")
+        self.assertEqual(result.stdout, "")
 
     def rehash(self) -> str:
         manifest = self.repo / MANIFEST_RELATIVE

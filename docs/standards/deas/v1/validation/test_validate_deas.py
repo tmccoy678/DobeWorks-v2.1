@@ -973,14 +973,20 @@ class DeasValidatorCliTests(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         root = Path(temporary.name) / "repo"
-        subprocess.run(
+        result = subprocess.run(
             ["git", "clone", "--quiet", "--no-hardlinks", "--no-checkout",
-             str(REPOSITORY_ROOT), str(root)], check=True, timeout=20,
+             str(REPOSITORY_ROOT), str(root)], check=False, capture_output=True, text=True, timeout=20,
         )
-        subprocess.run(
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        self.assertEqual(result.stderr, "")
+        self.assertEqual(result.stdout, "")
+        result = subprocess.run(
             ["git", "-C", str(root), "checkout", "--quiet", "--detach",
-             DEFINITION_PACKAGE_COMMIT], check=True, timeout=20,
+             DEFINITION_PACKAGE_COMMIT], check=False, capture_output=True, text=True, timeout=20,
         )
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        self.assertEqual(result.stderr, "")
+        self.assertEqual(result.stdout, "")
         return root
 
     def test_definition_rejects_edited_historical_readme(self) -> None:

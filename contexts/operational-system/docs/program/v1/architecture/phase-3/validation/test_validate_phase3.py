@@ -39,14 +39,20 @@ class Phase3PublicCliTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary.name) / "repo"
         self.addCleanup(self.temporary.cleanup)
-        subprocess.run(
+        result = subprocess.run(
             ["git", "clone", "--quiet", "--no-hardlinks", "--no-checkout",
-             str(SOURCE_REPOSITORY), str(self.root)], check=True, timeout=20,
+             str(SOURCE_REPOSITORY), str(self.root)], check=False, capture_output=True, text=True, timeout=20,
         )
-        subprocess.run(
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        self.assertEqual(result.stderr, "")
+        self.assertEqual(result.stdout, "")
+        result = subprocess.run(
             ["git", "-C", str(self.root), "checkout", "--quiet", "--detach",
-             PACKAGE_COMMIT], check=True, timeout=20,
+             PACKAGE_COMMIT], check=False, capture_output=True, text=True, timeout=20,
         )
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        self.assertEqual(result.stderr, "")
+        self.assertEqual(result.stdout, "")
         # Phase 3 binds its CLI to the containing repository. Only the disposable
         # candidate receives today's executable; its documents stay pinned.
         shutil.copy2(SOURCE_REPOSITORY / VALIDATOR_RELATIVE, self.root / VALIDATOR_RELATIVE)
