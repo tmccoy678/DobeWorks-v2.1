@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Public-seam tests for the exact Phase 4 package validator."""
+"""Current Phase 4 validator tests with isolated historical package inputs."""
 
 from __future__ import annotations
 
@@ -13,6 +13,7 @@ import unittest
 from pathlib import Path
 
 
+PACKAGE_COMMIT = "8f1ccb567af7be41c20452c34ae64c672136e317"
 ROOT = Path(__file__).resolve().parents[8]
 VALIDATOR_RELATIVE = "contexts/operational-system/docs/program/v1/architecture/phase-4/validation/validate_phase4.py"
 MANIFEST_RELATIVE = "contexts/operational-system/docs/program/v1/architecture/phase-4/phase-4-sha256.txt"
@@ -56,21 +57,21 @@ class Phase4ValidatorTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
         self.repo = Path(self.temporary.name) / "repo"
-        subprocess.run(["git", "clone", "--quiet", "--no-hardlinks", str(ROOT), str(self.repo)], timeout=20, check=True)
-        for relative in PACKAGE_FILES:
-            destination = self.repo / relative
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(ROOT / relative, destination)
-        self.rehash()
-        subprocess.run(["git", "-C", str(self.repo), "config", "user.name", "Phase4 Test"], timeout=10, check=True)
-        subprocess.run(["git", "-C", str(self.repo), "config", "user.email", "phase4-test@invalid"], timeout=10, check=True)
-        subprocess.run(["git", "-C", str(self.repo), "add", "--", *PACKAGE_FILES], timeout=10, check=True)
-        status = subprocess.run(["git", "-C", str(self.repo), "status", "--porcelain"], text=True, capture_output=True, timeout=10, check=True)
-        if status.stdout:
-            subprocess.run(["git", "-C", str(self.repo), "commit", "--quiet", "-m", "Phase 4 validator fixture"], timeout=20, check=True)
-
-    def tearDown(self) -> None:
-        self.temporary.cleanup()
+        self.addCleanup(self.temporary.cleanup)
+        result = subprocess.run(
+            ["git", "clone", "--quiet", "--no-hardlinks", "--no-checkout",
+             str(ROOT), str(self.repo)], check=False, capture_output=True, text=True, timeout=20,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        self.assertEqual(result.stderr, "")
+        self.assertEqual(result.stdout, "")
+        result = subprocess.run(
+            ["git", "-C", str(self.repo), "checkout", "--quiet", "--detach",
+             PACKAGE_COMMIT], check=False, capture_output=True, text=True, timeout=20,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        self.assertEqual(result.stderr, "")
+        self.assertEqual(result.stdout, "")
 
     def rehash(self) -> str:
         manifest = self.repo / MANIFEST_RELATIVE
@@ -81,7 +82,7 @@ class Phase4ValidatorTests(unittest.TestCase):
     def run_validator(self, manifest_sha=None, spec_sha=SPEC_SHA256, root=None):
         selected_root = root or self.repo
         selected_manifest = manifest_sha or digest(selected_root / MANIFEST_RELATIVE)
-        selected_validator = selected_root / VALIDATOR_RELATIVE
+        selected_validator = VALIDATOR
         command = [sys.executable, "-B", str(selected_validator), "--repository-root", str(selected_root), "--manifest-sha256", selected_manifest, "--external-spec", str(SPEC), "--external-spec-sha256", spec_sha, "--json"]
         completed = subprocess.run(command, text=True, capture_output=True, timeout=30, check=False)
         return completed, json.loads(completed.stdout)
@@ -119,11 +120,12 @@ class Phase4ValidatorTests(unittest.TestCase):
         self.assert_finding(result, "DEAS-GIT-001")
 
     def test_missing_and_extra_package_files_fail(self) -> None:
+        original = (self.repo / PACKAGE_FILES[-1]).read_bytes()
         (self.repo / PACKAGE_FILES[-1]).unlink()
         completed, result = self.run_validator()
         self.assertEqual(completed.returncode, 1)
         self.assert_finding(result, "DEAS-PATH-001")
-        shutil.copy2(ROOT / PACKAGE_FILES[-1], self.repo / PACKAGE_FILES[-1])
+        (self.repo / PACKAGE_FILES[-1]).write_bytes(original)
         self.rehash()
         extra = self.repo / "contexts/operational-system/docs/program/v1/architecture/phase-4/extra.md"
         extra.write_text("extra\n", encoding="utf-8")

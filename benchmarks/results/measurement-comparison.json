@@ -1,0 +1,7 @@
+{
+  "previous_run_sha256": "1bd78553b0ff09a221b45a0c328e0a02a03fa2738ec4b85e8bde1980110bbcde",
+  "corrected_run_sha256": "0bc86c770df25f1b9c9831fde543ec299e8d95bcb47c6fc565c22ec62144375d",
+  "manifest_unchanged": true,
+  "changed_cases": [],
+  "expected_changes": 0
+}

@@ -1,5 +1,13 @@
 # DobeWorks — v2.1 development draft
 
+## Figures and references
+
+[Read the illustrated system guide](docs/figures/README.md) for the relevant PDF figures and reflowable HTML equivalents. The [44-work APA reference edition](references/engineering-foundations-references.pdf) includes a [source-verification audit](references/verification.md).
+
+## Public-data benchmark
+
+**318 of 318 public inputs produced controlled, unusable telemetry outcomes. Both native controls passed.** See [benchmark results and reproduction](benchmarks/benchmark.md).
+
 DobeWorks brings engineering intent, bounded execution, evidence, and review into one inspectable workflow. Its current synthetic Worker checks a job's identity and limits before staging a result. Its Observer reports only permitted signals and marks unavailable or stale evidence explicitly.
 
 **Private development draft. Not qualified or publicly released.** This copy starts from DobeWorks commit `7374f7e21251e17ff40ef0e5a334e7fdd3d31684`. The existing source and fixtures are unchanged. The companion [DEGS draft](https://github.com/tmccoy678/draftdegs) demonstrates the evidence gate and a small Sashiko-derived Python component.
@@ -44,9 +52,9 @@ python3 -B -m unittest discover \
   -s contexts/operational-system/software/phase4 -p 'test_*.py' -v
 ```
 
-All **70 Worker/Observer tests passed** in the recorded environment. The tests include malformed input, identity drift, resource limits, cancellation, privacy fields, and unavailable evidence. The broader run also passed 28 DEAS tests and 32 Phase 4 validator tests. The historical Phase 3 suite passed 18 of 19 tests; one frozen-manifest mismatch also occurs in the untouched source snapshot. It remains unresolved and prevents an all-tests-passing or public-release-ready claim.
+The current run passes **70 Worker/Observer tests** and **six benchmark tests**. Across the existing 149-test suite, 145 pass and four historical package assertions fail: one DEAS README identity mismatch, one Phase 3 manifest mismatch, and two Phase 4 exact Git-diff scope checks. These failures occur at the supplied baseline too. Frozen manifests remain unchanged.
 
-[The test report](docs/draft-test-report.md) contains exact commands, results, source identity, the inherited failure, and limitations. [Raw evidence](docs/draft-test-evidence.json) is available for inspection. Test counts are bounded evidence, not a guarantee of correctness, safety, or qualification. Other platforms and clean-user installation have not been tested in this workflow.
+[Current validation and scope](docs/benchmark-correction.md) explains the distinction. [Current raw tests](benchmarks/results/validation-v2.json) and the [earlier draft report](docs/draft-test-report.md) preserve both observations. Test counts are bounded evidence, not a guarantee of correctness, safety, or qualification. Other platforms and clean-user installation have not been tested in this workflow.
 
 ## Context and next work
 
@@ -59,4 +67,4 @@ The Sashiko-derived work lives in the companion DEGS draft. Muchun Song receives
 
 Taylor welcomes questions, corrections, and help making the work more useful and efficient, and will respond as quickly as possible. Use issues for non-sensitive questions. No response-time guarantee is promised.
 
-Public Apache-2.0 distribution remains planned. This private snapshot retains historical project records, identity material, and original scope statements; copying it does not clear all of that material for public release or grant new rights to it. Resolve the inherited test failure, source/asset rights, public packaging, and fresh-user installation before publication. No public release tag or universal platform-support claim is made here.
+Public Apache-2.0 distribution remains planned. This private snapshot retains historical project records, identity material, and original scope statements; copying it does not clear all of that material for public release or grant new rights to it. Resolve the inherited package-test failures, source/asset rights, public packaging, and fresh-user installation before publication. No public release tag or universal platform-support claim is made here.
