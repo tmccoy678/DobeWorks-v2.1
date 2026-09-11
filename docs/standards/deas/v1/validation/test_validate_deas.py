@@ -33,6 +33,7 @@ DEAS_REPORT_COMMAND = (
     '--identity-manifest-sha256 "$DEAS_GENERATION_2_MANIFEST_SHA256" '
     "--json --repository-root ."
 )
+DEFINITION_PACKAGE_COMMIT = "ca8efcefe6568a7a64b5b6d930031dff0131efec"
 MAX_GIT_BLOB_BYTES = 4 * 1024 * 1024
 
 
@@ -968,10 +969,32 @@ class DeasValidatorCliTests(unittest.TestCase):
 
         self.assert_validation_error(result, "Generation 1 Git emitted diagnostics")
 
+    def definition_package_fixture(self) -> Path:
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name) / "repo"
+        subprocess.run(
+            ["git", "clone", "--quiet", "--no-hardlinks", "--no-checkout",
+             str(REPOSITORY_ROOT), str(root)], check=True, timeout=20,
+        )
+        subprocess.run(
+            ["git", "-C", str(root), "checkout", "--quiet", "--detach",
+             DEFINITION_PACKAGE_COMMIT], check=True, timeout=20,
+        )
+        return root
+
+    def test_definition_rejects_edited_historical_readme(self) -> None:
+        root = self.definition_package_fixture()
+        readme = root / "README.md"
+        readme.write_text(readme.read_text(encoding="utf-8") + "\nchanged\n", encoding="utf-8")
+        result = self.run_cli("definition", "--json", repository_root=root)
+        self.assert_validation_error(result, "artifact manifest mismatch: README.md")
+
     def test_definition_passes_with_frozen_generation_1_regression(self) -> None:
-        task = json.loads(DEFINITION_TASK.read_text(encoding="utf-8"))
+        root = self.definition_package_fixture()
+        task = json.loads((root / DEFINITION_TASK.relative_to(REPOSITORY_ROOT)).read_text(encoding="utf-8"))
         self.assertEqual("READY_FOR_EXECUTION", task["status"])
-        result = self.run_cli("definition", "--json")
+        result = self.run_cli("definition", "--json", repository_root=root)
 
         self.assertEqual(0, result.returncode, result.stderr)
         self.assertEqual(

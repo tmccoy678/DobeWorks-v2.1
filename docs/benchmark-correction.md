@@ -6,6 +6,8 @@ Both harnesses now preserve partial timeout diagnostics and actual script invoca
 
 ## Observer and historical package checks
 
+**Later test-fixture correction:** historical package samples now come from pinned commits, while the current validator CLIs remain under test. All 150 tests pass: DEAS 29, Phase 3 19, Phase 4 32, and current Worker/Observer 70. The four failures described below are retained as the earlier observation, not the result of the corrected setup. See [historical package test scope](historical-package-tests.md) and [new test evidence](historical-package-test-results.json).
+
 The Observer source and fixtures remain unchanged. All 318 public out-of-contract inputs still produce controlled unusable outcomes; both native controls pass. This is application rejection evidence, not JSON parser conformance or whole-system assurance. All 70 Worker/Observer tests and six benchmark tests pass.
 
 The existing 149-test suite has 145 passes and four failures: DEAS 27/28, Phase 3 18/19, Phase 4 package validation 30/32, Worker/Observer 70/70. These reproduce at the approved base 793ed01. The DEAS manifest expects an older README identity; Phase 3 likewise expects its frozen Operational System README. Phase 4's positive package tests assert an exact diff against their historical baseline, but the supplied draft base already contains documentation paths outside that package. The current benchmark commit adds more paths outside that historical package; it cannot qualify as that exact package either.

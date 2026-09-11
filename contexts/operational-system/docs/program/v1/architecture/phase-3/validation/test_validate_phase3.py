@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Public-seam tests for the Phase 3 package validator."""
+"""Current Phase 3 validator tests with pinned historical package inputs."""
 
 from __future__ import annotations
 
@@ -16,49 +16,8 @@ from pathlib import Path
 PACKAGE_PREFIX = "contexts/operational-system/docs/program/v1/architecture/phase-3"
 VALIDATOR_RELATIVE = f"{PACKAGE_PREFIX}/validation/validate_phase3.py"
 MANIFEST_RELATIVE = f"{PACKAGE_PREFIX}/phase-3-sha256.txt"
+PACKAGE_COMMIT = "f507e927cf98992b7679e46cf536a70fc2fd9c49"
 SOURCE_REPOSITORY = Path(__file__).resolve().parents[8]
-PACKAGE_FILES = (
-    "contexts/operational-system/README.md",
-    "contexts/operational-system/docs/program/v1/program-definition.md",
-    "contexts/operational-system/docs/program/v1/traceability-matrix.md",
-    f"{PACKAGE_PREFIX}/architecture-plan.md",
-    f"{PACKAGE_PREFIX}/authority-and-threat-map.md",
-    f"{PACKAGE_PREFIX}/data-and-signal-map.md",
-    f"{PACKAGE_PREFIX}/degs/phase3-task.json",
-    f"{PACKAGE_PREFIX}/fault-and-safe-degradation.md",
-    f"{PACKAGE_PREFIX}/handoff.md",
-    f"{PACKAGE_PREFIX}/operations-lifecycle-policy.md",
-    f"{PACKAGE_PREFIX}/phase-3-sha256.txt",
-    f"{PACKAGE_PREFIX}/recovery-and-capacity-policy.md",
-    f"{PACKAGE_PREFIX}/role-architecture.md",
-    f"{PACKAGE_PREFIX}/role-dispositions.md",
-    f"{PACKAGE_PREFIX}/source-register.md",
-    f"{PACKAGE_PREFIX}/validation/test_validate_phase3.py",
-    f"{PACKAGE_PREFIX}/validation/validate_phase3.py",
-    f"{PACKAGE_PREFIX}/validation/validation-report.md",
-)
-SOURCE_FILES = (
-    "CONTEXT-MAP.md",
-    "docs/adr/0013-distinct-operational-system-context.md",
-    "docs/standards/deas/v1/standard.md",
-    "docs/standards/deas/v1/deas-v1-sha256.txt",
-    "contexts/operational-system/CONTEXT.md",
-    "contexts/operational-system/docs/program/v1/requirements.md",
-    "contexts/operational-system/docs/program/v1/decisions.md",
-    "contexts/operational-system/docs/program/v1/evidence-and-audit-plan.md",
-    "contexts/operational-system/docs/program/v1/fault-test-matrix.md",
-    "contexts/operational-system/docs/program/v1/phase-2-entry-criteria.md",
-    "contexts/operational-system/docs/program/v1/provenance.md",
-    "contexts/operational-system/docs/program/v1/qualification/phase-2/handoff.md",
-    "contexts/operational-system/docs/program/v1/qualification/phase-2/discrepancies-and-unknowns.md",
-    "contexts/operational-system/docs/program/v1/qualification/phase-2/degs/phase2-generation-2-task.json",
-    "contexts/operational-system/docs/program/v1/qualification/phase-2/generation-2-sha256.txt",
-    "contexts/operational-system/docs/program/v1/qualification/phase-2/validation/validation-report.md",
-    "contexts/operational-system/docs/program/v1/qualification/phase-2/evidence/current-mac-baseline.md",
-    "contexts/operational-system/docs/program/v1/qualification/phase-2/evidence/seagate-device-volume.md",
-    "contexts/operational-system/docs/program/v1/qualification/phase-2/evidence/worker-candidate.md",
-    "contexts/operational-system/docs/program/v1/qualification/phase-2/evidence/observer-surface.md",
-)
 
 
 def sha256(path: Path) -> str:
@@ -79,14 +38,19 @@ class Phase3PublicCliTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary.name) / "repo"
-        for relative in (*PACKAGE_FILES, *SOURCE_FILES):
-            source = SOURCE_REPOSITORY / relative
-            target = self.root / relative
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source, target)
-
-    def tearDown(self) -> None:
-        self.temporary.cleanup()
+        self.addCleanup(self.temporary.cleanup)
+        subprocess.run(
+            ["git", "clone", "--quiet", "--no-hardlinks", "--no-checkout",
+             str(SOURCE_REPOSITORY), str(self.root)], check=True, timeout=20,
+        )
+        subprocess.run(
+            ["git", "-C", str(self.root), "checkout", "--quiet", "--detach",
+             PACKAGE_COMMIT], check=True, timeout=20,
+        )
+        # Phase 3 binds its CLI to the containing repository. Only the disposable
+        # candidate receives today's executable; its documents stay pinned.
+        shutil.copy2(SOURCE_REPOSITORY / VALIDATOR_RELATIVE, self.root / VALIDATOR_RELATIVE)
+        refresh_manifest(self.root)
 
     def run_cli(
         self,
