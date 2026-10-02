@@ -1,6 +1,6 @@
 # Public-data benchmark selection for current DW/DEGS
 
-Date: 2026-09-11. Research and corpus inventory only; no benchmark implementation or execution. Public datasets do not authorize publication of project code or results. The project copies remain private unless Taylor authorizes otherwise.
+Date: 2026-09-11. This is the pre-execution selection record. At that time, research and corpus inventory alone did not authorize publication. The repository owner later authorized the public source snapshot in [ADR 0015](../docs/adr/0015-publish-the-source-snapshot.md).
 
 ## Recommended achievable benchmark
 

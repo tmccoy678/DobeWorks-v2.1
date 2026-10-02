@@ -14,7 +14,7 @@ DEAS and Phase 4 invoke the current validator script outside the fixture checkou
 
 The previously failing tests were the DEAS definition positive case, Phase 3 exact-package positive case, and Phase 4's valid-package and clean-committed-package cases. An additional DEAS negative case proves that changing the historical README still fails its manifest check. Current Worker and Observer behavior remains covered by their separate suite against current source.
 
-These tests require full local Git history. Phase 4 retains its existing externally pinned specification dependency; an archive-only checkout without the required objects or specification is insufficient. The change does not claim to resolve that separate portability limitation.
+These tests require full local Git history. Phase 4 also retains an externally pinned historical specification that is not distributed here. Set `DOBEWORKS_PHASE4_SPEC` to an authorized copy with the recorded SHA-256 identity. Without it, the Phase 4 historical tests skip; the current Worker/Observer and benchmark suites remain fully runnable from the public checkout.
 
 ## Run
 
@@ -26,3 +26,5 @@ python3 -B -m unittest discover -s contexts/operational-system/docs/program/v1/a
 python3 -B -m unittest discover -s contexts/operational-system/docs/program/v1/architecture/phase-4/validation -p 'test_*.py' -v
 python3 -B -m unittest discover -s contexts/operational-system/software/phase4 -p 'test_*.py' -v
 ```
+
+The Phase 4 command runs its 32 cases only when `DOBEWORKS_PHASE4_SPEC` names the required historical artifact.

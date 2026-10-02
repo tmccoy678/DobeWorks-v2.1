@@ -1,3 +1,7 @@
+---
+status: superseded by ADR 0015 for this repository's source snapshot
+---
+
 # Keep the current scope private and personal
 
-DobeWorks is currently Taylor's private personal engineering system and identity. Work may produce complete, validated assets for Taylor's own use, but it is not preparation for a public launch, external offering, commercial identity, or organizational adoption. Any move beyond Taylor's Private Use is a different scope that requires Taylor to make a new explicit decision; it cannot be inferred from asset completion, repository history, or prior exploratory discussion.
+DobeWorks was scoped here as Taylor's private personal engineering system and identity. This decision remains historical evidence for the identity work. ADR 0015 records the later explicit decision to publish this repository's source snapshot without authorizing private-source publication, a hosted service, a commercial identity, or organizational adoption.

@@ -1,12 +1,12 @@
 # DobeWorks
 
-DobeWorks is Taylor's private personal engineering system for methodological systems, software, research infrastructure, and special projects, together with the identity that represents that work. It is not currently a public organization, service, or commercial offering.
+DobeWorks is Taylor's personal engineering system for methodological systems, software, research infrastructure, and special projects, together with the identity that represents that work. Selected source code and documentation are publicly shared in this repository. DobeWorks is not a public organization, hosted service, or commercial offering.
 
 ## Language
 
 **DobeWorks**:
-The complete, standalone name of Taylor's private personal engineering system and its identity. Use it without a category or project suffix.
-_Avoid_: Company, public offering, qualified forms of the DobeWorks name
+The complete, standalone name of Taylor's personal engineering system and its identity. Use it without a category or project suffix.
+_Avoid_: Company, hosted service, qualified forms of the DobeWorks name
 
 **DobeWorks Mark**:
 The core, static DobeWorks symbol: Marie's left-facing silhouette crossing the divided Eclipse Ring. Refinement may perfect its anatomy and geometry without replacing, mirroring, or reorienting the concept.
@@ -65,8 +65,8 @@ A DobeWorks identity package approved for Taylor's Private Use after defined val
 _Avoid_: Publicly cleared identity, auto-approved output
 
 **Public Release**:
-Any publication, marketing, external distribution, commercial use, or adoption by a person or organization other than Taylor. Public Release is outside the current project scope and is not authorized. It would require a new explicit scope decision and its own professional-clearance gates.
-_Avoid_: Implied next phase, incidental authorization
+Publication or external distribution of a named DobeWorks artifact. This source snapshot is public under its repository license. A release of the DobeWorks identity package, private sources, hosted service, or commercial offering remains a separate decision with its own clearance gates.
+_Avoid_: Treating a source-code publication as approval for unrelated identity assets or services
 
 **Private Source**:
 An original Marie photograph used to establish identity and contour. Private Sources remain outside version control; the repository records their provenance and integrity without publishing the photographs.

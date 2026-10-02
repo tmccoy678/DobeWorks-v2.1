@@ -1,22 +1,22 @@
-# DobeWorks — v2.1 development draft
+# DobeWorks v2.1
 
-## Figures and references
+DobeWorks is a public development snapshot of a personal engineering system. This repository contains two runnable, standard-library Python demonstrations:
 
-[Read the illustrated system guide](docs/figures/README.md) for the relevant PDF figures and reflowable HTML equivalents. The [44-work APA reference edition](references/engineering-foundations-references.pdf) includes a [source-verification audit](references/verification.md).
+- **Observer Core** turns a bounded synthetic snapshot into a minimized status record and makes stale or unavailable evidence explicit.
+- **Worker Core** validates a bounded synthetic job and stages its result without accepting or promoting it.
 
-## Public-data benchmark
+The examples use synthetic fixtures. They do not inspect a device, install a service, grant authority, or qualify a production system.
 
-**318 of 318 public inputs produced controlled, unusable telemetry outcomes. Both native controls passed.** See [benchmark results and reproduction](benchmarks/benchmark.md).
+## Quick start
 
-DobeWorks brings engineering intent, bounded execution, evidence, and review into one inspectable workflow. Its current synthetic Worker checks a job's identity and limits before staging a result. Its Observer reports only permitted signals and marks unavailable or stale evidence explicitly.
+Python 3.9 or later is required. No package installation is needed.
 
-**Private development draft. Not qualified or publicly released.** This copy starts from DobeWorks commit `7374f7e21251e17ff40ef0e5a334e7fdd3d31684`. The existing source and fixtures are unchanged. The companion [DEGS draft](https://github.com/tmccoy678/draftdegs) demonstrates the evidence gate and a small Sashiko-derived Python component.
+```sh
+git clone https://github.com/tmccoy678/DobeWorks-v2.1.git
+cd DobeWorks-v2.1
+```
 
-## See it work
-
-Use an Apple-silicon Mac with Python 3.9 or later. Python 3.9.6 on macOS 26.6.2 was tested. These examples use synthetic fixture data and historical fixture time, not your current device or live operational records. Private repository access is currently required.
-
-From the checkout root, observe a fresh synthetic snapshot:
+Run the Observer against the included fresh fixture:
 
 ```sh
 python3 -B contexts/operational-system/software/phase4/observer_core.py \
@@ -26,45 +26,45 @@ python3 -B contexts/operational-system/software/phase4/observer_core.py \
   --now 2026-09-06T00:01:00Z
 ```
 
-Expected and observed: `status: VALIDATED`, `freshness: FRESH`, exit 0. The output includes the inspected snapshot and policy hashes and limits its claims to synthetic observation.
+The result has `status: VALIDATED` and `freshness: FRESH`. Change `--now` to `2026-09-07T00:01:00Z` to see stale evidence become `TELEMETRY_UNAVAILABLE` with unknown signals.
 
-Repeat the command with `--now 2026-09-07T00:01:00Z`. Expected and observed: `status: TELEMETRY_UNAVAILABLE`, `freshness: STALE`, and signals set to `UNKNOWN`. Exit 0 means the structured observation was emitted; it does **not** mean the evidence is fresh or suitable for a decision. Read the status fields.
-
-To stage a bounded synthetic job, create a disposable directory and run:
+Run one Worker job in a disposable directory:
 
 ```sh
-DEMO_STAGE=$(mktemp -d)
+demo_stage=$(mktemp -d)
 python3 -B contexts/operational-system/software/phase4/worker_core.py \
   --envelope contexts/operational-system/software/phase4/fixtures/job-envelope.json \
   --input contexts/operational-system/software/phase4/fixtures/input-records.json \
-  --staging-root "$DEMO_STAGE" \
+  --staging-root "$demo_stage" \
   --allowed-input-root contexts/operational-system/software/phase4/fixtures \
   --configuration-sha256 ba0e803fc49b7a78989a44c9c9beb9789e37980b7ce92654a89d3f364460873d \
   --now 2026-09-06T00:01:00Z
 ```
 
-Expected and observed: `COMPLETED_UNACCEPTED`, one attempt, no promotion, exit 0. Inspect the files in `$DEMO_STAGE`. This example writes synthetic output there; it neither accepts the result nor deploys anything. The [core documentation](contexts/operational-system/software/phase4/README.md) explains the exact checks and limits.
+The expected state is `COMPLETED_UNACCEPTED`. Inspect the staged files, then remove the disposable directory when finished. The [software-core guide](contexts/operational-system/software/phase4/README.md) explains the checks and limits.
 
-## Understand the evidence
+## Tests
+
+The ordinary public tests use only the checkout and Python standard library:
 
 ```sh
 python3 -B -m unittest discover \
-  -s contexts/operational-system/software/phase4 -p 'test_*.py' -v
+  -s contexts/operational-system/software/phase4 -p 'test_*_core.py' -v
+python3 -B -m unittest discover -s benchmarks -p 'test_*.py' -v
 ```
 
-The current run passes **70 Worker/Observer tests** and **six benchmark tests**. Across the existing 149-test suite, 145 pass and four historical package assertions fail: one DEAS README identity mismatch, one Phase 3 manifest mismatch, and two Phase 4 exact Git-diff scope checks. These failures occur at the supplied baseline too. Frozen manifests remain unchanged.
+The current suite contains 70 Worker/Observer tests and six benchmark tests. The benchmark exercises 318 public JSON inputs plus two native controls. These results cover the included synthetic behaviors; they do not prove security, correctness, device support, or production readiness.
 
-[Current validation and scope](docs/benchmark-correction.md) explains the distinction. [Current raw tests](benchmarks/results/validation-v2.json) and the [earlier draft report](docs/draft-test-report.md) preserve both observations. Test counts are bounded evidence, not a guarantee of correctness, safety, or qualification. Other platforms and clean-user installation have not been tested in this workflow.
+Historical package-validator tests are separate. They use pinned Git history, and the Phase 4 set also needs the original external specification through `DOBEWORKS_PHASE4_SPEC`. A normal source archive does not contain that historical artifact. See [historical package tests](docs/historical-package-tests.md).
 
-## Context and next work
+## Documentation
 
-- [Operational System](contexts/operational-system/README.md) describes the current engineering program.
-- [DEAS v1.0](docs/standards/deas/v1/standard.md) defines the assurance framework.
-- [Citations and credit](CITATIONS.md) explain the source material and test-reporting research.
-- [Security policy](SECURITY.md) explains how to request a private reporting channel.
+- [Illustrated system guide](docs/figures/README.md)
+- [Benchmark method and results](benchmarks/benchmark.md)
+- [DobeWorks Engineering Assurance Standard](docs/standards/deas/v1/standard.md)
+- [Citations and source credit](CITATIONS.md)
+- [Companion DEGS repository](https://github.com/tmccoy678/DEGS-v2.1)
 
-The Sashiko-derived work lives in the companion DEGS draft. Muchun Song receives credit for dismissed concerns and conflict resolution; Chris Mason receives credit for the review-prompts foundation, alongside the Sashiko contributors. Those are distinct contributions. No Sashiko service or model review is running in this repository.
+This is a development snapshot without a versioned release or universal platform-support claim. It was recorded on Apple silicon with macOS 26.6.2 and Python 3.9.6; the standard-library examples are intended to be portable, while other environments remain unverified.
 
-Taylor welcomes questions, corrections, and help making the work more useful and efficient, and will respond as quickly as possible. Use issues for non-sensitive questions. No response-time guarantee is promised.
-
-Public Apache-2.0 distribution remains planned. This private snapshot retains historical project records, identity material, and original scope statements; copying it does not clear all of that material for public release or grant new rights to it. Resolve the inherited package-test failures, source/asset rights, public packaging, and fresh-user installation before publication. No public release tag or universal platform-support claim is made here.
+Except for material identified in [third-party notices](THIRD_PARTY_NOTICES.md) and under its own license, this repository is available under the [Apache License 2.0](LICENSE). Use [issues](https://github.com/tmccoy678/DobeWorks-v2.1/issues) for non-sensitive questions and [SECURITY.md](SECURITY.md) for vulnerability reporting.

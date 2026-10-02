@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -18,7 +19,9 @@ ROOT = Path(__file__).resolve().parents[8]
 VALIDATOR_RELATIVE = "contexts/operational-system/docs/program/v1/architecture/phase-4/validation/validate_phase4.py"
 MANIFEST_RELATIVE = "contexts/operational-system/docs/program/v1/architecture/phase-4/phase-4-sha256.txt"
 VALIDATOR = ROOT / VALIDATOR_RELATIVE
-SPEC = Path("/Users/taylor/AI-Workspace/.scratch/dobeworks-operational-system-phase4-software-core/spec.md")
+SPEC_ENV = "DOBEWORKS_PHASE4_SPEC"
+SPEC_VALUE = os.environ.get(SPEC_ENV)
+SPEC = Path(SPEC_VALUE).expanduser() if SPEC_VALUE else None
 SPEC_SHA256 = "e95b8369c7abaf80948e34c61c1b5f803f4ad2ecc2138d78d62a98a81135af9b"
 PACKAGE_FILES = (
     "contexts/operational-system/README.md",
@@ -53,6 +56,10 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+@unittest.skipUnless(
+    SPEC is not None and SPEC.is_file(),
+    f"set {SPEC_ENV} to the historical external specification",
+)
 class Phase4ValidatorTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
