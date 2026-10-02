@@ -28,7 +28,7 @@ This is a multi-context repository:
             └── program/
 ```
 
-The root context owns the complete DobeWorks name, private-personal scope, identity, and provenance. The Operational System context owns hardware/software mission, roles, data and recovery classes, requirements, configuration, evidence, operations, maintenance, and retirement. AI-Workspace Workbench/Command Center terminology and DEGS policy remain external sources and are not redefined here.
+The root context owns the complete DobeWorks name, personal-project scope, public-source boundary, identity, and provenance. The Operational System context owns hardware/software mission, roles, data and recovery classes, requirements, configuration, evidence, operations, maintenance, and retirement. AI-Workspace Workbench/Command Center terminology and DEGS policy remain external sources and are not redefined here.
 
 ## Vocabulary
 

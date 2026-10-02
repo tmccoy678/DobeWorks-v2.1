@@ -2,7 +2,7 @@
 
 > **Status: PHASE 4 SYNTHETIC SOFTWARE CORE PRODUCED — `NOT_YET_QUALIFIED` — `NOT_YET_RELEASED`**
 
-The Operational System is the bounded DobeWorks context for Taylor's private hardware, software, storage, worker execution, telemetry, recovery, maintenance, and retirement. It does not redefine the DobeWorks name or identity, and it is not a public service or offering.
+The Operational System is the bounded DobeWorks context for hardware, software, storage, worker execution, telemetry, recovery, maintenance, and retirement. Its synthetic source examples are public in this repository. It does not redefine the DobeWorks name or identity, describe a deployed system, or provide a public service.
 
 ## Start here
 

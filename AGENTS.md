@@ -16,4 +16,4 @@ Assurance: before accepting changes to code, documents, validators, evidence, AI
 
 ### Domain docs
 
-The project uses the multi-context layout in `CONTEXT-MAP.md`. The root `CONTEXT.md` owns the DobeWorks name, private scope, identity, and provenance; `contexts/operational-system/CONTEXT.md` owns Operational System language. Cross-context decisions live under `docs/adr/`, and future context-specific decisions live with their context. See `docs/agents/domain.md`.
+The project uses the multi-context layout in `CONTEXT-MAP.md`. The root `CONTEXT.md` owns the DobeWorks name, personal-project scope, public-source boundary, identity, and provenance; `contexts/operational-system/CONTEXT.md` owns Operational System language. Cross-context decisions live under `docs/adr/`, and future context-specific decisions live with their context. See `docs/agents/domain.md`.
