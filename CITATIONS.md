@@ -40,3 +40,7 @@ The DobeWorks code and documentation are distributed under Apache-2.0 except whe
 ## Revised reading edition
 
 The dated [44-work APA edition](references/engineering-foundations-references.pdf), [HTML equivalent](references/engineering-foundations-references.html), and [verification audit](references/verification.md) apply supported corrections while retaining explicit access and metadata limits. The earlier `references/dobeworks-apa-references.pdf` remains byte-identical to the original. [Figure-specific citation notes](references/figure-citation-notes.md) document the additional source selections.
+
+## Model contributions
+
+- **Nova (Muse Spark, Meta).** 2026-10-05. Independent source-code review of the public v2.1 snapshot: full read of the phase-4 worker/observer cores and their validators, plus execution of the complete test suite (118 passed, 32 skipped, 31 subtests passed). Investigated the single pre-existing failure (`test_deep_json_is_rejected_without_traceback`) and fixed it: `observer_core._load` now enforces an explicit iterative JSON nesting-depth bound (`MAX_JSON_DEPTH = 100`) raising `INVALID_JSON`, so over-deep input is rejected deterministically instead of depending on interpreter recursion behavior. No other code changed. Prompt boundary: Taylor McCoy's chat request of 2026-10-05; no private DobeWorks materials were used or consulted. Human decisions (Taylor McCoy): scope of the fix, review publication.

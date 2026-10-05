@@ -16,6 +16,7 @@ SNAPSHOT_SCHEMA = "dobeworks.observer-snapshot.v1"
 POLICY_SCHEMA = "dobeworks.observer-policy.v1"
 RECORD_SCHEMA = "dobeworks.observer-record.v1"
 MAX_NODES = 256
+MAX_JSON_DEPTH = 100
 MAX_RETENTION_AGE_DAYS = 36500
 ROLE_ID = re.compile(r"^[A-Z]{2}-CANDIDATE-[0-9]{2}$")
 GENERATION = re.compile(r"^[a-z0-9][a-z0-9.-]{0,63}$")
@@ -79,6 +80,25 @@ def _utc(value: str) -> datetime:
     return parsed
 
 
+def _check_depth(value) -> None:
+    """Reject excessively nested JSON without recursion.
+
+    Whether json.loads raises RecursionError for deep input depends on
+    interpreter version and build, so enforce the bound explicitly and
+    iteratively. The rejection code is then deterministic: over-deep input
+    is INVALID_JSON on every interpreter, not an accident of C-stack depth.
+    """
+    stack = [(value, 1)]
+    while stack:
+        node, depth = stack.pop()
+        if depth > MAX_JSON_DEPTH:
+            raise ObserverRejected("INVALID_JSON", "JSON nesting exceeds limit")
+        if isinstance(node, dict):
+            stack.extend((child, depth + 1) for child in node.values())
+        elif isinstance(node, list):
+            stack.extend((child, depth + 1) for child in node)
+
+
 def _load(raw: bytes) -> dict:
     def reject_duplicates(pairs):
         result = {}
@@ -92,6 +112,7 @@ def _load(raw: bytes) -> dict:
         value = json.loads(raw.decode("utf-8"), object_pairs_hook=reject_duplicates)
     except (UnicodeDecodeError, json.JSONDecodeError, RecursionError) as error:
         raise ObserverRejected("INVALID_JSON", "input is not one UTF-8 JSON value") from error
+    _check_depth(value)
     if not isinstance(value, dict):
         raise ObserverRejected("INVALID_SCHEMA", "JSON root is not an object")
     return value
